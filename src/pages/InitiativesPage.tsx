@@ -8,24 +8,22 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import StatCard from '@/components/ui/stat-card';
+import InitiativeForm from '@/components/forms/initiatives/InitiativeForm';
 
 const InitiativesPage = () => {
   const { initiatives, targets, openSidePanel, extractPercentage } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter initiatives based on search query
   const filteredInitiatives = initiatives.filter(
     (initiative) =>
       initiative.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
-  // Calculate metrics for stat cards
   const totalInitiatives = initiatives.length;
   const activeInitiatives = initiatives.filter(i => i.status === 'in_progress').length;
   const totalSpend = initiatives.reduce((sum, i) => sum + i.spend, 0);
   const totalImpact = initiatives.reduce((sum, i) => sum + i.absolute, 0);
 
-  // Calculate the absolute value for an initiative: sum of target values * plan percentage
   const calculateInitiativeAbsoluteValue = (initiative: Initiative): number => {
     const initiativeTargets = targets.filter(t => initiative.targetIds.includes(t.id));
     
@@ -44,7 +42,6 @@ const InitiativesPage = () => {
     openSidePanel('view', 'initiative', initiative);
   };
 
-  // Helper function to get target names for an initiative
   const getTargetNames = (targetIds: string[]) => {
     return targetIds.map(id => {
       const target = targets.find(t => t.id === id);
@@ -52,7 +49,6 @@ const InitiativesPage = () => {
     }).join(', ');
   };
 
-  // Status color mapping
   const statusColorMap: Record<string, string> = {
     'not_started': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
     'in_progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -101,7 +97,6 @@ const InitiativesPage = () => {
       header: 'Absolute',
       accessorKey: 'absolute',
       cell: (initiative: Initiative) => {
-        // Use the calculated value from the current initiative
         return <span>{calculateInitiativeAbsoluteValue(initiative).toFixed(2)} tCO₂e</span>;
       }
     },
@@ -129,7 +124,6 @@ const InitiativesPage = () => {
         </Button>
       </div>
       
-      {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard 
           title="Total Initiatives" 

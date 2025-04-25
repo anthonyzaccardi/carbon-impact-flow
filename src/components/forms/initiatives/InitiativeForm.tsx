@@ -1,6 +1,5 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+
+import { Initiative } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,58 +18,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { useInitiativeForm } from "./useInitiativeForm";
+import { AssociatedTargets } from "./AssociatedTargets";
+import { TargetSelector } from "./TargetSelector";
 import { useAppContext } from "@/contexts/useAppContext";
-import { Initiative, InitiativeStatus, PlanType, TrajectoryType } from "@/types";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
-
-const formSchema = z.object({
-  name: z.string().min(3, {
-    message: "Initiative name must be at least 3 characters.",
-  }),
-  description: z.string().min(5, {
-    message: "Description must be at least 5 characters.",
-  }),
-  startDate: z.date({
-    required_error: "Start date is required.",
-  }),
-  endDate: z.date({
-    required_error: "End date is required.",
-  }),
-  status: z.enum(["not_started", "in_progress", "completed", "committed"], {
-    required_error: "Status is required.",
-  }),
-  spend: z.coerce.number().nonnegative({
-    message: "Spend amount must be a non-negative number.",
-  }),
-  trajectory: z.enum(["every_year", "linear"], {
-    required_error: "Trajectory type is required.",
-  }),
-  plan: z.enum(["-2%", "-4%", "-6%", "-8%", "-10%", "-15%", "-5%"], {
-    required_error: "Reduction plan is required.",
-  }),
-  currency: z.string().min(1, {
-    message: "Currency is required.",
-  }),
-  targetIds: z.array(z.string()).optional(),
-}).refine(data => data.endDate > data.startDate, {
-  message: "End date must be after start date",
-  path: ["endDate"],
-});
-
-type FormData = z.infer<typeof formSchema>;
 
 interface InitiativeFormProps {
   mode: "create" | "edit" | "view";
@@ -78,116 +39,18 @@ interface InitiativeFormProps {
   onClose: () => void;
 }
 
-const currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY"];
-const statusColorMap: Record<InitiativeStatus, string> = {
-  not_started: 'bg-yellow-100 text-yellow-800',
-  in_progress: 'bg-blue-100 text-blue-800',
-  completed: 'bg-green-100 text-green-800',
-  committed: 'bg-purple-100 text-purple-800',
-};
-
-const InitiativeForm: React.FC<InitiativeFormProps> = ({
-  mode,
-  initialData,
-  onClose,
-}) => {
-  const isViewMode = mode === "view";
-  const { 
-    createInitiative, 
-    updateInitiative, 
-    targets,
-    extractPercentage,
-    calculateTrackMeasurementsValue
-  } = useAppContext();
-
-  const defaultValues = initialData
-    ? {
-        ...initialData,
-        startDate: new Date(initialData.startDate),
-        endDate: new Date(initialData.endDate),
-        targetIds: initialData.targetIds || [],
-        description: initialData.description || ""
-      }
-    : {
-        name: "",
-        description: "",
-        startDate: new Date(),
-        endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
-        status: "not_started" as InitiativeStatus,
-        spend: 0,
-        trajectory: "linear" as TrajectoryType,
-        plan: "-6%" as PlanType,
-        currency: "USD",
-        targetIds: [],
-      };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
+const InitiativeForm = ({ mode, initialData, onClose }: InitiativeFormProps) => {
+  const { targets } = useAppContext();
+  const { form, selectedTargets, calculatedAbsolute, onSubmit, isViewMode } = useInitiativeForm({
+    mode,
+    initialData,
+    onClose,
   });
-
-  const watchTargetIds = form.watch("targetIds");
-  const watchPlan = form.watch("plan");
-  const watchSpend = form.watch("spend");
-
-  const [calculatedAbsolute, setCalculatedAbsolute] = useState(0);
-  const [selectedTargets, setSelectedTargets] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (watchTargetIds && watchTargetIds.length > 0) {
-      const targetsData = targets.filter(t => watchTargetIds.includes(t.id));
-      setSelectedTargets(targetsData);
-
-      let absoluteValue = 0;
-      
-      if (targetsData.length > 0) {
-        absoluteValue = targetsData.reduce((sum, target) => {
-          if (target.trackId) {
-            const trackMeasurementsValue = calculateTrackMeasurementsValue(target.trackId);
-            return sum + (trackMeasurementsValue * Math.abs(extractPercentage(watchPlan as PlanType)));
-          }
-          return sum;
-        }, 0);
-        
-        if (targetsData.length > 1) {
-          absoluteValue /= targetsData.length;
-        }
-      }
-      
-      setCalculatedAbsolute(absoluteValue);
-    } else {
-      setSelectedTargets([]);
-      setCalculatedAbsolute(0);
-    }
-  }, [watchTargetIds, watchPlan, targets, calculateTrackMeasurementsValue, extractPercentage]);
-
-  function onSubmit(data: FormData) {
-    const formattedData = {
-      ...data,
-      startDate: format(data.startDate, "yyyy-MM-dd"),
-      endDate: format(data.endDate, "yyyy-MM-dd"),
-      name: data.name,
-      description: data.description,
-      status: data.status as InitiativeStatus,
-      spend: data.spend,
-      trajectory: data.trajectory as TrajectoryType,
-      plan: data.plan as PlanType,
-      currency: data.currency,
-      targetIds: data.targetIds || [],
-      absolute: calculatedAbsolute,
-    };
-
-    if (mode === "create") {
-      createInitiative(formattedData);
-    } else if (mode === "edit" && initialData) {
-      updateInitiative(initialData.id, formattedData);
-    }
-    onClose();
-  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -246,6 +109,7 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
           )}
         />
 
+        {/* Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -279,7 +143,6 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
-                      className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
@@ -320,7 +183,6 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
-                      className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
@@ -330,6 +192,7 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
           />
         </div>
 
+        {/* Plan and Trajectory */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -389,25 +252,8 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
           />
         </div>
 
-        {isViewMode && selectedTargets.length > 0 && (
-          <Card className="bg-accent/50">
-            <CardContent className="pt-6">
-              <h3 className="text-sm font-medium mb-2">Impact Calculation</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Reduction Plan:</span>
-                  <p className="font-medium">{form.getValues().plan}</p>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Absolute Value:</span>
-                  <p className="font-medium">{calculatedAbsolute.toFixed(2)} tCO₂e</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Financial Information */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="spend"
@@ -444,11 +290,13 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {currencies.map((currency) => (
-                      <SelectItem key={currency} value={currency}>
-                        {currency}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="GBP">GBP</SelectItem>
+                    <SelectItem value="CAD">CAD</SelectItem>
+                    <SelectItem value="AUD">AUD</SelectItem>
+                    <SelectItem value="JPY">JPY</SelectItem>
+                    <SelectItem value="CNY">CNY</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -457,91 +305,64 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
           />
         </div>
 
-        {!isViewMode && (
+        {/* Impact Calculation */}
+        {isViewMode && selectedTargets.length > 0 && (
+          <Card className="bg-accent/50">
+            <CardContent className="pt-6">
+              <h3 className="text-sm font-medium mb-2">Impact Calculation</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Reduction Plan:</span>
+                  <p className="font-medium">{form.getValues().plan}</p>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Absolute Value:</span>
+                  <p className="font-medium">{calculatedAbsolute.toFixed(2)} tCO₂e</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Target Selection */}
+        {!isViewMode ? (
           <FormField
             control={form.control}
             name="targetIds"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Associated Targets</FormLabel>
-                <div className="border rounded-md p-4 space-y-2">
-                  {targets.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No targets available</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {targets.map((target) => {
-                        const isSelected = field.value?.includes(target.id) || false;
-                        return (
-                          <div 
-                            key={target.id}
-                            className={cn(
-                              "flex items-center justify-between p-2 rounded-md",
-                              isSelected ? "bg-primary/10" : "hover:bg-muted cursor-pointer"
-                            )}
-                            onClick={() => {
-                              const currentTargets = field.value || [];
-                              const newTargets = isSelected 
-                                ? currentTargets.filter(id => id !== target.id)
-                                : [...currentTargets, target.id];
-                              field.onChange(newTargets);
-                            }}
-                          >
-                            <div className="flex items-center space-x-2">
-                              {isSelected && <Check className="h-4 w-4 text-primary" />}
-                              <span className="text-sm font-medium">{target.name}</span>
-                              <Badge variant="outline" className="text-xs">
-                                {target.targetPercentage}% reduction
-                              </Badge>
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              By {format(new Date(target.targetDate), 'MMM d, yyyy')}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                <div className="border rounded-md p-4">
+                  <TargetSelector
+                    targets={targets}
+                    selectedTargets={field.value || []}
+                    onSelect={(targetId) => {
+                      const currentTargets = field.value || [];
+                      const newTargets = currentTargets.includes(targetId)
+                        ? currentTargets.filter(id => id !== targetId)
+                        : [...currentTargets, targetId];
+                      field.onChange(newTargets);
+                    }}
+                    disabled={isViewMode}
+                  />
                 </div>
                 <FormMessage />
               </FormItem>
             )}
           />
+        ) : (
+          <AssociatedTargets targets={selectedTargets} isViewMode />
         )}
 
-        {isViewMode && initialData?.targetIds.length > 0 && (
-          <div>
-            <h3 className="text-sm font-medium mb-2">Associated Targets</h3>
-            <div className="border rounded-md p-4 space-y-2">
-              {selectedTargets.map((target) => (
-                <div 
-                  key={target.id}
-                  className="flex items-center justify-between p-2 rounded-md bg-muted"
-                >
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium">{target.name}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {target.targetPercentage}% reduction
-                    </Badge>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    By {format(new Date(target.targetDate), 'MMM d, yyyy')}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!isViewMode && (
+        {/* Form Actions */}
+        {!isViewMode ? (
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={onClose} type="button">
               Cancel
             </Button>
             <Button type="submit">Save</Button>
           </div>
-        )}
-        
-        {isViewMode && (
+        ) : (
           <div className="flex justify-end">
             <Button variant="outline" onClick={onClose} type="button">
               Close
