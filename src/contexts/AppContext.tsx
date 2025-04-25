@@ -1,0 +1,393 @@
+
+import { createContext, useState, useContext, ReactNode } from 'react';
+import { SidePanel, Track, Factor, Measurement, Target, Initiative, Scenario, Supplier } from '../types';
+import { 
+  tracks as initialTracks,
+  factors as initialFactors,
+  measurements as initialMeasurements,
+  targets as initialTargets,
+  initiatives as initialInitiatives,
+  scenarios as initialScenarios,
+  suppliers as initialSuppliers
+} from '../data/sample-data';
+import { toast } from 'sonner';
+
+interface AppContextType {
+  // Data
+  tracks: Track[];
+  factors: Factor[];
+  measurements: Measurement[];
+  targets: Target[];
+  initiatives: Initiative[];
+  scenarios: Scenario[];
+  suppliers: Supplier[];
+  
+  // Side panel state
+  sidePanel: SidePanel;
+  
+  // UI state
+  sidebarExpanded: boolean;
+  
+  // Actions
+  openSidePanel: (type: 'create' | 'edit' | 'view', entityType: SidePanel['entityType'], data?: any) => void;
+  closeSidePanel: () => void;
+  toggleSidebar: () => void;
+  
+  // CRUD operations
+  createTrack: (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateTrack: (id: string, track: Partial<Track>) => void;
+  deleteTrack: (id: string) => void;
+  
+  createFactor: (factor: Omit<Factor, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateFactor: (id: string, factor: Partial<Factor>) => void;
+  deleteFactor: (id: string) => void;
+  
+  createMeasurement: (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => void;
+  updateMeasurement: (id: string, measurement: Partial<Measurement>) => void;
+  deleteMeasurement: (id: string) => void;
+  
+  createTarget: (target: Omit<Target, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateTarget: (id: string, target: Partial<Target>) => void;
+  deleteTarget: (id: string) => void;
+  
+  createInitiative: (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => void;
+  updateInitiative: (id: string, initiative: Partial<Initiative>) => void;
+  deleteInitiative: (id: string) => void;
+  
+  createScenario: (scenario: Omit<Scenario, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateScenario: (id: string, scenario: Partial<Scenario>) => void;
+  deleteScenario: (id: string) => void;
+  
+  createSupplier: (supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateSupplier: (id: string, supplier: Partial<Supplier>) => void;
+  deleteSupplier: (id: string) => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+  // Data state
+  const [tracks, setTracks] = useState<Track[]>(initialTracks);
+  const [factors, setFactors] = useState<Factor[]>(initialFactors);
+  const [measurements, setMeasurements] = useState<Measurement[]>(initialMeasurements);
+  const [targets, setTargets] = useState<Target[]>(initialTargets);
+  const [initiatives, setInitiatives] = useState<Initiative[]>(initialInitiatives);
+  const [scenarios, setScenarios] = useState<Scenario[]>(initialScenarios);
+  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
+  
+  // UI state
+  const [sidePanel, setSidePanel] = useState<SidePanel>({
+    isOpen: false,
+    type: 'view',
+    entityType: 'track'
+  });
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  
+  // Helper function to generate IDs and timestamps
+  const generateId = (prefix: string) => `${prefix}-${Date.now()}`;
+  const getCurrentTimestamp = () => new Date().toISOString();
+  
+  // Side panel actions
+  const openSidePanel = (type: 'create' | 'edit' | 'view', entityType: SidePanel['entityType'], data?: any) => {
+    setSidePanel({ isOpen: true, type, entityType, data });
+  };
+  
+  const closeSidePanel = () => {
+    setSidePanel(prev => ({ ...prev, isOpen: false }));
+  };
+  
+  const toggleSidebar = () => {
+    setSidebarExpanded(prev => !prev);
+  };
+  
+  // Calculate values for measurements based on factors
+  const calculateMeasurementValue = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
+    const factor = factors.find(f => f.id === measurement.factorId);
+    if (!factor) return 0;
+    return measurement.quantity * factor.value;
+  };
+  
+  // Calculate values for initiatives based on targets
+  const calculateInitiativeValue = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
+    const target = targets.find(t => t.id === initiative.targetId);
+    if (!target) return 0;
+    return target.baselineValue * (initiative.impactPercentage / 100);
+  };
+  
+  // CRUD operations for tracks
+  const createTrack = (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newTrack: Track = {
+      ...track,
+      id: generateId('track'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    setTracks([...tracks, newTrack]);
+    toast.success(`Created track: ${track.name}`);
+  };
+  
+  const updateTrack = (id: string, track: Partial<Track>) => {
+    setTracks(tracks.map(t => 
+      t.id === id ? { ...t, ...track, updatedAt: getCurrentTimestamp() } : t
+    ));
+    toast.success(`Updated track: ${track.name || id}`);
+  };
+  
+  const deleteTrack = (id: string) => {
+    setTracks(tracks.filter(t => t.id !== id));
+    toast.success(`Deleted track: ${id}`);
+  };
+  
+  // CRUD operations for factors
+  const createFactor = (factor: Omit<Factor, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newFactor: Factor = {
+      ...factor,
+      id: generateId('factor'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    setFactors([...factors, newFactor]);
+    toast.success(`Created factor: ${factor.name}`);
+  };
+  
+  const updateFactor = (id: string, factor: Partial<Factor>) => {
+    setFactors(factors.map(f => 
+      f.id === id ? { ...f, ...factor, updatedAt: getCurrentTimestamp() } : f
+    ));
+    toast.success(`Updated factor: ${factor.name || id}`);
+  };
+  
+  const deleteFactor = (id: string) => {
+    setFactors(factors.filter(f => f.id !== id));
+    toast.success(`Deleted factor: ${id}`);
+  };
+  
+  // CRUD operations for measurements
+  const createMeasurement = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
+    const calculatedValue = calculateMeasurementValue(measurement);
+    
+    const newMeasurement: Measurement = {
+      ...measurement,
+      calculatedValue,
+      id: generateId('measurement'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    
+    setMeasurements([...measurements, newMeasurement]);
+    toast.success(`Created measurement with value: ${calculatedValue} ${
+      tracks.find(t => t.id === measurement.trackId)?.unit || ''
+    }`);
+  };
+  
+  const updateMeasurement = (id: string, measurement: Partial<Measurement>) => {
+    let updatedMeasurement: Partial<Measurement> = { ...measurement };
+    
+    // If quantity or factorId changed, recalculate the value
+    if (measurement.quantity !== undefined || measurement.factorId !== undefined) {
+      const currentMeasurement = measurements.find(m => m.id === id);
+      if (currentMeasurement) {
+        const newMeasurement = {
+          ...currentMeasurement,
+          ...measurement
+        };
+        updatedMeasurement.calculatedValue = calculateMeasurementValue(newMeasurement);
+      }
+    }
+    
+    setMeasurements(measurements.map(m => 
+      m.id === id ? { ...m, ...updatedMeasurement, updatedAt: getCurrentTimestamp() } : m
+    ));
+    
+    toast.success(`Updated measurement: ${id}`);
+  };
+  
+  const deleteMeasurement = (id: string) => {
+    setMeasurements(measurements.filter(m => m.id !== id));
+    toast.success(`Deleted measurement: ${id}`);
+  };
+  
+  // CRUD operations for targets
+  const createTarget = (target: Omit<Target, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newTarget: Target = {
+      ...target,
+      id: generateId('target'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    
+    setTargets([...targets, newTarget]);
+    toast.success(`Created target: ${target.name}`);
+  };
+  
+  const updateTarget = (id: string, target: Partial<Target>) => {
+    setTargets(targets.map(t => 
+      t.id === id ? { ...t, ...target, updatedAt: getCurrentTimestamp() } : t
+    ));
+    
+    // If baselineValue or targetPercentage changed, update related initiatives
+    if (target.baselineValue !== undefined || target.targetPercentage !== undefined) {
+      const relatedInitiatives = initiatives.filter(i => i.targetId === id);
+      relatedInitiatives.forEach(initiative => {
+        const updatedTarget = targets.find(t => t.id === id);
+        if (updatedTarget) {
+          const calculatedValue = updatedTarget.baselineValue * (initiative.impactPercentage / 100);
+          updateInitiative(initiative.id, { calculatedValue });
+        }
+      });
+    }
+    
+    toast.success(`Updated target: ${target.name || id}`);
+  };
+  
+  const deleteTarget = (id: string) => {
+    setTargets(targets.filter(t => t.id !== id));
+    toast.success(`Deleted target: ${id}`);
+  };
+  
+  // CRUD operations for initiatives
+  const createInitiative = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
+    const calculatedValue = calculateInitiativeValue(initiative);
+    
+    const newInitiative: Initiative = {
+      ...initiative,
+      calculatedValue,
+      id: generateId('initiative'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    
+    setInitiatives([...initiatives, newInitiative]);
+    toast.success(`Created initiative: ${initiative.name}`);
+  };
+  
+  const updateInitiative = (id: string, initiative: Partial<Initiative>) => {
+    let updatedInitiative: Partial<Initiative> = { ...initiative };
+    
+    // If impactPercentage changed or targetId changed, recalculate the value
+    if (initiative.impactPercentage !== undefined || initiative.targetId !== undefined) {
+      const currentInitiative = initiatives.find(i => i.id === id);
+      if (currentInitiative) {
+        const newInitiative = {
+          ...currentInitiative,
+          ...initiative
+        };
+        updatedInitiative.calculatedValue = calculateInitiativeValue(newInitiative);
+      }
+    }
+    
+    setInitiatives(initiatives.map(i => 
+      i.id === id ? { ...i, ...updatedInitiative, updatedAt: getCurrentTimestamp() } : i
+    ));
+    
+    toast.success(`Updated initiative: ${initiative.name || id}`);
+  };
+  
+  const deleteInitiative = (id: string) => {
+    setInitiatives(initiatives.filter(i => i.id !== id));
+    toast.success(`Deleted initiative: ${id}`);
+  };
+  
+  // CRUD operations for scenarios
+  const createScenario = (scenario: Omit<Scenario, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newScenario: Scenario = {
+      ...scenario,
+      id: generateId('scenario'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    
+    setScenarios([...scenarios, newScenario]);
+    toast.success(`Created scenario: ${scenario.name}`);
+  };
+  
+  const updateScenario = (id: string, scenario: Partial<Scenario>) => {
+    setScenarios(scenarios.map(s => 
+      s.id === id ? { ...s, ...scenario, updatedAt: getCurrentTimestamp() } : s
+    ));
+    toast.success(`Updated scenario: ${scenario.name || id}`);
+  };
+  
+  const deleteScenario = (id: string) => {
+    setScenarios(scenarios.filter(s => s.id !== id));
+    toast.success(`Deleted scenario: ${id}`);
+  };
+  
+  // CRUD operations for suppliers
+  const createSupplier = (supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newSupplier: Supplier = {
+      ...supplier,
+      id: generateId('supplier'),
+      createdAt: getCurrentTimestamp(),
+      updatedAt: getCurrentTimestamp()
+    };
+    
+    setSuppliers([...suppliers, newSupplier]);
+    toast.success(`Created supplier: ${supplier.name}`);
+  };
+  
+  const updateSupplier = (id: string, supplier: Partial<Supplier>) => {
+    setSuppliers(suppliers.map(s => 
+      s.id === id ? { ...s, ...supplier, updatedAt: getCurrentTimestamp() } : s
+    ));
+    toast.success(`Updated supplier: ${supplier.name || id}`);
+  };
+  
+  const deleteSupplier = (id: string) => {
+    setSuppliers(suppliers.filter(s => s.id !== id));
+    toast.success(`Deleted supplier: ${id}`);
+  };
+  
+  const value = {
+    // Data
+    tracks,
+    factors,
+    measurements,
+    targets,
+    initiatives,
+    scenarios,
+    suppliers,
+    
+    // UI state
+    sidePanel,
+    sidebarExpanded,
+    
+    // Actions
+    openSidePanel,
+    closeSidePanel,
+    toggleSidebar,
+    
+    // CRUD operations
+    createTrack,
+    updateTrack,
+    deleteTrack,
+    createFactor,
+    updateFactor,
+    deleteFactor,
+    createMeasurement,
+    updateMeasurement,
+    deleteMeasurement,
+    createTarget,
+    updateTarget,
+    deleteTarget,
+    createInitiative,
+    updateInitiative,
+    deleteInitiative,
+    createScenario,
+    updateScenario,
+    deleteScenario,
+    createSupplier,
+    updateSupplier,
+    deleteSupplier
+  };
+  
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (context === undefined) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
+};
