@@ -7,13 +7,14 @@ import {
   Home, 
   BarChart, 
   Database, 
-  Target, 
   Activity, 
+  Target, 
   Users,
   Settings,
   ChevronLeft,
   ChevronRight,
-  Lightbulb
+  Lightbulb,
+  PlayCircle
 } from 'lucide-react';
 
 const NavItem = ({ 
@@ -40,6 +41,44 @@ const NavItem = ({
         <Icon className="h-5 w-5" />
         {expanded && <span className="ml-3 text-sm">{label}</span>}
       </NavLink>
+    </li>
+  );
+};
+
+const NavGroupItem = ({ 
+  label, 
+  icon: Icon, 
+  expanded,
+  children 
+}: { 
+  label: string; 
+  icon: React.ElementType; 
+  expanded: boolean;
+  children: React.ReactNode;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <li className="mb-1">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center w-full p-2 rounded-md transition-colors duration-200
+          hover:bg-primary/5 text-foreground/80
+          ${expanded ? 'justify-start' : 'justify-center'}`}
+      >
+        <Icon className="h-5 w-5" />
+        {expanded && (
+          <>
+            <span className="ml-3 text-sm flex-grow text-left">{label}</span>
+            <ChevronRight className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+          </>
+        )}
+      </button>
+      {(isOpen || !expanded) && (
+        <ul className={`${expanded ? 'ml-7' : 'mt-1'} space-y-1`}>
+          {children}
+        </ul>
+      )}
     </li>
   );
 };
@@ -72,9 +111,14 @@ const Sidebar = () => {
           <NavItem to="/tracks" icon={BarChart} label="Tracks" expanded={sidebarExpanded} />
           <NavItem to="/factors" icon={Database} label="Factors" expanded={sidebarExpanded} />
           <NavItem to="/measurements" icon={Activity} label="Measurements" expanded={sidebarExpanded} />
-          <NavItem to="/targets" icon={Target} label="Targets" expanded={sidebarExpanded} />
-          <NavItem to="/initiatives" icon={Lightbulb} label="Initiatives" expanded={sidebarExpanded} />
-          <NavItem to="/scenarios" icon={Settings} label="Scenarios" expanded={sidebarExpanded} />
+          
+          {/* Act group with sub-navigation */}
+          <NavGroupItem icon={PlayCircle} label="Act" expanded={sidebarExpanded}>
+            <NavItem to="/targets" icon={Target} label="Targets" expanded={sidebarExpanded} />
+            <NavItem to="/initiatives" icon={Lightbulb} label="Initiatives" expanded={sidebarExpanded} />
+            <NavItem to="/scenarios" icon={Settings} label="Scenarios" expanded={sidebarExpanded} />
+          </NavGroupItem>
+          
           <NavItem to="/suppliers" icon={Users} label="Suppliers" expanded={sidebarExpanded} />
         </ul>
       </nav>

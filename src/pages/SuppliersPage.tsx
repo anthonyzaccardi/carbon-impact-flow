@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 const SuppliersPage = () => {
-  const { suppliers, measurements, targets, openSidePanel } = useAppContext();
+  const { suppliers, targets, openSidePanel } = useAppContext();
   
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -16,20 +16,14 @@ const SuppliersPage = () => {
   const filteredSuppliers = suppliers.filter(supplier => 
     supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.industry.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supplier.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   // Metrics
   const totalSuppliers = suppliers.length;
-  const activeSuppliers = suppliers.filter(s => s.status === 'active').length;
   
   // Get association counts for each supplier
-  const getMeasurementCount = (supplierId) => {
-    return measurements.filter(m => m.supplierId === supplierId).length;
-  };
-  
   const getTargetCount = (supplierId) => {
     return targets.filter(t => t.supplierId === supplierId).length;
   };
@@ -45,10 +39,6 @@ const SuppliersPage = () => {
       accessorKey: "industry",
     },
     {
-      header: "Location",
-      accessorKey: "location",
-    },
-    {
       header: "Contact",
       accessorKey: "contactPerson",
       cell: (item) => (
@@ -59,18 +49,13 @@ const SuppliersPage = () => {
       ),
     },
     {
-      header: "Measurements",
-      accessorKey: "measurements",
-      cell: (item) => getMeasurementCount(item.id),
-    },
-    {
       header: "Targets",
       accessorKey: "targets",
       cell: (item) => getTargetCount(item.id),
     },
     {
-      header: "Status",
-      accessorKey: "status",
+      header: "Currency",
+      accessorKey: "currency",
     }
   ];
 
@@ -106,12 +91,12 @@ const SuppliersPage = () => {
           value={totalSuppliers}
         />
         <StatCard 
-          title="Active Suppliers" 
-          value={activeSuppliers}
-        />
-        <StatCard 
           title="Industries" 
           value={new Set(suppliers.map(s => s.industry)).size}
+        />
+        <StatCard 
+          title="Suppliers with Targets" 
+          value={suppliers.filter(s => getTargetCount(s.id) > 0).length}
         />
       </div>
       

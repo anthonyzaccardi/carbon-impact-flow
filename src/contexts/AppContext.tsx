@@ -34,7 +34,7 @@ interface AppContextType {
   toggleSidebar: () => void;
   
   // CRUD operations
-  createTrack: (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  createTrack: (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt' | 'totalEmissions'>) => void;
   updateTrack: (id: string, track: Partial<Track>) => void;
   deleteTrack: (id: string) => void;
   
@@ -42,11 +42,11 @@ interface AppContextType {
   updateFactor: (id: string, factor: Partial<Factor>) => void;
   deleteFactor: (id: string) => void;
   
-  createMeasurement: (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => void;
+  createMeasurement: (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue' | 'unit'>) => void;
   updateMeasurement: (id: string, measurement: Partial<Measurement>) => void;
   deleteMeasurement: (id: string) => void;
   
-  createTarget: (target: Omit<Target, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  createTarget: (target: Omit<Target, 'id' | 'createdAt' | 'updatedAt' | 'targetValue'>) => void;
   updateTarget: (id: string, target: Partial<Target>) => void;
   deleteTarget: (id: string) => void;
   
@@ -68,13 +68,19 @@ interface AppContextType {
   // Utility functions
   calculateTrackMeasurementsValue: (trackId: string) => number;
   extractPercentage: (plan: PlanType) => number;
+  getFactorUnit: (factorId: string) => string;
+  getInitiativesForTarget: (targetId: string) => Initiative[];
+  getTrackStats: (trackId: string) => { factorsCount: number; measurementsCount: number; targetsCount: number };
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   // Data state
-  const [tracks, setTracks] = useState<Track[]>(initialTracks);
+  const [tracks, setTracks] = useState<Track[]>(initialTracks.map(track => ({
+    ...track,
+    totalEmissions: 0 // Set initially to 0, will be calculated in useEffect
+  })));
   const [factors, setFactors] = useState<Factor[]>(initialFactors);
   const [measurements, setMeasurements] = useState<Measurement[]>(initialMeasurements);
   const [targets, setTargets] = useState<Target[]>(initialTargets);
@@ -117,8 +123,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return parseFloat(plan.replace('%', '')) / 100;
   };
   
+  const getFactorUnit = (factorId: string): string => {
+    const factor = factors.find(f => f.id === factorId);
+    return factor ? factor.unit : 'tCO2e';
+  };
+  
+  const getInitiativesForTarget = (targetId: string): Initiative[] => {
+    return initiatives.filter(i => i.targetIds.includes(targetId));
+  };
+  
+  const getTrackStats = (trackId: string) => {
+    return {
+      factorsCount: factors.filter(f => f.trackId === trackId).length,
+      measurementsCount: measurements.filter(m => m.trackId === trackId).length,
+      targetsCount: targets.filter(t => t.trackId === trackId).length
+    };
+  };
+  
   // Calculate values for measurements based on factors
-  const calculateMeasurementValue = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
+  const calculateMeasurementValue = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue' | 'unit'>) => {
     const factor = factors.find(f => f.id === measurement.factorId);
     if (!factor) return 0;
     return measurement.quantity * factor.value;
@@ -132,19 +155,41 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (initiativeTargets.length > 0) {
       absolute = initiativeTargets.reduce((sum, target) => {
         if (target.trackId) {
-          const trackMeasurementsValue = calculateTrackMeasurementsValue(target.trackId);
-          return sum + (trackMeasurementsValue * Math.abs(extractPercentage(initiative.plan)));
+          return sum + (target.targetValue * Math.abs(extractPercentage(initiative.plan)));
         }
         return sum;
       }, 0);
-      
-      if (initiativeTargets.length > 1) {
-        absolute /= initiativeTargets.length;
-      }
     }
     
     return absolute;
   };
+  
+  // Update track total emissions based on measurements
+  useEffect(() => {
+    const updatedTracks = tracks.map(track => {
+      const totalEmissions = calculateTrackMeasurementsValue(track.id);
+      return { ...track, totalEmissions };
+    });
+    
+    if (JSON.stringify(updatedTracks) !== JSON.stringify(tracks)) {
+      setTracks(updatedTracks);
+    }
+  }, [measurements]);
+  
+  // Update target values based on percentage
+  useEffect(() => {
+    const updatedTargets = targets.map(target => {
+      const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+      if (target.targetValue !== targetValue) {
+        return { ...target, targetValue };
+      }
+      return target;
+    });
+    
+    if (JSON.stringify(updatedTargets) !== JSON.stringify(targets)) {
+      setTargets(updatedTargets);
+    }
+  }, [targets]);
   
   // Update absolute values when related data changes
   useEffect(() => {
@@ -156,12 +201,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (JSON.stringify(updatedInitiatives) !== JSON.stringify(initiatives)) {
       setInitiatives(updatedInitiatives);
     }
-  }, [measurements, targets, initiatives]);
+  }, [targets, initiatives]);
   
   // CRUD operations for tracks
-  const createTrack = (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const createTrack = (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt' | 'totalEmissions'>) => {
     const newTrack: Track = {
       ...track,
+      totalEmissions: 0,
       id: generateId('track'),
       createdAt: getCurrentTimestamp(),
       updatedAt: getCurrentTimestamp()
@@ -178,6 +224,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const deleteTrack = (id: string) => {
+    // Check for dependencies first
+    const hasFactors = factors.some(f => f.trackId === id);
+    const hasMeasurements = measurements.some(m => m.trackId === id);
+    const hasTargets = targets.some(t => t.trackId === id);
+    
+    if (hasFactors || hasMeasurements || hasTargets) {
+      toast.error(`Cannot delete track: it's in use by factors, measurements, or targets`);
+      return;
+    }
+    
     setTracks(tracks.filter(t => t.id !== id));
     toast.success(`Deleted track: ${id}`);
   };
@@ -202,16 +258,31 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const deleteFactor = (id: string) => {
+    // Check if factor is in use by measurements
+    const hasMeasurements = measurements.some(m => m.factorId === id);
+    
+    if (hasMeasurements) {
+      toast.error(`Cannot delete factor: it's in use by measurements`);
+      return;
+    }
+    
     setFactors(factors.filter(f => f.id !== id));
     toast.success(`Deleted factor: ${id}`);
   };
   
   // CRUD operations for measurements
-  const createMeasurement = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
+  const createMeasurement = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue' | 'unit'>) => {
+    const factor = factors.find(f => f.id === measurement.factorId);
+    if (!factor) {
+      toast.error(`Factor not found`);
+      return;
+    }
+    
     const calculatedValue = calculateMeasurementValue(measurement);
     
     const newMeasurement: Measurement = {
       ...measurement,
+      unit: factor.unit,
       calculatedValue,
       id: generateId('measurement'),
       createdAt: getCurrentTimestamp(),
@@ -219,9 +290,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
     
     setMeasurements([...measurements, newMeasurement]);
-    toast.success(`Created measurement with value: ${calculatedValue} ${
-      tracks.find(t => t.id === measurement.trackId)?.unit || ''
-    }`);
+    toast.success(`Created measurement with value: ${calculatedValue} ${factor.unit}`);
   };
   
   const updateMeasurement = (id: string, measurement: Partial<Measurement>) => {
@@ -235,7 +304,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           ...currentMeasurement,
           ...measurement
         };
-        updatedMeasurement.calculatedValue = calculateMeasurementValue(newMeasurement);
+        
+        // If factor changed, update unit
+        if (measurement.factorId) {
+          const factor = factors.find(f => f.id === measurement.factorId);
+          if (factor) {
+            updatedMeasurement.unit = factor.unit;
+          }
+        }
+        
+        updatedMeasurement.calculatedValue = calculateMeasurementValue({
+          trackId: newMeasurement.trackId,
+          factorId: newMeasurement.factorId,
+          date: newMeasurement.date,
+          quantity: newMeasurement.quantity,
+          supplierId: newMeasurement.supplierId
+        });
       }
     }
     
@@ -252,9 +336,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   // CRUD operations for targets
-  const createTarget = (target: Omit<Target, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const createTarget = (target: Omit<Target, 'id' | 'createdAt' | 'updatedAt' | 'targetValue'>) => {
+    const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+    
     const newTarget: Target = {
       ...target,
+      targetValue,
       id: generateId('target'),
       createdAt: getCurrentTimestamp(),
       updatedAt: getCurrentTimestamp()
@@ -265,26 +352,32 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const updateTarget = (id: string, target: Partial<Target>) => {
+    // Auto-calculate targetValue if baselineValue or targetPercentage is updated
+    if (target.baselineValue !== undefined || target.targetPercentage !== undefined) {
+      const currentTarget = targets.find(t => t.id === id);
+      if (currentTarget) {
+        const baselineValue = target.baselineValue !== undefined ? target.baselineValue : currentTarget.baselineValue;
+        const targetPercentage = target.targetPercentage !== undefined ? target.targetPercentage : currentTarget.targetPercentage;
+        target.targetValue = baselineValue * (1 - (targetPercentage / 100));
+      }
+    }
+    
     setTargets(targets.map(t => 
       t.id === id ? { ...t, ...target, updatedAt: getCurrentTimestamp() } : t
     ));
-    
-    // If baselineValue or targetPercentage changed, update related initiatives
-    if (target.baselineValue !== undefined || target.targetPercentage !== undefined) {
-      // Since we now use targetIds array, we need to find all initiatives that include this target
-      const relatedInitiatives = initiatives.filter(i => i.targetIds.includes(id));
-      
-      // Recalculate absolute values for all affected initiatives
-      relatedInitiatives.forEach(initiative => {
-        const absolute = calculateInitiativeAbsoluteValue(initiative);
-        updateInitiative(initiative.id, { absolute });
-      });
-    }
     
     toast.success(`Updated target: ${target.name || id}`);
   };
   
   const deleteTarget = (id: string) => {
+    // Check if target is used in initiatives
+    const usedInInitiatives = initiatives.some(i => i.targetIds.includes(id));
+    
+    if (usedInInitiatives) {
+      toast.error(`Cannot delete target: it's used in initiatives`);
+      return;
+    }
+    
     setTargets(targets.filter(t => t.id !== id));
     toast.success(`Deleted target: ${id}`);
   };
@@ -372,6 +465,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const deleteScenario = (id: string) => {
+    // Check if scenario is used in targets
+    const hasTargets = targets.some(t => t.scenarioId === id);
+    
+    if (hasTargets) {
+      toast.error(`Cannot delete scenario: it's used in targets`);
+      return;
+    }
+    
     setScenarios(scenarios.filter(s => s.id !== id));
     toast.success(`Deleted scenario: ${id}`);
   };
@@ -397,6 +498,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const deleteSupplier = (id: string) => {
+    // Check if supplier is used in measurements or targets
+    const usedInMeasurements = measurements.some(m => m.supplierId === id);
+    const usedInTargets = targets.some(t => t.supplierId === id);
+    
+    if (usedInMeasurements || usedInTargets) {
+      toast.error(`Cannot delete supplier: it's used in measurements or targets`);
+      return;
+    }
+    
     setSuppliers(suppliers.filter(s => s.id !== id));
     toast.success(`Deleted supplier: ${id}`);
   };
@@ -448,7 +558,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     
     // Utility functions
     calculateTrackMeasurementsValue,
-    extractPercentage
+    extractPercentage,
+    getFactorUnit,
+    getInitiativesForTarget,
+    getTrackStats
   };
   
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -8,6 +8,7 @@ import { Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import StatCard from '@/components/ui/stat-card';
 
 const InitiativesPage = () => {
   const { initiatives, targets, openSidePanel } = useAppContext();
@@ -16,9 +17,14 @@ const InitiativesPage = () => {
   // Filter initiatives based on search query
   const filteredInitiatives = initiatives.filter(
     (initiative) =>
-      initiative.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      initiative.description.toLowerCase().includes(searchQuery.toLowerCase())
+      initiative.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  // Calculate metrics for stat cards
+  const totalInitiatives = initiatives.length;
+  const activeInitiatives = initiatives.filter(i => i.status === 'in_progress').length;
+  const totalSpend = initiatives.reduce((sum, i) => sum + i.spend, 0);
+  const totalImpact = initiatives.reduce((sum, i) => sum + i.absolute, 0);
 
   const handleCreateInitiative = () => {
     openSidePanel('create', 'initiative');
@@ -100,11 +106,37 @@ const InitiativesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Initiatives</h1>
+        <div>
+          <h1 className="text-2xl font-bold">Initiatives</h1>
+          <p className="text-muted-foreground">
+            Manage climate action initiatives and interventions
+          </p>
+        </div>
         <Button onClick={handleCreateInitiative}>
           <Plus className="mr-2 h-4 w-4" />
           Add Initiative
         </Button>
+      </div>
+      
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard 
+          title="Total Initiatives" 
+          value={totalInitiatives}
+        />
+        <StatCard 
+          title="Active Initiatives" 
+          value={activeInitiatives}
+        />
+        <StatCard 
+          title="Total Spend" 
+          value={`${totalSpend.toLocaleString()} USD`}
+        />
+        <StatCard 
+          title="Total Impact" 
+          value={`${totalImpact.toFixed(2)} tCO₂e`}
+          description="Calculated reduction"
+        />
       </div>
       
       <div className="relative">

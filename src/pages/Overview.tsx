@@ -4,7 +4,6 @@ import StatCard from "@/components/ui/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
-  TrendingUp,
   TrendingDown,
   Target,
   Users,
@@ -20,7 +19,6 @@ import {
   Cell,
   Legend,
 } from 'recharts';
-import { useNavigate } from "react-router-dom";
 
 const Overview = () => {
   const { 
@@ -32,8 +30,6 @@ const Overview = () => {
     scenarios,
     suppliers,
   } = useAppContext();
-  
-  const navigate = useNavigate();
 
   // Calculate total emissions across all tracks
   const totalEmissions = tracks.reduce((sum, track) => sum + track.totalEmissions, 0);
@@ -103,12 +99,11 @@ const Overview = () => {
         />
       </div>
       
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Emissions by Category */}
+      {/* Emissions by Tracks Chart */}
+      <div className="grid grid-cols-1 gap-6">
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Emissions by Category</CardTitle>
+            <CardTitle>Emissions by Tracks</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -161,59 +156,6 @@ const Overview = () => {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        
-        {/* Quick Actions Card */}
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Quick Links</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div 
-                className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => navigate('/tracks')}
-              >
-                <BarChart className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-medium">Tracks</h3>
-                <p className="text-sm text-muted-foreground">
-                  Manage emission categories
-                </p>
-              </div>
-              <div 
-                className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => navigate('/factors')}
-              >
-                <TrendingUp className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-medium">Factors</h3>
-                <p className="text-sm text-muted-foreground">
-                  Update conversion factors
-                </p>
-              </div>
-              <div 
-                className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => navigate('/targets')}
-              >
-                <Target className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-medium">Targets</h3>
-                <p className="text-sm text-muted-foreground">
-                  Set reduction goals
-                </p>
-              </div>
-              <div 
-                className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => navigate('/suppliers')}
-              >
-                <Users className="h-8 w-8 mb-2 text-primary" />
-                <h3 className="font-medium">Suppliers</h3>
-                <p className="text-sm text-muted-foreground">
-                  Manage organizations
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Recent Activity (could be implemented in a later version) */}
       </div>
     </div>
   );

@@ -8,10 +8,7 @@ export interface Track {
   id: string;
   name: string;
   emoji: string;
-  description: string;
-  totalEmissions: number;
-  unit: string;
-  status: Status;
+  totalEmissions: number; // Calculated field
   createdAt: string;
   updatedAt: string;
 }
@@ -22,12 +19,7 @@ export interface Factor {
   name: string;
   value: number;
   unit: string;
-  source: string;
   category: string;
-  description: string;
-  effectiveDate: string;
-  expirationDate?: string;
-  status: Status;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,10 +31,8 @@ export interface Measurement {
   supplierId?: string;
   date: string;
   quantity: number;
-  unit: string;
-  notes?: string;
+  unit: string; // Inherited from factor
   calculatedValue: number;
-  status: Status;
   createdAt: string;
   updatedAt: string;
 }
@@ -53,9 +43,8 @@ export interface Target {
   scenarioId?: string;
   supplierId?: string;
   name: string;
-  description: string;
   baselineValue: number;
-  targetValue: number;
+  targetValue: number; // Auto-calculated
   targetPercentage: number;
   targetDate: string;
   status: Status;
@@ -66,14 +55,13 @@ export interface Target {
 export interface Initiative {
   id: string;
   name: string;
-  description: string;
   startDate: string;
   endDate: string;
   status: InitiativeStatus;
   spend: number;
   trajectory: TrajectoryType;
   plan: PlanType;
-  absolute: number;
+  absolute: number; // Auto-calculated
   targetIds: string[];
   currency: string;
   createdAt: string;
@@ -83,10 +71,6 @@ export interface Initiative {
 export interface Scenario {
   id: string;
   name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  status: Status;
   createdAt: string;
   updatedAt: string;
 }
@@ -95,12 +79,10 @@ export interface Supplier {
   id: string;
   name: string;
   industry: string;
-  location: string;
   contactPerson: string;
   email: string;
   phone: string;
   currency: string;
-  status: Status;
   createdAt: string;
   updatedAt: string;
 }
