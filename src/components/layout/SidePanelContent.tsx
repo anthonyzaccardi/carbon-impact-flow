@@ -1,4 +1,3 @@
-
 import TrackForm from '@/components/forms/TrackForm';
 import FactorForm from '@/components/forms/FactorForm';
 import MeasurementForm from '@/components/forms/MeasurementForm';
@@ -6,10 +5,10 @@ import TargetForm from '@/components/forms/TargetForm';
 import InitiativeForm from '@/components/forms/InitiativeForm';
 import ScenarioForm from '@/components/forms/ScenarioForm';
 import SupplierForm from '@/components/forms/SupplierForm';
-import { SidePanelState } from '@/contexts/AppContext';
+import { SidePanel } from '@/types';
 
 interface SidePanelContentProps {
-  sidePanel: SidePanelState;
+  sidePanel: SidePanel;
   onClose: () => void;
 }
 
