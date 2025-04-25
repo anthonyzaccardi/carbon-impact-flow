@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Initiative, Target } from "@/types";
+import { Initiative, Target, InitiativeStatus, TrajectoryType, PlanType } from "@/types";
 import { InitiativeFormData, initiativeFormSchema } from "./schema";
 import { useAppContext } from "@/contexts/useAppContext";
+import { format } from "date-fns";
 
 interface UseInitiativeFormProps {
   mode: "create" | "edit" | "view";
@@ -17,13 +18,19 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
   const [selectedTargets, setSelectedTargets] = useState<Target[]>([]);
   const [calculatedAbsolute, setCalculatedAbsolute] = useState(0);
 
-  const defaultValues = initialData
+  // Define defaultValues with proper type casting to satisfy TypeScript
+  const defaultValues: InitiativeFormData = initialData
     ? {
-        ...initialData,
+        name: initialData.name,
+        description: initialData.description || "",
         startDate: new Date(initialData.startDate),
         endDate: new Date(initialData.endDate),
+        status: initialData.status as InitiativeStatus,
+        spend: initialData.spend,
+        trajectory: initialData.trajectory as TrajectoryType,
+        plan: initialData.plan as PlanType,
+        currency: initialData.currency,
         targetIds: initialData.targetIds || [],
-        description: initialData.description || ""
       }
     : {
         name: "",
@@ -82,7 +89,18 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
     };
 
     if (mode === "create") {
-      createInitiative(formattedData);
+      createInitiative({
+        name: formattedData.name,
+        description: formattedData.description,
+        startDate: formattedData.startDate,
+        endDate: formattedData.endDate,
+        status: formattedData.status,
+        spend: formattedData.spend,
+        trajectory: formattedData.trajectory,
+        plan: formattedData.plan,
+        currency: formattedData.currency,
+        targetIds: formattedData.targetIds || []
+      });
     } else if (mode === "edit" && initialData) {
       updateInitiative(initialData.id, formattedData);
     }

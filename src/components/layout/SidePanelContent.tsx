@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
@@ -5,7 +6,7 @@ import TrackForm from '@/components/forms/TrackForm';
 import FactorForm from '@/components/forms/FactorForm';
 import MeasurementForm from '@/components/forms/MeasurementForm';
 import TargetForm from '@/components/forms/TargetForm';
-import InitiativeForm from '@/components/forms/InitiativeForm';
+import InitiativeForm from '@/components/forms/initiatives/InitiativeForm';
 import ScenarioForm from '@/components/forms/ScenarioForm';
 import SupplierForm from '@/components/forms/SupplierForm';
 import { SidePanel } from '@/types';
