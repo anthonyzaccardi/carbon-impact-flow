@@ -1,7 +1,7 @@
 
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { AppContextType } from './types';
-import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier, InitiativeStatus, TrajectoryType, PlanType } from '../types';
+import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier, InitiativeStatus, TrajectoryType, PlanType, SidePanel } from '../types';
 import { createTrackOperation, updateTrackOperation, deleteTrackOperation, createFactorOperation, updateFactorOperation, deleteFactorOperation, createMeasurementOperation, updateMeasurementOperation, deleteMeasurementOperation, createTargetOperation, updateTargetOperation, deleteTargetOperation, createInitiativeOperation, updateInitiativeOperation, deleteInitiativeOperation, addTargetsToInitiativeOperation, removeTargetFromInitiativeOperation, createScenarioOperation, updateScenarioOperation, deleteScenarioOperation, createSupplierOperation, updateSupplierOperation, deleteSupplierOperation } from './operations';
 import { calculateInitiativeAbsoluteValue, generateId, getCurrentTimestamp } from './utils';
 import { toast } from 'sonner';
@@ -31,10 +31,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers);
   
   // UI state
-  const [sidePanel, setSidePanel] = useState({
+  const [sidePanel, setSidePanel] = useState<SidePanel>({
     isOpen: false,
-    type: 'view' as 'view' | 'create' | 'edit',
-    entityType: 'track' as 'track' | 'factor' | 'measurement' | 'target' | 'initiative' | 'scenario' | 'supplier'
+    type: 'view',
+    entityType: 'track'
   });
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
@@ -92,7 +92,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const createFactor = (factor: Omit<Factor, 'id' | 'createdAt' | 'updatedAt'>) => {
-    createFactorOperation(factors, setFactors, measurements, setMeasurements, factor);
+    createFactorOperation(factors, setFactors, factor);
   };
 
   const updateFactor = (id: string, factor: Partial<Factor>) => {
@@ -172,7 +172,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteSupplier = (id: string) => {
-    deleteSupplierOperation(suppliers, setSuppliers, measurements, targets, setSuppliers, id);
+    deleteSupplierOperation(suppliers, setSuppliers, id);
   };
   
   // Effects for automatic calculations

@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Scenario } from "@/types";
-import { format } from "date-fns";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -65,9 +64,15 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
 
   function onSubmit(data: FormData) {
     if (mode === "create") {
-      createScenario(data);
+      createScenario({
+        name: data.name,
+        status: data.status
+      });
     } else if (mode === "edit" && initialData) {
-      updateScenario(initialData.id, data);
+      updateScenario(initialData.id, {
+        name: data.name,
+        status: data.status
+      });
     }
     onClose();
   }

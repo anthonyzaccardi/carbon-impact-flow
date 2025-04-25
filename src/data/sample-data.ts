@@ -1,3 +1,4 @@
+
 import { 
   Track, Factor, Measurement, Target, 
   Initiative, Scenario, Supplier, 
@@ -5,38 +6,38 @@ import {
 } from '../types';
 import { generateId } from '../contexts/utils';
 
-// Create tracks with proper structure (no description)
+// Create tracks with proper structure
 export const tracks: Track[] = [
   {
     id: generateId('track'),
     name: '🏭 Scope 1',
     emoji: '🏭',
+    unit: 'tCO2e',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    totalEmissions: 120000,
-    unit: 'tCO2e'
+    totalEmissions: 120000
   },
   {
     id: generateId('track'),
     name: '⚡ Scope 2',
     emoji: '⚡',
+    unit: 'tCO2e',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    totalEmissions: 85000,
-    unit: 'tCO2e'
+    totalEmissions: 85000
   },
   {
     id: generateId('track'),
     name: '🚗 Scope 3',
     emoji: '🚗',
+    unit: 'tCO2e',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    totalEmissions: 50000,
-    unit: 'tCO2e'
+    totalEmissions: 50000
   }
 ];
 
-// Create factors with proper structure (no source)
+// Create factors with proper structure
 export const factors: Factor[] = [
   {
     id: generateId('factor'),
@@ -70,7 +71,7 @@ export const factors: Factor[] = [
   }
 ];
 
-// Create suppliers with proper structure (no location)
+// Create suppliers with proper structure
 export const suppliers: Supplier[] = [
   {
     id: generateId('supplier'),
@@ -78,6 +79,7 @@ export const suppliers: Supplier[] = [
     industry: 'Manufacturing',
     contactPerson: 'Sarah Johnson',
     email: 'sarah@ecosupply.com',
+    phone: '555-1234',
     currency: 'USD',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -88,6 +90,7 @@ export const suppliers: Supplier[] = [
     industry: 'Technology',
     contactPerson: 'David Lee',
     email: 'david@greentech.com',
+    phone: '555-5678',
     currency: 'EUR',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -98,13 +101,14 @@ export const suppliers: Supplier[] = [
     industry: 'Energy',
     contactPerson: 'Emily White',
     email: 'emily@sustainableenergy.com',
+    phone: '555-9012',
     currency: 'USD',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
 ];
 
-// Create scenarios with proper structure (no description)
+// Create scenarios with proper structure
 export const scenarios: Scenario[] = [
   {
     id: generateId('scenario'),
@@ -129,7 +133,7 @@ export const scenarios: Scenario[] = [
   }
 ];
 
-// Create targets with proper structure (no description)
+// Create targets with proper structure
 export const targets: Target[] = [
   {
     id: generateId('target'),
@@ -141,6 +145,7 @@ export const targets: Target[] = [
     targetDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(),
     status: 'active',
     scenarioId: scenarios[0].id,
+    description: 'Reduce Scope 1 emissions through energy efficiency measures',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -154,6 +159,7 @@ export const targets: Target[] = [
     targetDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(),
     status: 'active',
     scenarioId: scenarios[1].id,
+    description: 'Reduce electricity consumption through renewable energy sourcing',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -167,12 +173,13 @@ export const targets: Target[] = [
     targetDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(),
     status: 'active',
     scenarioId: scenarios[2].id,
+    description: 'Reduce commuting emissions through sustainable transportation options',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
 ];
 
-// Create measurements with proper structure (no notes)
+// Create measurements with proper structure
 export const measurements: Measurement[] = [
   {
     id: generateId('measurement'),
@@ -183,6 +190,7 @@ export const measurements: Measurement[] = [
     date: new Date().toISOString(),
     calculatedValue: 99900,
     status: 'active',
+    notes: 'Annual natural gas consumption for heating',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -195,6 +203,7 @@ export const measurements: Measurement[] = [
     date: new Date().toISOString(),
     calculatedValue: 85000,
     status: 'active',
+    notes: 'Annual electricity consumption',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -207,18 +216,19 @@ export const measurements: Measurement[] = [
     date: new Date().toISOString(),
     calculatedValue: 50000,
     status: 'active',
+    notes: 'Annual employee commuting distance',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
 ];
 
-// Create initiatives with proper structure (no description)
+// Create initiatives with proper structure
 export const initiatives: Initiative[] = [
   {
     id: generateId('initiative'),
     name: 'Energy Efficiency Program',
     targetIds: [targets[0].id, targets[1].id],
-    plan: '-15%',
+    plan: '-15%' as PlanType,
     trajectory: 'linear',
     status: 'in_progress',
     startDate: new Date().toISOString(),
@@ -233,7 +243,7 @@ export const initiatives: Initiative[] = [
     id: generateId('initiative'),
     name: 'Renewable Energy Sourcing',
     targetIds: [targets[1].id],
-    plan: '-10%',
+    plan: '-10%' as PlanType,
     trajectory: 'linear',
     status: 'committed',
     startDate: new Date().toISOString(),
@@ -248,7 +258,7 @@ export const initiatives: Initiative[] = [
     id: generateId('initiative'),
     name: 'Sustainable Commuting',
     targetIds: [targets[2].id],
-    plan: '-5%',
+    plan: '-5%' as PlanType,
     trajectory: 'linear',
     status: 'not_started',
     startDate: new Date().toISOString(),

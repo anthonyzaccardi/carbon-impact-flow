@@ -2,12 +2,13 @@
 export type Status = 'active' | 'pending' | 'completed' | 'cancelled';
 export type InitiativeStatus = 'not_started' | 'in_progress' | 'completed' | 'committed';
 export type TrajectoryType = 'every_year' | 'linear';
-export type PlanType = '-2%' | '-4%' | '-6%' | '-8%' | '-10%';
+export type PlanType = '-2%' | '-4%' | '-6%' | '-8%' | '-10%' | '-15%' | '-5%';
 
 export interface Track {
   id: string;
   name: string;
   emoji: string;
+  unit: string;
   totalEmissions: number; // Calculated field (sum of measurements)
   createdAt: string;
   updatedAt: string;
@@ -33,6 +34,8 @@ export interface Measurement {
   quantity: number;
   unit: string; // Inherited from factor
   calculatedValue: number;
+  status: Status;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +46,7 @@ export interface Target {
   scenarioId?: string;
   supplierId?: string;
   name: string;
+  description: string;
   baselineValue: number;
   targetValue: number; // Auto-calculated
   targetPercentage: number;
@@ -71,6 +75,7 @@ export interface Initiative {
 export interface Scenario {
   id: string;
   name: string;
+  status: Status;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,5 +1,6 @@
+
 import { toast } from 'sonner';
-import { generateId, getCurrentTimestamp } from './utils';
+import { generateId, getCurrentTimestamp, calculateInitiativeAbsoluteValue } from './utils';
 import { 
   Track, Factor, Measurement, Target, 
   Initiative, Scenario, Supplier 
@@ -58,8 +59,6 @@ export const deleteTrackOperation = (
 export const createFactorOperation = (
   factors: Factor[],
   setFactors: (factors: Factor[]) => void,
-  measurements: Measurement[],
-  setMeasurements: (measurements: Measurement[]) => void,
   factor: Omit<Factor, 'id' | 'createdAt' | 'updatedAt'>
 ) => {
   const newFactor: Factor = {
@@ -124,12 +123,12 @@ export const deleteFactorOperation = (
 };
 
 export const createMeasurementOperation = (
+  factors: Factor[],
   measurements: Measurement[],
   setMeasurements: (measurements: Measurement[]) => void,
-  factors: Factor[],
-  measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>
+  measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue' | 'unit'>
 ) => {
-  const factor = factors.find(f => f.factorId === measurement.factorId);
+  const factor = factors.find(f => f.id === measurement.factorId);
   if (!factor) {
     toast.error('Factor not found');
     return;
@@ -139,6 +138,7 @@ export const createMeasurementOperation = (
     ...measurement,
     id: generateId('measurement'),
     calculatedValue: measurement.quantity * factor.value,
+    unit: factor.unit,
     createdAt: getCurrentTimestamp(),
     updatedAt: getCurrentTimestamp()
   };
