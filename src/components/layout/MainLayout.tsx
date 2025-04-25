@@ -105,11 +105,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
-      <main 
-        className={`flex-1 overflow-auto content-transition
-        ${sidebarExpanded ? 'ml-60' : 'ml-16'}`}
-      >
-        <div className="p-6">
+      <main className="flex-1 relative">
+        <div 
+          className={`w-full min-h-screen pt-6 pb-6 px-4 md:px-6 transition-all duration-300
+            ${sidebarExpanded ? 'md:pl-64' : 'md:pl-20'}`}
+        >
           {children}
         </div>
       </main>

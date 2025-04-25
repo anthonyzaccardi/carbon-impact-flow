@@ -49,8 +49,8 @@ const Sidebar = () => {
   
   return (
     <div 
-      className={`h-screen bg-sidebar border-r border-border sidebar-transition 
-      ${sidebarExpanded ? 'w-60' : 'w-16'} flex flex-col`}
+      className={`fixed top-0 left-0 h-screen bg-sidebar border-r border-border
+      ${sidebarExpanded ? 'w-60' : 'w-16'} flex flex-col z-10 transition-all duration-300`}
     >
       <div className="p-4 flex items-center border-b border-border">
         {sidebarExpanded && (
