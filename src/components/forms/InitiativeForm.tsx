@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -135,7 +136,8 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
         
         setTargetDetails({
           baselineValue: selectedTarget.baselineValue,
-          unit: "",
+          unit: "", // You might want to get the unit from the track associated with the target
+          track: selectedTarget.trackId || "" // Add the track property
         });
       }
     }
