@@ -61,6 +61,12 @@ export const createFactorOperation = (
   setFactors: (factors: Factor[]) => void,
   factor: Omit<Factor, 'id' | 'createdAt' | 'updatedAt'>
 ) => {
+  // Ensure trackId is provided
+  if (!factor.trackId) {
+    toast.error('Factor must be associated with a track');
+    return;
+  }
+
   const newFactor: Factor = {
     ...factor,
     id: generateId('factor'),
@@ -79,6 +85,14 @@ export const updateFactorOperation = (
   id: string,
   factor: Partial<Factor>
 ) => {
+  // Ensure trackId isn't removed
+  if (factor.trackId === undefined) {
+    const existingFactor = factors.find(f => f.id === id);
+    if (existingFactor) {
+      factor.trackId = existingFactor.trackId;
+    }
+  }
+
   setFactors(factors.map(f => 
     f.id === id ? { ...f, ...factor, updatedAt: getCurrentTimestamp() } : f
   ));
@@ -134,8 +148,16 @@ export const createMeasurementOperation = (
     return;
   }
 
+  // Ensure measurement has the same trackId as its factor
+  const trackId = factor.trackId;
+  if (!trackId) {
+    toast.error('Factor must be associated with a track');
+    return;
+  }
+
   const newMeasurement: Measurement = {
     ...measurement,
+    trackId, // Ensure the measurement has the same trackId as its factor
     id: generateId('measurement'),
     calculatedValue: measurement.quantity * factor.value,
     unit: factor.unit,
@@ -158,9 +180,13 @@ export const updateMeasurementOperation = (
       const factor = factors.find(f => f.id === (measurement.factorId || m.factorId));
       if (!factor) return m;
       
+      // If factor is changed, update trackId to match the new factor's trackId
+      const trackId = measurement.factorId ? factor.trackId : m.trackId;
+      
       const updatedMeasurement = {
         ...m,
         ...measurement,
+        trackId, // Ensure the measurement has the same trackId as its factor
         calculatedValue: (measurement.quantity || m.quantity) * factor.value,
         updatedAt: getCurrentTimestamp()
       };
@@ -185,6 +211,12 @@ export const createTargetOperation = (
   setTargets: (targets: Target[]) => void,
   target: Omit<Target, 'id' | 'createdAt' | 'updatedAt' | 'targetValue'>
 ) => {
+  // Ensure trackId is provided
+  if (!target.trackId) {
+    toast.error('Target must be associated with a track');
+    return;
+  }
+
   const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
   const newTarget: Target = {
     ...target,
@@ -203,6 +235,14 @@ export const updateTargetOperation = (
   id: string,
   target: Partial<Target>
 ) => {
+  // Ensure trackId isn't removed
+  if (target.trackId === undefined) {
+    const existingTarget = targets.find(t => t.id === id);
+    if (existingTarget) {
+      target.trackId = existingTarget.trackId;
+    }
+  }
+
   setTargets(targets.map(t => {
     if (t.id === id) {
       const targetValue = target.baselineValue !== undefined && target.targetPercentage !== undefined

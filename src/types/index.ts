@@ -16,7 +16,7 @@ export interface Track {
 
 export interface Factor {
   id: string;
-  trackId: string;
+  trackId: string; // Required - a factor must be associated with exactly one track
   name: string;
   value: number;
   unit: string;
@@ -27,7 +27,7 @@ export interface Factor {
 
 export interface Measurement {
   id: string;
-  trackId: string;
+  trackId: string; // Required - a measurement must be associated with exactly one track
   factorId: string;
   supplierId?: string;
   date: string;
@@ -42,7 +42,7 @@ export interface Measurement {
 
 export interface Target {
   id: string;
-  trackId: string;
+  trackId: string; // Required - a target must be associated with exactly one track
   scenarioId?: string;
   supplierId?: string;
   name: string;
@@ -59,7 +59,7 @@ export interface Target {
 export interface Initiative {
   id: string;
   name: string;
-  description: string; // Adding description which is used in the form
+  description: string;
   startDate: string;
   endDate: string;
   status: InitiativeStatus;
