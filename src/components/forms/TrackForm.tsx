@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -5,14 +6,12 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -30,22 +29,11 @@ const formSchema = z.object({
   emoji: z.string().min(1, {
     message: "Please select an emoji.",
   }),
-  description: z.string().min(5, {
-    message: "Description must be at least 5 characters.",
-  }),
-  totalEmissions: z.coerce.number().nonnegative({
-    message: "Total emissions must be a non-negative number.",
-  }),
-  unit: z.string().min(1, {
-    message: "Unit is required.",
-  }),
-  status: z.enum(["active", "pending", "completed", "cancelled"]),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const emojis = ["🏭", "⚡", "🌐", "💧", "🗑️", "🌱", "🚗", "✈️", "🏢", "🌲"];
-const units = ["tCO2e", "kgCO2e", "gCO2e", "m³", "kWh", "tonnes", "liters"];
 
 interface TrackFormProps {
   mode: "create" | "edit" | "view";
@@ -55,38 +43,30 @@ interface TrackFormProps {
 
 const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => {
   const isViewMode = mode === "view";
-  const { createTrack, updateTrack } = useAppContext();
+  const { createTrack, updateTrack, getTrackStats } = useAppContext();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      name: initialData.name,
+      emoji: initialData.emoji,
+    } : {
       name: "",
       emoji: "",
-      description: "",
-      totalEmissions: 0,
-      unit: "",
-      status: "active",
     },
   });
 
   function onSubmit(data: FormData) {
-    // Ensure all required fields are explicitly included
-    const formattedData = {
-      name: data.name,
-      emoji: data.emoji,
-      description: data.description,
-      totalEmissions: data.totalEmissions,
-      unit: data.unit,
-      status: data.status
-    };
-
     if (mode === "create") {
-      createTrack(formattedData);
+      createTrack(data);
     } else if (mode === "edit" && initialData) {
-      updateTrack(initialData.id, formattedData);
+      updateTrack(initialData.id, data);
     }
     onClose();
   }
+
+  // Get track stats for view mode
+  const trackStats = initialData ? getTrackStats(initialData.id) : { factorsCount: 0, measurementsCount: 0, targetsCount: 0 };
 
   return (
     <Form {...form}>
@@ -136,92 +116,26 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} disabled={isViewMode} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="totalEmissions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Total Emissions</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} disabled={isViewMode} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="unit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unit</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select unit" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {units.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        {isViewMode && initialData && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="border rounded p-3">
+              <div className="text-sm text-muted-foreground">Factors</div>
+              <div className="text-lg font-semibold">{trackStats.factorsCount}</div>
+            </div>
+            <div className="border rounded p-3">
+              <div className="text-sm text-muted-foreground">Measurements</div>
+              <div className="text-lg font-semibold">{trackStats.measurementsCount}</div>
+            </div>
+            <div className="border rounded p-3">
+              <div className="text-sm text-muted-foreground">Targets</div>
+              <div className="text-lg font-semibold">{trackStats.targetsCount}</div>
+            </div>
+            <div className="border rounded p-3">
+              <div className="text-sm text-muted-foreground">Total Emissions</div>
+              <div className="text-lg font-semibold">{initialData.totalEmissions.toLocaleString()} tCO₂e</div>
+            </div>
+          </div>
+        )}
 
         {!isViewMode && (
           <div className="flex justify-end space-x-2">

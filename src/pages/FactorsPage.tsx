@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 
 const FactorsPage = () => {
-  const { factors, tracks, openSidePanel } = useAppContext();
+  const { factors, tracks, measurements, openSidePanel } = useAppContext();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [trackFilter, setTrackFilter] = useState("all");
@@ -33,8 +33,12 @@ const FactorsPage = () => {
   
   // Metrics
   const totalFactors = factors.length;
-  const activeFactors = factors.filter(factor => factor.status === 'active').length;
   const categories = [...new Set(factors.map(factor => factor.category))].length;
+  
+  // Count measurements for each factor
+  const getMeasurementsCount = (factorId: string) => {
+    return measurements.filter(m => m.factorId === factorId).length;
+  };
   
   // Table columns
   const columns = [
@@ -63,6 +67,11 @@ const FactorsPage = () => {
     {
       header: "Category",
       accessorKey: "category",
+    },
+    {
+      header: "Measurements",
+      accessorKey: "measurements",
+      cell: (item) => getMeasurementsCount(item.id),
     }
   ];
 
@@ -98,12 +107,12 @@ const FactorsPage = () => {
           value={totalFactors}
         />
         <StatCard 
-          title="Active Factors" 
-          value={activeFactors}
-        />
-        <StatCard 
           title="Categories" 
           value={categories}
+        />
+        <StatCard 
+          title="Total Measurements" 
+          value={measurements.length}
         />
       </div>
       

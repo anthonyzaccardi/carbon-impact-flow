@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import StatCard from '@/components/ui/stat-card';
 
 const InitiativesPage = () => {
-  const { initiatives, targets, openSidePanel } = useAppContext();
+  const { initiatives, targets, openSidePanel, extractPercentage } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter initiatives based on search query
@@ -25,6 +25,17 @@ const InitiativesPage = () => {
   const activeInitiatives = initiatives.filter(i => i.status === 'in_progress').length;
   const totalSpend = initiatives.reduce((sum, i) => sum + i.spend, 0);
   const totalImpact = initiatives.reduce((sum, i) => sum + i.absolute, 0);
+
+  // Calculate the absolute value for an initiative: sum of target values * plan percentage
+  const calculateInitiativeAbsoluteValue = (initiative: Initiative): number => {
+    const initiativeTargets = targets.filter(t => initiative.targetIds.includes(t.id));
+    
+    if (initiativeTargets.length === 0) return 0;
+    
+    return initiativeTargets.reduce((sum, target) => {
+      return sum + (target.targetValue * Math.abs(extractPercentage(initiative.plan)));
+    }, 0);
+  };
 
   const handleCreateInitiative = () => {
     openSidePanel('create', 'initiative');
@@ -90,9 +101,10 @@ const InitiativesPage = () => {
     {
       header: 'Absolute',
       accessorKey: 'absolute',
-      cell: (initiative: Initiative) => (
-        <span>{initiative.absolute.toFixed(2)} tCO₂e</span>
-      )
+      cell: (initiative: Initiative) => {
+        // Use the calculated value from the current initiative
+        return <span>{calculateInitiativeAbsoluteValue(initiative).toFixed(2)} tCO₂e</span>;
+      }
     },
     {
       header: 'Targets',

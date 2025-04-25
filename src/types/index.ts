@@ -8,13 +8,9 @@ export interface Track {
   id: string;
   name: string;
   emoji: string;
-  totalEmissions: number; // Calculated field
+  totalEmissions: number; // Calculated field (sum of measurements)
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  description?: string;
-  unit?: string;
-  status?: Status;
 }
 
 export interface Factor {
@@ -26,12 +22,6 @@ export interface Factor {
   category: string;
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  description?: string;
-  source?: string;
-  status?: Status;
-  effectiveDate?: string;
-  expirationDate?: string;
 }
 
 export interface Measurement {
@@ -45,9 +35,6 @@ export interface Measurement {
   calculatedValue: number;
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  notes?: string;
-  status?: Status;
 }
 
 export interface Target {
@@ -63,8 +50,6 @@ export interface Target {
   status: Status;
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  description?: string;
 }
 
 export interface Initiative {
@@ -76,13 +61,11 @@ export interface Initiative {
   spend: number;
   trajectory: TrajectoryType;
   plan: PlanType;
-  absolute: number; // Auto-calculated
+  absolute: number; // Auto-calculated (sum of targets * plan)
   targetIds: string[];
   currency: string;
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  description?: string;
 }
 
 export interface Scenario {
@@ -90,11 +73,6 @@ export interface Scenario {
   name: string;
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-  status?: Status;
 }
 
 export interface Supplier {
@@ -107,9 +85,6 @@ export interface Supplier {
   currency: string;
   createdAt: string;
   updatedAt: string;
-  // Fields used in code but not in original definition
-  location?: string;
-  status?: Status;
 }
 
 export interface SidePanel {

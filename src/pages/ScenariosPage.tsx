@@ -6,6 +6,7 @@ import StatCard from "@/components/ui/stat-card";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Card, 
   CardContent, 
@@ -16,18 +17,17 @@ import {
 
 const ScenariosPage = () => {
   const { scenarios, targets, tracks, openSidePanel } = useAppContext();
+  const navigate = useNavigate();
   
   const [searchTerm, setSearchTerm] = useState("");
   
   // Apply filters
   const filteredScenarios = scenarios.filter(scenario => 
-    scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    scenario.description.toLowerCase().includes(searchTerm.toLowerCase())
+    scenario.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   // Metrics
   const totalScenarios = scenarios.length;
-  const activeScenarios = scenarios.filter(s => s.status === 'active').length;
   
   // Calculate targets and reductions by scenario
   const getScenarioStats = (scenarioId) => {
@@ -39,7 +39,18 @@ const ScenariosPage = () => {
     );
     const uniqueTracks = new Set(scenarioTargets.map(t => t.trackId)).size;
     
-    return { totalTargets, totalReduction, uniqueTracks };
+    // Calculate scenario dates from the targets
+    const startDates = scenarioTargets.map(t => new Date(t.targetDate).getFullYear());
+    const minYear = startDates.length > 0 ? Math.min(...startDates) : null;
+    const maxYear = startDates.length > 0 ? Math.max(...startDates) : null;
+    
+    return { 
+      totalTargets, 
+      totalReduction, 
+      uniqueTracks,
+      startYear: minYear,
+      endYear: maxYear
+    };
   };
   
   // Table columns
@@ -47,15 +58,6 @@ const ScenariosPage = () => {
     {
       header: "Name",
       accessorKey: "name",
-    },
-    {
-      header: "Description",
-      accessorKey: "description",
-      cell: (item) => (
-        <div className="truncate max-w-[250px]">
-          {item.description}
-        </div>
-      ),
     },
     {
       header: "Targets",
@@ -75,19 +77,18 @@ const ScenariosPage = () => {
     {
       header: "Period",
       accessorKey: "period",
-      cell: (item) => (
-        `${new Date(item.startDate).getFullYear()} - ${new Date(item.endDate).getFullYear()}`
-      ),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
+      cell: (item) => {
+        const stats = getScenarioStats(item.id);
+        return stats.startYear && stats.endYear ? 
+          `${stats.startYear} - ${stats.endYear}` : 
+          "—";
+      },
     }
   ];
 
-  // Handle row click
+  // Handle row click - navigate to targets page filtered by this scenario
   const handleRowClick = (scenario) => {
-    openSidePanel('view', 'scenario', scenario);
+    navigate(`/targets?scenario=${scenario.id}`);
   };
   
   // Handle create new
@@ -144,12 +145,14 @@ const ScenariosPage = () => {
           value={totalScenarios}
         />
         <StatCard 
-          title="Active Scenarios" 
-          value={activeScenarios}
-        />
-        <StatCard 
           title="Scenario Targets" 
           value={targets.filter(t => t.scenarioId).length}
+        />
+        <StatCard 
+          title="Total Reduction" 
+          value={`${targets.filter(t => t.scenarioId).reduce(
+            (sum, t) => sum + (t.baselineValue - t.targetValue), 0
+          ).toLocaleString()} tCO2e`}
         />
       </div>
       
@@ -165,15 +168,14 @@ const ScenariosPage = () => {
               <CardHeader>
                 <CardTitle>{scenario.name}</CardTitle>
                 <CardDescription>
-                  {new Date(scenario.startDate).getFullYear()} - {new Date(scenario.endDate).getFullYear()}
+                  {stats.startYear && stats.endYear ? 
+                    `${stats.startYear} - ${stats.endYear}` : 
+                    "No targets"
+                  }
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="text-sm text-muted-foreground line-clamp-2">
-                    {scenario.description}
-                  </div>
-                  
                   <div className="space-y-2">
                     <div className="text-sm font-medium">Targets:</div>
                     {trackGroups.length > 0 ? (
@@ -185,7 +187,7 @@ const ScenariosPage = () => {
                               <span>{track.name}</span>
                             </div>
                             <span className="text-green-500">
-                              -{totalReduction.toLocaleString()} {track.unit}
+                              -{totalReduction.toLocaleString()} tCO2e
                             </span>
                           </li>
                         ))}

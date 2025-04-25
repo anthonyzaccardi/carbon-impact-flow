@@ -6,11 +6,10 @@ import StatCard from "@/components/ui/stat-card";
 import { Plus } from "lucide-react";
 
 const TracksPage = () => {
-  const { tracks, openSidePanel } = useAppContext();
+  const { tracks, openSidePanel, getTrackStats } = useAppContext();
   
   // Metrics
   const totalTracks = tracks.length;
-  const activeTracks = tracks.filter(track => track.status === 'active').length;
   const totalEmissions = tracks.reduce((sum, track) => sum + track.totalEmissions, 0);
   const averageEmissions = totalTracks > 0 ? totalEmissions / totalTracks : 0;
   
@@ -27,22 +26,33 @@ const TracksPage = () => {
       ),
     },
     {
-      header: "Description",
-      accessorKey: "description",
-      cell: (item) => (
-        <div className="truncate max-w-[250px]">
-          {item.description}
-        </div>
-      ),
+      header: "Factors",
+      accessorKey: "factorsCount",
+      cell: (item) => {
+        const stats = getTrackStats(item.id);
+        return stats.factorsCount;
+      },
     },
     {
-      header: "Emissions",
+      header: "Measurements",
+      accessorKey: "measurementsCount",
+      cell: (item) => {
+        const stats = getTrackStats(item.id);
+        return stats.measurementsCount;
+      },
+    },
+    {
+      header: "Targets",
+      accessorKey: "targetsCount",
+      cell: (item) => {
+        const stats = getTrackStats(item.id);
+        return stats.targetsCount;
+      },
+    },
+    {
+      header: "Total Emissions",
       accessorKey: "totalEmissions",
-      cell: (item) => `${item.totalEmissions.toLocaleString()} ${item.unit}`,
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
+      cell: (item) => `${item.totalEmissions.toLocaleString()} tCO₂e`,
     }
   ];
 
@@ -72,14 +82,10 @@ const TracksPage = () => {
       </div>
       
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard 
           title="Total Tracks" 
           value={totalTracks}
-        />
-        <StatCard 
-          title="Active Tracks" 
-          value={activeTracks}
         />
         <StatCard 
           title="Total Emissions" 

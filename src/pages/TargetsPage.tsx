@@ -16,7 +16,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const TargetsPage = () => {
-  const { targets, tracks, scenarios, suppliers, initiatives, openSidePanel } = useAppContext();
+  const { targets, tracks, scenarios, suppliers, openSidePanel } = useAppContext();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [trackFilter, setTrackFilter] = useState("all");
@@ -25,8 +25,7 @@ const TargetsPage = () => {
   // Apply filters
   const filteredTargets = targets.filter(target => {
     const matchesSearch = 
-      target.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      target.description.toLowerCase().includes(searchTerm.toLowerCase());
+      target.name.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesTrack = trackFilter === "all" || target.trackId === trackFilter;
     const matchesScenario = scenarioFilter === "all" || 
@@ -43,20 +42,6 @@ const TargetsPage = () => {
   const totalReduction = targets.reduce((sum, t) => sum + (t.baselineValue - t.targetValue), 0);
   const averageReduction = targets.length > 0 ? 
     targets.reduce((sum, t) => sum + t.targetPercentage, 0) / targets.length : 0;
-  
-  // Get initiatives associated with each target
-  const getInitiativesForTarget = (targetId) => {
-    return initiatives.filter(i => i.targetIds.includes(targetId));
-  };
-  
-  // Calculate the percentage of target covered by initiatives
-  const getCoveragePercentage = (targetId) => {
-    const targetInitiatives = initiatives.filter(i => i.targetIds.includes(targetId));
-    // For this example, we'll just use a calculation based on the number of initiatives
-    // In a real app, you might use a more complex calculation based on impact percentages
-    const coveragePerTarget = targetInitiatives.length > 0 ? (100 / targetInitiatives.length) : 0;
-    return Math.min(100, targetInitiatives.length * coveragePerTarget);
-  };
   
   // Table columns
   const columns = [
@@ -90,24 +75,6 @@ const TargetsPage = () => {
       header: "Target",
       accessorKey: "targetPercentage",
       cell: (item) => `${item.targetPercentage}% reduction`,
-    },
-    {
-      header: "Implementation",
-      accessorKey: "id",
-      cell: (item) => {
-        const coverage = getCoveragePercentage(item.id);
-        return (
-          <div className="w-full">
-            <div className="text-xs mb-1">{coverage}% covered</div>
-            <div className="w-full bg-muted rounded-full h-1.5">
-              <div 
-                className="bg-primary h-1.5 rounded-full" 
-                style={{ width: `${coverage}%` }}
-              ></div>
-            </div>
-          </div>
-        );
-      }
     },
     {
       header: "Target Date",

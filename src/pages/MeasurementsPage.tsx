@@ -22,10 +22,8 @@ const MeasurementsPage = () => {
   
   // Apply filters
   const filteredMeasurements = measurements.filter(measurement => {
-    const matchesSearch = searchTerm === "" || (
-      measurement.notes?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      measurement.unit.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const matchesSearch = searchTerm === "" || 
+      measurement.unit.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesTrack = trackFilter === "all" || measurement.trackId === trackFilter;
     
@@ -85,14 +83,7 @@ const MeasurementsPage = () => {
     {
       header: "Calculated Value",
       accessorKey: "calculatedValue",
-      cell: (item) => {
-        const track = tracks.find(t => t.id === item.trackId);
-        return `${item.calculatedValue.toLocaleString()} ${track?.unit || ''}`;
-      }
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
+      cell: (item) => `${item.calculatedValue.toLocaleString()} tCO₂e`,
     }
   ];
 

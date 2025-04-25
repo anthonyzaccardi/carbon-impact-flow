@@ -154,10 +154,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     
     if (initiativeTargets.length > 0) {
       absolute = initiativeTargets.reduce((sum, target) => {
-        if (target.trackId) {
-          return sum + (target.targetValue * Math.abs(extractPercentage(initiative.plan)));
-        }
-        return sum;
+        return sum + (target.targetValue * Math.abs(extractPercentage(initiative.plan)));
       }, 0);
     }
     
@@ -254,6 +251,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setFactors(factors.map(f => 
       f.id === id ? { ...f, ...factor, updatedAt: getCurrentTimestamp() } : f
     ));
+    
+    // If factor value or unit changes, update all related measurements
+    if (factor.value !== undefined || factor.unit !== undefined) {
+      const updatedFactor = factors.find(f => f.id === id);
+      if (updatedFactor) {
+        const updatedMeasurements = measurements.map(m => {
+          if (m.factorId === id) {
+            const newCalculatedValue = m.quantity * (factor.value !== undefined ? factor.value : updatedFactor.value);
+            return { 
+              ...m, 
+              calculatedValue: newCalculatedValue,
+              unit: factor.unit !== undefined ? factor.unit : updatedFactor.unit,
+              updatedAt: getCurrentTimestamp()
+            };
+          }
+          return m;
+        });
+        setMeasurements(updatedMeasurements);
+      }
+    }
+    
     toast.success(`Updated factor: ${factor.name || id}`);
   };
   
