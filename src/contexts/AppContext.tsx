@@ -271,13 +271,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     
     // If baselineValue or targetPercentage changed, update related initiatives
     if (target.baselineValue !== undefined || target.targetPercentage !== undefined) {
-      const relatedInitiatives = initiatives.filter(i => i.targetId === id);
+      // Since we now use targetIds array, we need to find all initiatives that include this target
+      const relatedInitiatives = initiatives.filter(i => i.targetIds.includes(id));
+      
+      // Recalculate absolute values for all affected initiatives
       relatedInitiatives.forEach(initiative => {
-        const updatedTarget = targets.find(t => t.id === id);
-        if (updatedTarget) {
-          const calculatedValue = updatedTarget.baselineValue * (initiative.impactPercentage / 100);
-          updateInitiative(initiative.id, { calculatedValue });
-        }
+        const absolute = calculateInitiativeAbsoluteValue(initiative);
+        updateInitiative(initiative.id, { absolute });
       });
     }
     

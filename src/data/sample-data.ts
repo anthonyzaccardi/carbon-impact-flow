@@ -305,49 +305,49 @@ export const measurements: Measurement[] = [
 export const initiatives: Initiative[] = [
   {
     id: "initiative-1",
-    targetId: "target-1",
     name: "Boiler Upgrade Program",
     description: "Replace old boilers with high-efficiency models",
     startDate: "2023-03-01",
     endDate: "2023-08-31",
-    impactPercentage: 25,
-    calculatedValue: 312.5, // 1250 * 0.25
-    budget: 250000,
-    spent: 150000,
+    status: "in_progress",
+    spend: 150000,
+    trajectory: "linear",
+    plan: "-6%",
+    absolute: 312.5,
+    targetIds: ["target-1"],
     currency: "USD",
-    status: "active",
     createdAt: "2023-01-15T00:00:00Z",
     updatedAt: "2023-01-15T00:00:00Z"
   },
   {
     id: "initiative-2",
-    targetId: "target-2",
     name: "Solar Panel Installation",
     description: "Install solar panels on facility rooftops",
     startDate: "2023-04-01",
     endDate: "2023-10-31",
-    impactPercentage: 40,
-    calculatedValue: 340, // 850 * 0.4
-    budget: 500000,
-    spent: 350000,
+    status: "in_progress",
+    spend: 350000,
+    trajectory: "linear",
+    plan: "-8%",
+    absolute: 340,
+    targetIds: ["target-2"],
     currency: "USD",
-    status: "active",
     createdAt: "2023-02-15T00:00:00Z",
     updatedAt: "2023-02-15T00:00:00Z"
   },
   {
     id: "initiative-3",
-    targetId: "target-3",
     name: "Supply Chain Optimization",
     description: "Optimize logistics and reduce unnecessary transportation",
     startDate: "2023-05-01",
     endDate: "2024-04-30",
-    impactPercentage: 15,
-    calculatedValue: 480, // 3200 * 0.15
-    budget: 200000,
-    spent: 75000,
+    status: "not_started",
+    spend: 75000,
+    trajectory: "every_year",
+    plan: "-4%",
+    absolute: 480,
+    targetIds: ["target-3"],
     currency: "USD",
-    status: "active",
     createdAt: "2023-03-15T00:00:00Z",
     updatedAt: "2023-03-15T00:00:00Z"
   }
@@ -358,6 +358,6 @@ export const getTrackById = (id: string) => tracks.find(track => track.id === id
 export const getFactorsByTrackId = (trackId: string) => factors.filter(factor => factor.trackId === trackId);
 export const getMeasurementsByTrackId = (trackId: string) => measurements.filter(measurement => measurement.trackId === trackId);
 export const getTargetsByTrackId = (trackId: string) => targets.filter(target => target.trackId === trackId);
-export const getInitiativesByTargetId = (targetId: string) => initiatives.filter(initiative => initiative.targetId === targetId);
+export const getInitiativesByTargetId = (targetId: string) => initiatives.filter(initiative => initiative.targetIds.includes(targetId));
 export const getSupplierById = (id: string) => suppliers.find(supplier => supplier.id === id);
 export const getTargetsByScenarioId = (scenarioId: string) => targets.filter(target => target.scenarioId === scenarioId);

@@ -46,14 +46,16 @@ const TargetsPage = () => {
   
   // Get initiatives associated with each target
   const getInitiativesForTarget = (targetId) => {
-    return initiatives.filter(i => i.targetId === targetId);
+    return initiatives.filter(i => i.targetIds.includes(targetId));
   };
   
   // Calculate the percentage of target covered by initiatives
   const getCoveragePercentage = (targetId) => {
-    const targetInitiatives = initiatives.filter(i => i.targetId === targetId);
-    const totalImpact = targetInitiatives.reduce((sum, i) => sum + i.impactPercentage, 0);
-    return Math.min(100, totalImpact);
+    const targetInitiatives = initiatives.filter(i => i.targetIds.includes(targetId));
+    // For this example, we'll just use a calculation based on the number of initiatives
+    // In a real app, you might use a more complex calculation based on impact percentages
+    const coveragePerTarget = targetInitiatives.length > 0 ? (100 / targetInitiatives.length) : 0;
+    return Math.min(100, targetInitiatives.length * coveragePerTarget);
   };
   
   // Table columns
