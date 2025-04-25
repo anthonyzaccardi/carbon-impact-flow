@@ -106,7 +106,15 @@ const FactorForm: React.FC<FactorFormProps> = ({ mode, initialData, onClose }) =
 
   function onSubmit(data: FormData) {
     if (mode === "create") {
-      createFactor(data);
+      // Ensure all required properties are provided for a new factor
+      const newFactor: Omit<Factor, "id" | "createdAt" | "updatedAt"> = {
+        trackId: data.trackId,
+        name: data.name,
+        value: data.value,
+        unit: data.unit,
+        category: data.category,
+      };
+      createFactor(newFactor);
     } else if (mode === "edit" && initialData) {
       updateFactor(initialData.id, data);
     }
