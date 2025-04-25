@@ -69,7 +69,6 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
     createScenario, 
     updateScenario,
     targets,
-    getTargetsByScenarioId,
   } = useAppContext();
 
   // Parse dates for the form
@@ -102,6 +101,9 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
       ...data,
       startDate: format(data.startDate, "yyyy-MM-dd"),
       endDate: format(data.endDate, "yyyy-MM-dd"),
+      name: data.name,
+      description: data.description,
+      status: data.status
     };
 
     if (mode === "create") {

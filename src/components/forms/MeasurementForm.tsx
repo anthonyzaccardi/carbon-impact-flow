@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -81,7 +80,6 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
   const [selectedTrackUnit, setSelectedTrackUnit] = useState("");
   const [calculatedValue, setCalculatedValue] = useState(0);
 
-  // Parse dates for the form
   const formattedData = initialData
     ? {
         ...initialData,
@@ -101,12 +99,10 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
     },
   });
 
-  // Watch for changes in trackId and quantity and factorId to update calculations
   const watchTrackId = form.watch("trackId");
   const watchQuantity = form.watch("quantity");
   const watchFactorId = form.watch("factorId");
 
-  // Filter factors when track changes
   useEffect(() => {
     if (watchTrackId) {
       const filteredFactors = factors.filter(
@@ -114,16 +110,12 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
       );
       setAvailableFactors(filteredFactors);
 
-      // Update the track unit
       const selectedTrack = tracks.find((track) => track.id === watchTrackId);
       if (selectedTrack) {
         setSelectedTrackUnit(selectedTrack.unit);
-        
-        // Set the default unit from the track
         form.setValue("unit", selectedTrack.unit);
       }
 
-      // Clear factor selection if the current one doesn't belong to the new track
       const currentFactor = form.getValues("factorId");
       if (currentFactor && !filteredFactors.some(f => f.id === currentFactor)) {
         form.setValue("factorId", "");
@@ -131,7 +123,6 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
     }
   }, [watchTrackId, factors, tracks, form]);
 
-  // Calculate measurement value
   useEffect(() => {
     if (watchFactorId && watchQuantity) {
       const factor = factors.find((f) => f.id === watchFactorId);
@@ -146,6 +137,13 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
     const formattedData = {
       ...data,
       date: format(data.date, "yyyy-MM-dd"),
+      trackId: data.trackId,
+      factorId: data.factorId,
+      quantity: data.quantity,
+      unit: data.unit,
+      status: data.status,
+      notes: data.notes,
+      supplierId: data.supplierId
     };
 
     if (mode === "create") {
@@ -366,7 +364,6 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
           )}
         />
 
-        {/* Calculation card */}
         {watchFactorId && watchQuantity > 0 && (
           <Card className="bg-accent/50">
             <CardContent className="pt-6">

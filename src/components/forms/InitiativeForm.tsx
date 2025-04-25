@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -91,7 +90,6 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
     targets,
   } = useAppContext();
 
-  // Parse dates for the form
   const formattedData = initialData
     ? {
         ...initialData,
@@ -116,21 +114,18 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
     },
   });
 
-  // Watch for changes in relevant fields
   const watchTargetId = form.watch("targetId");
   const watchImpactPercentage = form.watch("impactPercentage");
   const watchBudget = form.watch("budget");
   const watchSpent = form.watch("spent");
 
-  // State for calculated values
   const [calculatedValue, setCalculatedValue] = useState(0);
   const [targetDetails, setTargetDetails] = useState({
     baselineValue: 0,
     unit: "",
     track: "",
   });
-  
-  // Calculate impact when target or percentage changes
+
   useEffect(() => {
     if (watchTargetId) {
       const selectedTarget = targets.find(t => t.id === watchTargetId);
@@ -138,11 +133,9 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
         const impactValue = selectedTarget.baselineValue * (watchImpactPercentage / 100);
         setCalculatedValue(impactValue);
         
-        // Find associated track
         setTargetDetails({
           baselineValue: selectedTarget.baselineValue,
-          unit: "", // Will be populated below
-          track: "",
+          unit: "",
         });
       }
     }
@@ -153,6 +146,14 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
       ...data,
       startDate: format(data.startDate, "yyyy-MM-dd"),
       endDate: format(data.endDate, "yyyy-MM-dd"),
+      targetId: data.targetId,
+      name: data.name,
+      description: data.description,
+      impactPercentage: data.impactPercentage,
+      budget: data.budget,
+      spent: data.spent,
+      currency: data.currency,
+      status: data.status
     };
 
     if (mode === "create") {
@@ -372,7 +373,6 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
           )}
         />
 
-        {/* Calculation card */}
         {watchTargetId && watchImpactPercentage > 0 && (
           <Card className="bg-accent/50">
             <CardContent className="pt-6">
@@ -464,7 +464,6 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
           />
         </div>
 
-        {/* Budget progress */}
         {watchBudget > 0 && (
           <div className="space-y-2">
             <div className="flex justify-between text-sm">

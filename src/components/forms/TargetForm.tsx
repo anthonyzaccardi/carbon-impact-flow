@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -84,7 +83,6 @@ const TargetForm: React.FC<TargetFormProps> = ({
     suppliers,
   } = useAppContext();
 
-  // Parse dates for the form
   const formattedData = initialData
     ? {
         ...initialData,
@@ -106,16 +104,13 @@ const TargetForm: React.FC<TargetFormProps> = ({
     },
   });
 
-  // Watch for changes in relevant fields
   const watchBaselineValue = form.watch("baselineValue");
   const watchTargetPercentage = form.watch("targetPercentage");
   const watchTargetValue = form.watch("targetValue");
   const watchTrackId = form.watch("trackId");
 
-  // Track unit state
   const [trackUnit, setTrackUnit] = useState("");
 
-  // Update unit when track changes
   useEffect(() => {
     if (watchTrackId) {
       const selectedTrack = tracks.find((track) => track.id === watchTrackId);
@@ -125,14 +120,11 @@ const TargetForm: React.FC<TargetFormProps> = ({
     }
   }, [watchTrackId, tracks]);
 
-  // Sync percentage and target value
   useEffect(() => {
     if (form.formState.dirtyFields.baselineValue || form.formState.dirtyFields.targetPercentage) {
-      // If baseline or percentage changed, update target value
       const newValue = watchBaselineValue * (1 - watchTargetPercentage / 100);
       form.setValue("targetValue", parseFloat(newValue.toFixed(2)), { shouldDirty: true });
     } else if (form.formState.dirtyFields.targetValue) {
-      // If target value changed directly, update percentage
       const newPercentage = ((watchBaselineValue - watchTargetValue) / watchBaselineValue) * 100;
       form.setValue("targetPercentage", parseFloat(newPercentage.toFixed(2)), { shouldDirty: true });
     }
@@ -142,6 +134,15 @@ const TargetForm: React.FC<TargetFormProps> = ({
     const formattedData = {
       ...data,
       targetDate: format(data.targetDate, "yyyy-MM-dd"),
+      trackId: data.trackId,
+      name: data.name,
+      description: data.description,
+      baselineValue: data.baselineValue,
+      targetValue: data.targetValue,
+      targetPercentage: data.targetPercentage,
+      status: data.status,
+      scenarioId: data.scenarioId,
+      supplierId: data.supplierId
     };
 
     if (mode === "create") {
@@ -388,7 +389,6 @@ const TargetForm: React.FC<TargetFormProps> = ({
           />
         </div>
 
-        {/* Calculation card */}
         {watchBaselineValue > 0 && watchTargetPercentage > 0 && (
           <Card className="bg-accent/50">
             <CardContent className="pt-6">

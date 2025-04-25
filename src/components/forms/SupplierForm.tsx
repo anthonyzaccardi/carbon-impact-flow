@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -98,10 +97,22 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   });
 
   function onSubmit(data: FormData) {
+    // Ensure all required fields are explicitly included
+    const formattedData = {
+      name: data.name,
+      industry: data.industry,
+      location: data.location,
+      contactPerson: data.contactPerson,
+      email: data.email,
+      phone: data.phone,
+      currency: data.currency,
+      status: data.status
+    };
+
     if (mode === "create") {
-      createSupplier(data);
+      createSupplier(formattedData);
     } else if (mode === "edit" && initialData) {
-      updateSupplier(initialData.id, data);
+      updateSupplier(initialData.id, formattedData);
     }
     onClose();
   }

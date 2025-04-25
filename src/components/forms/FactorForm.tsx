@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -96,7 +95,6 @@ const FactorForm: React.FC<FactorFormProps> = ({ mode, initialData, onClose }) =
   const isViewMode = mode === "view";
   const { createFactor, updateFactor, tracks } = useAppContext();
 
-  // Parse dates for the form
   const formattedData = initialData
     ? {
         ...initialData,
@@ -129,6 +127,14 @@ const FactorForm: React.FC<FactorFormProps> = ({ mode, initialData, onClose }) =
       expirationDate: data.expirationDate
         ? format(data.expirationDate, "yyyy-MM-dd")
         : undefined,
+      trackId: data.trackId,
+      name: data.name,
+      value: data.value,
+      unit: data.unit,
+      source: data.source,
+      category: data.category,
+      description: data.description,
+      status: data.status
     };
 
     if (mode === "create") {

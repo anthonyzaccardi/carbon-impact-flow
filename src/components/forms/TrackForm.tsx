@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -71,10 +70,20 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
   });
 
   function onSubmit(data: FormData) {
+    // Ensure all required fields are explicitly included
+    const formattedData = {
+      name: data.name,
+      emoji: data.emoji,
+      description: data.description,
+      totalEmissions: data.totalEmissions,
+      unit: data.unit,
+      status: data.status
+    };
+
     if (mode === "create") {
-      createTrack(data);
+      createTrack(formattedData);
     } else if (mode === "edit" && initialData) {
-      updateTrack(initialData.id, data);
+      updateTrack(initialData.id, formattedData);
     }
     onClose();
   }
