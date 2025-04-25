@@ -12,7 +12,8 @@ import {
   Users,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Lightbulb
 } from 'lucide-react';
 
 const NavItem = ({ 
@@ -72,6 +73,7 @@ const Sidebar = () => {
           <NavItem to="/factors" icon={Database} label="Factors" expanded={sidebarExpanded} />
           <NavItem to="/measurements" icon={Activity} label="Measurements" expanded={sidebarExpanded} />
           <NavItem to="/targets" icon={Target} label="Targets" expanded={sidebarExpanded} />
+          <NavItem to="/initiatives" icon={Lightbulb} label="Initiatives" expanded={sidebarExpanded} />
           <NavItem to="/scenarios" icon={Settings} label="Scenarios" expanded={sidebarExpanded} />
           <NavItem to="/suppliers" icon={Users} label="Suppliers" expanded={sidebarExpanded} />
         </ul>

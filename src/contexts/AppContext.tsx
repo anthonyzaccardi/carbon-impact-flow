@@ -1,6 +1,6 @@
 
-import { createContext, useState, useContext, ReactNode } from 'react';
-import { SidePanel, Track, Factor, Measurement, Target, Initiative, Scenario, Supplier } from '../types';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { SidePanel, Track, Factor, Measurement, Target, Initiative, Scenario, Supplier, InitiativeStatus, TrajectoryType, PlanType } from '../types';
 import { 
   tracks as initialTracks,
   factors as initialFactors,
@@ -50,9 +50,12 @@ interface AppContextType {
   updateTarget: (id: string, target: Partial<Target>) => void;
   deleteTarget: (id: string) => void;
   
-  createInitiative: (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => void;
+  createInitiative: (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'absolute' | 'targetIds'> & { targetIds?: string[] }) => void;
   updateInitiative: (id: string, initiative: Partial<Initiative>) => void;
   deleteInitiative: (id: string) => void;
+  addTargetsToInitiative: (initiativeId: string, targetIds: string[]) => void;
+  removeTargetFromInitiative: (initiativeId: string, targetId: string) => void;
+  getInitiativesByTargetId: (targetId: string) => Initiative[];
   
   createScenario: (scenario: Omit<Scenario, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateScenario: (id: string, scenario: Partial<Scenario>) => void;
@@ -61,6 +64,10 @@ interface AppContextType {
   createSupplier: (supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateSupplier: (id: string, supplier: Partial<Supplier>) => void;
   deleteSupplier: (id: string) => void;
+  
+  // Utility functions
+  calculateTrackMeasurementsValue: (trackId: string) => number;
+  extractPercentage: (plan: PlanType) => number;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -100,6 +107,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setSidebarExpanded(prev => !prev);
   };
   
+  // Utility functions
+  const calculateTrackMeasurementsValue = (trackId: string): number => {
+    const trackMeasurements = measurements.filter(m => m.trackId === trackId);
+    return trackMeasurements.reduce((sum, measurement) => sum + measurement.calculatedValue, 0);
+  };
+  
+  const extractPercentage = (plan: PlanType): number => {
+    return parseFloat(plan.replace('%', '')) / 100;
+  };
+  
   // Calculate values for measurements based on factors
   const calculateMeasurementValue = (measurement: Omit<Measurement, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
     const factor = factors.find(f => f.id === measurement.factorId);
@@ -108,11 +125,38 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   // Calculate values for initiatives based on targets
-  const calculateInitiativeValue = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
-    const target = targets.find(t => t.id === initiative.targetId);
-    if (!target) return 0;
-    return target.baselineValue * (initiative.impactPercentage / 100);
+  const calculateInitiativeAbsoluteValue = (initiative: Initiative): number => {
+    const initiativeTargets = targets.filter(t => initiative.targetIds.includes(t.id));
+    let absolute = 0;
+    
+    if (initiativeTargets.length > 0) {
+      absolute = initiativeTargets.reduce((sum, target) => {
+        if (target.trackId) {
+          const trackMeasurementsValue = calculateTrackMeasurementsValue(target.trackId);
+          return sum + (trackMeasurementsValue * Math.abs(extractPercentage(initiative.plan)));
+        }
+        return sum;
+      }, 0);
+      
+      if (initiativeTargets.length > 1) {
+        absolute /= initiativeTargets.length;
+      }
+    }
+    
+    return absolute;
   };
+  
+  // Update absolute values when related data changes
+  useEffect(() => {
+    const updatedInitiatives = initiatives.map(initiative => {
+      const absolute = calculateInitiativeAbsoluteValue(initiative);
+      return { ...initiative, absolute };
+    });
+    
+    if (JSON.stringify(updatedInitiatives) !== JSON.stringify(initiatives)) {
+      setInitiatives(updatedInitiatives);
+    }
+  }, [measurements, targets, initiatives]);
   
   // CRUD operations for tracks
   const createTrack = (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -246,46 +290,65 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
   
   // CRUD operations for initiatives
-  const createInitiative = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'calculatedValue'>) => {
-    const calculatedValue = calculateInitiativeValue(initiative);
+  const createInitiative = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'absolute' | 'targetIds'> & { targetIds?: string[] }) => {
+    const targetIds = initiative.targetIds || [];
     
     const newInitiative: Initiative = {
       ...initiative,
-      calculatedValue,
+      targetIds,
+      absolute: 0, // Will be calculated in useEffect
       id: generateId('initiative'),
       createdAt: getCurrentTimestamp(),
       updatedAt: getCurrentTimestamp()
     };
     
-    setInitiatives([...initiatives, newInitiative]);
+    const updatedInitiatives = [...initiatives, newInitiative];
+    setInitiatives(updatedInitiatives);
     toast.success(`Created initiative: ${initiative.name}`);
   };
   
   const updateInitiative = (id: string, initiative: Partial<Initiative>) => {
-    let updatedInitiative: Partial<Initiative> = { ...initiative };
-    
-    // If impactPercentage changed or targetId changed, recalculate the value
-    if (initiative.impactPercentage !== undefined || initiative.targetId !== undefined) {
-      const currentInitiative = initiatives.find(i => i.id === id);
-      if (currentInitiative) {
-        const newInitiative = {
-          ...currentInitiative,
-          ...initiative
-        };
-        updatedInitiative.calculatedValue = calculateInitiativeValue(newInitiative);
-      }
-    }
-    
     setInitiatives(initiatives.map(i => 
-      i.id === id ? { ...i, ...updatedInitiative, updatedAt: getCurrentTimestamp() } : i
+      i.id === id ? { ...i, ...initiative, updatedAt: getCurrentTimestamp() } : i
     ));
-    
     toast.success(`Updated initiative: ${initiative.name || id}`);
   };
   
   const deleteInitiative = (id: string) => {
     setInitiatives(initiatives.filter(i => i.id !== id));
     toast.success(`Deleted initiative: ${id}`);
+  };
+  
+  const addTargetsToInitiative = (initiativeId: string, targetIds: string[]) => {
+    const initiative = initiatives.find(i => i.id === initiativeId);
+    
+    if (initiative) {
+      const updatedTargetIds = [...new Set([...initiative.targetIds, ...targetIds])];
+      
+      setInitiatives(initiatives.map(i => 
+        i.id === initiativeId ? { ...i, targetIds: updatedTargetIds, updatedAt: getCurrentTimestamp() } : i
+      ));
+      
+      toast.success(`Added ${targetIds.length} targets to initiative: ${initiative.name}`);
+    }
+  };
+  
+  const removeTargetFromInitiative = (initiativeId: string, targetId: string) => {
+    const initiative = initiatives.find(i => i.id === initiativeId);
+    
+    if (initiative) {
+      const updatedTargetIds = initiative.targetIds.filter(id => id !== targetId);
+      
+      setInitiatives(initiatives.map(i => 
+        i.id === initiativeId ? { ...i, targetIds: updatedTargetIds, updatedAt: getCurrentTimestamp() } : i
+      ));
+      
+      toast.success(`Removed target from initiative: ${initiative.name}`);
+    }
+  };
+  
+  const getInitiativesByTargetId = (targetId: string): Initiative[] => {
+    return initiatives.filter(initiative => initiative.targetIds.includes(targetId));
   };
   
   // CRUD operations for scenarios
@@ -373,12 +436,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     createInitiative,
     updateInitiative,
     deleteInitiative,
+    addTargetsToInitiative,
+    removeTargetFromInitiative,
+    getInitiativesByTargetId,
     createScenario,
     updateScenario,
     deleteScenario,
     createSupplier,
     updateSupplier,
-    deleteSupplier
+    deleteSupplier,
+    
+    // Utility functions
+    calculateTrackMeasurementsValue,
+    extractPercentage
   };
   
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

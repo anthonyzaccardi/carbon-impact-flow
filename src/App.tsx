@@ -11,6 +11,7 @@ import TracksPage from "./pages/TracksPage";
 import FactorsPage from "./pages/FactorsPage";
 import MeasurementsPage from "./pages/MeasurementsPage";
 import TargetsPage from "./pages/TargetsPage";
+import InitiativesPage from "./pages/InitiativesPage";
 import ScenariosPage from "./pages/ScenariosPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import NotFound from "./pages/NotFound";
@@ -62,6 +63,14 @@ const App = () => (
               element={
                 <MainLayout>
                   <TargetsPage />
+                </MainLayout>
+              } 
+            />
+            <Route 
+              path="/initiatives" 
+              element={
+                <MainLayout>
+                  <InitiativesPage />
                 </MainLayout>
               } 
             />

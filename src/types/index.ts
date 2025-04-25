@@ -1,5 +1,8 @@
 
 export type Status = 'active' | 'pending' | 'completed' | 'cancelled';
+export type InitiativeStatus = 'not_started' | 'in_progress' | 'completed' | 'committed';
+export type TrajectoryType = 'every_year' | 'linear';
+export type PlanType = '-2%' | '-4%' | '-6%' | '-8%' | '-10%';
 
 export interface Track {
   id: string;
@@ -62,17 +65,17 @@ export interface Target {
 
 export interface Initiative {
   id: string;
-  targetId: string;
   name: string;
   description: string;
   startDate: string;
   endDate: string;
-  impactPercentage: number;
-  calculatedValue: number;
-  budget: number;
-  spent: number;
+  status: InitiativeStatus;
+  spend: number;
+  trajectory: TrajectoryType;
+  plan: PlanType;
+  absolute: number;
+  targetIds: string[];
   currency: string;
-  status: Status;
   createdAt: string;
   updatedAt: string;
 }
