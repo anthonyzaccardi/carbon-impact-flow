@@ -1,3 +1,4 @@
+
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { AppContextType } from './types';
 import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier, InitiativeStatus, TrajectoryType, PlanType } from '../types';
@@ -32,8 +33,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // UI state
   const [sidePanel, setSidePanel] = useState({
     isOpen: false,
-    type: 'view' as const,
-    entityType: 'track' as const
+    type: 'view' as 'view' | 'create' | 'edit',
+    entityType: 'track' as 'track' | 'factor' | 'measurement' | 'target' | 'initiative' | 'scenario' | 'supplier'
   });
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   

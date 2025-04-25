@@ -1,5 +1,4 @@
-
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import StatCard from "@/components/ui/stat-card";

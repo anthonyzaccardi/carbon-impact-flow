@@ -12,7 +12,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -20,35 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from "@/contexts/useAppContext";
 import { Scenario } from "@/types";
 import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(3, {
     message: "Scenario name must be at least 3 characters.",
   }),
-  description: z.string().min(5, {
-    message: "Description must be at least 5 characters.",
-  }),
-  startDate: z.date({
-    required_error: "Start date is required.",
-  }),
-  endDate: z.date({
-    required_error: "End date is required.",
-  }),
   status: z.enum(["active", "pending", "completed", "cancelled"]),
-}).refine(data => data.endDate > data.startDate, {
-  message: "End date must be after start date",
-  path: ["endDate"],
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -71,22 +50,10 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
     targets,
   } = useAppContext();
 
-  // Parse dates for the form
-  const formattedData = initialData
-    ? {
-        ...initialData,
-        startDate: new Date(initialData.startDate),
-        endDate: new Date(initialData.endDate),
-      }
-    : undefined;
-
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: formattedData || {
+    defaultValues: initialData || {
       name: "",
-      description: "",
-      startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)),
       status: "active",
     },
   });
@@ -97,19 +64,10 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
     [];
 
   function onSubmit(data: FormData) {
-    const formattedData = {
-      ...data,
-      startDate: format(data.startDate, "yyyy-MM-dd"),
-      endDate: format(data.endDate, "yyyy-MM-dd"),
-      name: data.name,
-      description: data.description,
-      status: data.status
-    };
-
     if (mode === "create") {
-      createScenario(formattedData);
+      createScenario(data);
     } else if (mode === "edit" && initialData) {
-      updateScenario(initialData.id, formattedData);
+      updateScenario(initialData.id, data);
     }
     onClose();
   }
@@ -130,104 +88,6 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
             </FormItem>
           )}
         />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} disabled={isViewMode} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isViewMode}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>End Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isViewMode}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
 
         <FormField
           control={form.control}

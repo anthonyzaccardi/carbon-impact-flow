@@ -1,5 +1,4 @@
-
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from "@/contexts/useAppContext";
 import StatCard from "@/components/ui/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {

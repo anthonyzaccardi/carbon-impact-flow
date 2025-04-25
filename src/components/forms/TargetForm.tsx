@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from '@/contexts/useAppContext';
 import { Target } from "@/types";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";

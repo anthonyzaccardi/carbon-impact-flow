@@ -1,5 +1,4 @@
-
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import StatCard from "@/components/ui/stat-card";
@@ -20,7 +19,6 @@ const MeasurementsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [trackFilter, setTrackFilter] = useState("all");
   
-  // Apply filters
   const filteredMeasurements = measurements.filter(measurement => {
     const matchesSearch = searchTerm === "" || 
       measurement.unit.toLowerCase().includes(searchTerm.toLowerCase());
@@ -30,7 +28,6 @@ const MeasurementsPage = () => {
     return matchesSearch && matchesTrack;
   });
   
-  // Metrics
   const totalMeasurements = measurements.length;
   const totalEmissions = measurements.reduce((sum, m) => sum + m.calculatedValue, 0);
   const latestDate = measurements.length > 0 
@@ -38,7 +35,6 @@ const MeasurementsPage = () => {
     : 'N/A';
   const uniqueSuppliers = new Set(measurements.map(m => m.supplierId).filter(Boolean)).size;
   
-  // Table columns
   const columns = [
     {
       header: "Date",
@@ -87,12 +83,10 @@ const MeasurementsPage = () => {
     }
   ];
 
-  // Handle row click
   const handleRowClick = (measurement) => {
     openSidePanel('view', 'measurement', measurement);
   };
   
-  // Handle create new
   const handleCreateNew = () => {
     openSidePanel('create', 'measurement');
   };
@@ -112,7 +106,6 @@ const MeasurementsPage = () => {
         </Button>
       </div>
       
-      {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard 
           title="Total Measurements" 
@@ -132,7 +125,6 @@ const MeasurementsPage = () => {
         />
       </div>
       
-      {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -161,7 +153,6 @@ const MeasurementsPage = () => {
         </Select>
       </div>
       
-      {/* Measurements Table */}
       <DataTable 
         data={filteredMeasurements} 
         columns={columns} 

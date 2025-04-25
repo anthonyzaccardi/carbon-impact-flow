@@ -1,6 +1,6 @@
 
 import { ReactNode } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/contexts/useAppContext';
 
 interface MainContentProps {
   children: ReactNode;

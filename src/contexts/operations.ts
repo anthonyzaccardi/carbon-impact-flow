@@ -1,6 +1,10 @@
-import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier } from '../types';
-import { generateId, getCurrentTimestamp, calculateInitiativeAbsoluteValue } from './utils';
 import { toast } from 'sonner';
+import { generateId, getCurrentTimestamp } from './utils';
+import { 
+  Track, Factor, Measurement, Target, 
+  Initiative, Scenario, Supplier 
+} from '../types';
+import { Dispatch, SetStateAction } from 'react';
 
 export const createTrackOperation = (
   tracks: Track[],
@@ -402,19 +406,15 @@ export const updateSupplierOperation = (
 
 export const deleteSupplierOperation = (
   suppliers: Supplier[],
-  setSuppliers: (suppliers: Supplier[]) => void,
-  measurements: Measurement[],
-  targets: Target[],
+  setSuppliers: Dispatch<SetStateAction<Supplier[]>>,
   id: string
 ) => {
-  const hasMeasurements = measurements.some(m => m.supplierId === id);
-  const hasTargets = targets.some(t => t.supplierId === id);
-  
-  if (hasMeasurements || hasTargets) {
-    toast.error(`Cannot delete supplier: it's in use by measurements or targets`);
-    return;
+  try {
+    const updatedSuppliers = suppliers.filter(supplier => supplier.id !== id);
+    setSuppliers(updatedSuppliers);
+    toast.success('Supplier deleted successfully');
+  } catch (error) {
+    toast.error('Failed to delete supplier');
+    console.error('Error deleting supplier:', error);
   }
-  
-  setSuppliers(suppliers.filter(s => s.id !== id));
-  toast.success(`Deleted supplier: ${id}`);
 };

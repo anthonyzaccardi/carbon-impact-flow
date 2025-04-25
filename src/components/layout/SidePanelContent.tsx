@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
@@ -10,7 +9,7 @@ import InitiativeForm from '@/components/forms/InitiativeForm';
 import ScenarioForm from '@/components/forms/ScenarioForm';
 import SupplierForm from '@/components/forms/SupplierForm';
 import { SidePanel } from '@/types';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/contexts/useAppContext';
 
 interface SidePanelContentProps {
   sidePanel: SidePanel;
@@ -34,7 +33,6 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
     getInitiativesByTargetId
   } = useAppContext();
   
-  // Handler for deleting an entity
   const handleDelete = () => {
     if (!data) return;
     
@@ -64,13 +62,11 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
     onClose();
   };
   
-  // Handler for editing an entity
   const handleEdit = () => {
     if (!data) return;
     openSidePanel('edit', entityType, data);
   };
   
-  // Render action buttons for view mode
   const renderActionButtons = () => {
     if (type !== 'view') return null;
     
@@ -98,13 +94,11 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
     );
   };
   
-  // Render related entities based on the entity type
   const renderRelatedEntities = () => {
     if (type !== 'view' || !data) return null;
     
     switch (entityType) {
       case 'factor':
-        // Show measurements using this factor
         const factorMeasurements = measurements.filter(m => m.factorId === data.id);
         if (factorMeasurements.length === 0) return null;
         
@@ -132,7 +126,6 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
         );
       
       case 'target':
-        // Show initiatives linked to this target
         const targetInitiatives = getInitiativesByTargetId(data.id);
         if (targetInitiatives.length === 0) return null;
         
@@ -157,7 +150,6 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
         );
       
       case 'supplier':
-        // Show targets linked to this supplier
         const supplierTargets = targets.filter(t => t.supplierId === data.id);
         if (supplierTargets.length === 0) return null;
         
@@ -186,7 +178,6 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
     }
   };
   
-  // Render the appropriate form based on entity type
   let formComponent = null;
   
   if (entityType === 'track') {

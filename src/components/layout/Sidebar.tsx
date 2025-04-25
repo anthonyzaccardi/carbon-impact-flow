@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/contexts/useAppContext';
 import { 
   Home, 
   BarChart, 

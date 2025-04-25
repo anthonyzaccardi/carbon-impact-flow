@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from '@/contexts/useAppContext';
 import { Supplier, Target } from "@/types";
 import {
   Dialog,
@@ -91,7 +90,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   const { createSupplier, updateSupplier, deleteSupplier, openSidePanel, targets } = useAppContext();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
-  // Get targets linked to this supplier
   const linkedTargets = initialData 
     ? targets.filter(target => target.supplierId === initialData.id)
     : [];
@@ -109,7 +107,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   });
 
   function onSubmit(data: FormData) {
-    // Ensure all required fields are explicitly included
     const formattedData = {
       name: data.name,
       industry: data.industry,
@@ -267,7 +264,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           />
         </div>
 
-        {/* Linked Targets Section */}
         {isViewMode && initialData && (
           <div className="mt-6">
             <h3 className="text-lg font-medium mb-2">Linked Targets</h3>
@@ -292,7 +288,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           </div>
         )}
         
-        {/* Action Buttons */}
         {!isViewMode && (
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={onClose} type="button">

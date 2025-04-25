@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/contexts/useAppContext';
 import { Initiative } from '@/types';
 import DataTable from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';

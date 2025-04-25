@@ -1,5 +1,4 @@
-
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import StatCard from "@/components/ui/stat-card";
@@ -22,7 +21,6 @@ const TargetsPage = () => {
   const [trackFilter, setTrackFilter] = useState("all");
   const [scenarioFilter, setScenarioFilter] = useState("all");
   
-  // Apply filters
   const filteredTargets = targets.filter(target => {
     const matchesSearch = 
       target.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -35,7 +33,6 @@ const TargetsPage = () => {
     return matchesSearch && matchesTrack && matchesScenario;
   });
   
-  // Metrics
   const totalTargets = targets.length;
   const activeTargets = targets.filter(target => target.status === 'active').length;
   const totalBaseline = targets.reduce((sum, t) => sum + t.baselineValue, 0);
@@ -43,7 +40,6 @@ const TargetsPage = () => {
   const averageReduction = targets.length > 0 ? 
     targets.reduce((sum, t) => sum + t.targetPercentage, 0) / targets.length : 0;
   
-  // Table columns
   const columns = [
     {
       header: "Name",
@@ -87,12 +83,10 @@ const TargetsPage = () => {
     }
   ];
 
-  // Handle row click
   const handleRowClick = (target) => {
     openSidePanel('view', 'target', target);
   };
   
-  // Handle create new
   const handleCreateNew = () => {
     openSidePanel('create', 'target');
   };
@@ -112,7 +106,6 @@ const TargetsPage = () => {
         </Button>
       </div>
       
-      {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Total Targets" 
@@ -132,7 +125,6 @@ const TargetsPage = () => {
         />
       </div>
       
-      {/* Reduction Summary */}
       <Card>
         <CardContent className="p-6">
           <div className="space-y-4">
@@ -168,7 +160,6 @@ const TargetsPage = () => {
         </CardContent>
       </Card>
       
-      {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -214,7 +205,6 @@ const TargetsPage = () => {
         </Select>
       </div>
       
-      {/* Targets Table */}
       <DataTable 
         data={filteredTargets} 
         columns={columns} 

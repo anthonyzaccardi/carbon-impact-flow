@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAppContext } from "@/contexts/AppContext";
+import { useAppContext } from "@/contexts/useAppContext";
 import { Initiative, InitiativeStatus, PlanType, TrajectoryType } from "@/types";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -133,7 +132,6 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
   const [calculatedAbsolute, setCalculatedAbsolute] = useState(0);
   const [selectedTargets, setSelectedTargets] = useState<any[]>([]);
 
-  // Update selectedTargets and calculated absolute value when targetIds change
   useEffect(() => {
     if (watchTargetIds && watchTargetIds.length > 0) {
       const targetsData = targets.filter(t => watchTargetIds.includes(t.id));

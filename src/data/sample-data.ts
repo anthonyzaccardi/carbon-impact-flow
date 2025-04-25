@@ -1,363 +1,262 @@
-
 import { 
-  Track, 
-  Factor,
-  Measurement, 
-  Target, 
-  Initiative, 
-  Scenario, 
-  Supplier
-} from "../types";
+  Track, Factor, Measurement, Target, 
+  Initiative, Scenario, Supplier, 
+  InitiativeStatus, TrajectoryType, PlanType 
+} from '../types';
+import { generateId } from '../contexts/utils';
 
-// Sample Tracks
+// Create tracks with proper structure (no description)
 export const tracks: Track[] = [
   {
-    id: "track-1",
-    name: "Scope 1 Emissions",
-    emoji: "🏭",
-    description: "Direct emissions from owned or controlled sources",
-    totalEmissions: 1250,
-    unit: "tCO2e",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('track'),
+    name: '🏭 Scope 1',
+    emoji: '🏭',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    totalEmissions: 120000,
+    unit: 'tCO2e'
   },
   {
-    id: "track-2",
-    name: "Scope 2 Emissions",
-    emoji: "⚡",
-    description: "Indirect emissions from purchased electricity, heating, and cooling",
-    totalEmissions: 850,
-    unit: "tCO2e",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('track'),
+    name: '⚡ Scope 2',
+    emoji: '⚡',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    totalEmissions: 85000,
+    unit: 'tCO2e'
   },
   {
-    id: "track-3",
-    name: "Scope 3 Emissions",
-    emoji: "🌐",
-    description: "All other indirect emissions in a company's value chain",
-    totalEmissions: 3200,
-    unit: "tCO2e",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
-  },
-  {
-    id: "track-4",
-    name: "Water Usage",
-    emoji: "💧",
-    description: "Total water consumption across operations",
-    totalEmissions: 45000,
-    unit: "m³",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
-  },
-  {
-    id: "track-5",
-    name: "Waste Management",
-    emoji: "🗑️",
-    description: "Solid waste generation and disposal",
-    totalEmissions: 320,
-    unit: "tonnes",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('track'),
+    name: '🚗 Scope 3',
+    emoji: '🚗',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    totalEmissions: 50000,
+    unit: 'tCO2e'
   }
 ];
 
-// Sample Factors
+// Create factors with proper structure (no source)
 export const factors: Factor[] = [
   {
-    id: "factor-1",
-    trackId: "track-1",
-    name: "Natural Gas Combustion",
-    value: 0.2,
-    unit: "kgCO2e/kWh",
-    source: "EPA Emission Factors 2023",
-    category: "Stationary Combustion",
-    description: "Emission factor for natural gas combustion in industrial boilers",
-    effectiveDate: "2023-01-01",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('factor'),
+    trackId: tracks[0].id,
+    name: 'Natural Gas Combustion',
+    value: 0.185,
+    unit: 'kgCO2e/kWh',
+    category: 'Stationary Combustion',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "factor-2",
-    trackId: "track-1",
-    name: "Company Vehicle Fleet",
-    value: 2.31,
-    unit: "kgCO2e/L",
-    source: "GHG Protocol 2023",
-    category: "Mobile Combustion",
-    description: "Emission factor for diesel use in company vehicles",
-    effectiveDate: "2023-01-01",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('factor'),
+    trackId: tracks[1].id,
+    name: 'Purchased Electricity',
+    value: 0.00035,
+    unit: 'kgCO2e/kWh',
+    category: 'Purchased Electricity',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "factor-3",
-    trackId: "track-2",
-    name: "Grid Electricity",
-    value: 0.35,
-    unit: "kgCO2e/kWh",
-    source: "National Grid 2023",
-    category: "Purchased Electricity",
-    description: "Emission factor for grid electricity",
-    effectiveDate: "2023-01-01",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
-  },
-  {
-    id: "factor-4",
-    trackId: "track-3",
-    name: "Air Travel",
-    value: 0.25,
-    unit: "kgCO2e/km",
-    source: "DEFRA 2023",
-    category: "Business Travel",
-    description: "Emission factor for long-haul flights, economy class",
-    effectiveDate: "2023-01-01",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
-  },
-  {
-    id: "factor-5",
-    trackId: "track-4",
-    name: "Water Consumption Factor",
-    value: 1,
-    unit: "m³",
-    source: "Water Utility 2023",
-    category: "Water",
-    description: "Direct measurement factor for water consumption",
-    effectiveDate: "2023-01-01",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('factor'),
+    trackId: tracks[2].id,
+    name: 'Employee Commuting',
+    value: 0.00012,
+    unit: 'kgCO2e/km',
+    category: 'Employee Commuting',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
-// Sample Suppliers
+// Create suppliers with proper structure (no location)
 export const suppliers: Supplier[] = [
   {
-    id: "supplier-1",
-    name: "EcoEnergy Solutions",
-    industry: "Energy",
-    location: "California, USA",
-    contactPerson: "Jane Smith",
-    email: "jane@ecoenergy.com",
-    phone: "+1-555-123-4567",
-    currency: "USD",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('supplier'),
+    name: 'EcoSupply Solutions',
+    industry: 'Manufacturing',
+    contactPerson: 'Sarah Johnson',
+    email: 'sarah@ecosupply.com',
+    currency: 'USD',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "supplier-2",
-    name: "Green Transport Ltd",
-    industry: "Transportation",
-    location: "London, UK",
-    contactPerson: "John Brown",
-    email: "john@greentransport.com",
-    phone: "+44-20-1234-5678",
-    currency: "GBP",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('supplier'),
+    name: 'GreenTech Innovations',
+    industry: 'Technology',
+    contactPerson: 'David Lee',
+    email: 'david@greentech.com',
+    currency: 'EUR',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "supplier-3",
-    name: "Sustainable Materials Co",
-    industry: "Manufacturing",
-    location: "Berlin, Germany",
-    contactPerson: "Anna Weber",
-    email: "anna@sustainablematerials.com",
-    phone: "+49-30-1234-5678",
-    currency: "EUR",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('supplier'),
+    name: 'Sustainable Energy Corp',
+    industry: 'Energy',
+    contactPerson: 'Emily White',
+    email: 'emily@sustainableenergy.com',
+    currency: 'USD',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
-// Sample Scenarios
+// Create scenarios with proper structure (no description)
 export const scenarios: Scenario[] = [
   {
-    id: "scenario-1",
-    name: "2030 Net Zero Roadmap",
-    description: "Aggressive reduction plan to achieve net zero emissions by 2030",
-    startDate: "2023-01-01",
-    endDate: "2030-12-31",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('scenario'),
+    name: 'Base Sustainability Plan',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "scenario-2",
-    name: "Moderate Reduction Plan",
-    description: "Balanced approach to emission reduction with moderate targets",
-    startDate: "2023-01-01",
-    endDate: "2035-12-31",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('scenario'),
+    name: 'Advanced Reduction Scenario',
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: generateId('scenario'),
+    name: 'Net-Zero Target 2050',
+    status: 'completed',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
-// Sample Targets
+// Create targets with proper structure (no description)
 export const targets: Target[] = [
   {
-    id: "target-1",
-    trackId: "track-1",
-    scenarioId: "scenario-1",
-    supplierId: "supplier-1",
-    name: "Scope 1 Reduction",
-    description: "Reduce direct emissions by transitioning to cleaner fuels",
-    baselineValue: 1250,
-    targetValue: 625,
-    targetPercentage: 50,
-    targetDate: "2025-12-31",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('target'),
+    name: 'Scope 1 Reduction',
+    trackId: tracks[0].id,
+    baselineValue: 120000,
+    targetValue: 90000,
+    targetPercentage: 25,
+    targetDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(),
+    status: 'active',
+    scenarioId: scenarios[0].id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "target-2",
-    trackId: "track-2",
-    scenarioId: "scenario-1",
-    name: "Renewable Energy Transition",
-    description: "Increase renewable energy usage to reduce scope 2 emissions",
-    baselineValue: 850,
-    targetValue: 170,
-    targetPercentage: 80,
-    targetDate: "2026-12-31",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('target'),
+    name: 'Electricity Consumption',
+    trackId: tracks[1].id,
+    baselineValue: 85000,
+    targetValue: 65000,
+    targetPercentage: 23.5,
+    targetDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(),
+    status: 'active',
+    scenarioId: scenarios[1].id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "target-3",
-    trackId: "track-3",
-    scenarioId: "scenario-2",
-    supplierId: "supplier-2",
-    name: "Supply Chain Optimization",
-    description: "Work with suppliers to reduce scope 3 emissions",
-    baselineValue: 3200,
-    targetValue: 1920,
-    targetPercentage: 40,
-    targetDate: "2027-12-31",
-    status: "active",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    id: generateId('target'),
+    name: 'Commuting Emissions',
+    trackId: tracks[2].id,
+    baselineValue: 50000,
+    targetValue: 40000,
+    targetPercentage: 20,
+    targetDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)).toISOString(),
+    status: 'active',
+    scenarioId: scenarios[2].id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
-// Sample Measurements
+// Create measurements with proper structure (no notes)
 export const measurements: Measurement[] = [
   {
-    id: "measurement-1",
-    trackId: "track-1",
-    factorId: "factor-1",
-    supplierId: "supplier-1",
-    date: "2023-01-31",
-    quantity: 5000,
-    unit: "kWh",
-    notes: "January natural gas usage",
-    calculatedValue: 1000, // 5000 * 0.2
-    status: "active",
-    createdAt: "2023-02-01T00:00:00Z",
-    updatedAt: "2023-02-01T00:00:00Z"
+    id: generateId('measurement'),
+    trackId: tracks[0].id,
+    factorId: factors[0].id,
+    quantity: 540000,
+    unit: 'kWh',
+    date: new Date().toISOString(),
+    calculatedValue: 99900,
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "measurement-2",
-    trackId: "track-1",
-    factorId: "factor-2",
-    date: "2023-01-31",
-    quantity: 500,
-    unit: "L",
-    notes: "January diesel consumption",
-    calculatedValue: 1155, // 500 * 2.31
-    status: "active",
-    createdAt: "2023-02-01T00:00:00Z",
-    updatedAt: "2023-02-01T00:00:00Z"
+    id: generateId('measurement'),
+    trackId: tracks[1].id,
+    factorId: factors[1].id,
+    quantity: 242857142.85714286,
+    unit: 'kWh',
+    date: new Date().toISOString(),
+    calculatedValue: 85000,
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   },
   {
-    id: "measurement-3",
-    trackId: "track-2",
-    factorId: "factor-3",
-    date: "2023-01-31",
-    quantity: 10000,
-    unit: "kWh",
-    notes: "January electricity usage",
-    calculatedValue: 3500, // 10000 * 0.35
-    status: "active",
-    createdAt: "2023-02-01T00:00:00Z",
-    updatedAt: "2023-02-01T00:00:00Z"
+    id: generateId('measurement'),
+    trackId: tracks[2].id,
+    factorId: factors[2].id,
+    quantity: 416666666.6666667,
+    unit: 'km',
+    date: new Date().toISOString(),
+    calculatedValue: 50000,
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
-// Sample Initiatives
+// Create initiatives with proper structure (no description)
 export const initiatives: Initiative[] = [
   {
-    id: "initiative-1",
-    name: "Boiler Upgrade Program",
-    description: "Replace old boilers with high-efficiency models",
-    startDate: "2023-03-01",
-    endDate: "2023-08-31",
-    status: "in_progress",
-    spend: 150000,
-    trajectory: "linear",
-    plan: "-6%",
-    absolute: 312.5,
-    targetIds: ["target-1"],
-    currency: "USD",
-    createdAt: "2023-01-15T00:00:00Z",
-    updatedAt: "2023-01-15T00:00:00Z"
-  },
-  {
-    id: "initiative-2",
-    name: "Solar Panel Installation",
-    description: "Install solar panels on facility rooftops",
-    startDate: "2023-04-01",
-    endDate: "2023-10-31",
-    status: "in_progress",
-    spend: 350000,
-    trajectory: "linear",
-    plan: "-8%",
-    absolute: 340,
-    targetIds: ["target-2"],
-    currency: "USD",
-    createdAt: "2023-02-15T00:00:00Z",
-    updatedAt: "2023-02-15T00:00:00Z"
-  },
-  {
-    id: "initiative-3",
-    name: "Supply Chain Optimization",
-    description: "Optimize logistics and reduce unnecessary transportation",
-    startDate: "2023-05-01",
-    endDate: "2024-04-30",
-    status: "not_started",
+    id: generateId('initiative'),
+    name: 'Energy Efficiency Program',
+    targetIds: [targets[0].id, targets[1].id],
+    plan: '-15%',
+    trajectory: 'linear',
+    status: 'in_progress',
+    startDate: new Date().toISOString(),
+    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString(),
     spend: 75000,
-    trajectory: "every_year",
-    plan: "-4%",
-    absolute: 480,
-    targetIds: ["target-3"],
-    currency: "USD",
-    createdAt: "2023-03-15T00:00:00Z",
-    updatedAt: "2023-03-15T00:00:00Z"
+    absolute: 30750,
+    currency: 'USD',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: generateId('initiative'),
+    name: 'Renewable Energy Sourcing',
+    targetIds: [targets[1].id],
+    plan: '-10%',
+    trajectory: 'linear',
+    status: 'committed',
+    startDate: new Date().toISOString(),
+    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 3)).toISOString(),
+    spend: 120000,
+    absolute: 8500,
+    currency: 'USD',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: generateId('initiative'),
+    name: 'Sustainable Commuting',
+    targetIds: [targets[2].id],
+    plan: '-5%',
+    trajectory: 'linear',
+    status: 'not_started',
+    startDate: new Date().toISOString(),
+    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+    spend: 30000,
+    absolute: 2500,
+    currency: 'USD',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
-
-// Helper function to find items by related IDs
-export const getTrackById = (id: string) => tracks.find(track => track.id === id);
-export const getFactorsByTrackId = (trackId: string) => factors.filter(factor => factor.trackId === trackId);
-export const getMeasurementsByTrackId = (trackId: string) => measurements.filter(measurement => measurement.trackId === trackId);
-export const getTargetsByTrackId = (trackId: string) => targets.filter(target => target.trackId === trackId);
-export const getInitiativesByTargetId = (targetId: string) => initiatives.filter(initiative => initiative.targetIds.includes(targetId));
-export const getSupplierById = (id: string) => suppliers.find(supplier => supplier.id === id);
-export const getTargetsByScenarioId = (scenarioId: string) => targets.filter(target => target.scenarioId === scenarioId);
