@@ -24,9 +24,7 @@ const FactorsPage = () => {
   const filteredFactors = factors.filter(factor => {
     const matchesSearch = 
       factor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      factor.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      factor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      factor.source.toLowerCase().includes(searchTerm.toLowerCase());
+      factor.category.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesTrack = trackFilter === "all" || factor.trackId === trackFilter;
     
@@ -37,7 +35,6 @@ const FactorsPage = () => {
   const totalFactors = factors.length;
   const activeFactors = factors.filter(factor => factor.status === 'active').length;
   const categories = [...new Set(factors.map(factor => factor.category))].length;
-  const sources = [...new Set(factors.map(factor => factor.source))].length;
   
   // Table columns
   const columns = [
@@ -66,19 +63,6 @@ const FactorsPage = () => {
     {
       header: "Category",
       accessorKey: "category",
-    },
-    {
-      header: "Source",
-      accessorKey: "source",
-    },
-    {
-      header: "Effective Date",
-      accessorKey: "effectiveDate",
-      cell: (item) => new Date(item.effectiveDate).toLocaleDateString(),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
     }
   ];
 
@@ -108,7 +92,7 @@ const FactorsPage = () => {
       </div>
       
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard 
           title="Total Factors" 
           value={totalFactors}
@@ -120,10 +104,6 @@ const FactorsPage = () => {
         <StatCard 
           title="Categories" 
           value={categories}
-        />
-        <StatCard 
-          title="Sources" 
-          value={sources}
         />
       </div>
       
