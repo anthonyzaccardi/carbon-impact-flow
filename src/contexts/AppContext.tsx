@@ -1,4 +1,3 @@
-
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { AppContextType } from './types';
 import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier, InitiativeStatus, TrajectoryType, PlanType, SidePanel } from '../types';
@@ -128,7 +127,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const createInitiative = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'absolute' | 'targetIds'> & { targetIds?: string[] }) => {
-    createInitiativeOperation(initiatives, setInitiatives, targets, extractPercentage, initiative);
+    createInitiativeOperation(
+      initiatives, 
+      setInitiatives, 
+      targets, 
+      extractPercentage, 
+      initiative
+    );
   };
 
   const updateInitiative = (id: string, initiative: Partial<Initiative>) => {
