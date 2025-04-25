@@ -9,7 +9,7 @@ export const useScenarioCrud = (
   setTargets: (targets: Target[]) => void
 ) => {
   const createScenario = (scenario: Omit<Scenario, 'id' | 'createdAt' | 'updatedAt'>) => {
-    createScenarioOperation(scenarios, setScenarios, targets, setTargets, scenario);
+    createScenarioOperation(scenarios, setScenarios, scenario);
   };
 
   const updateScenario = (id: string, scenario: Partial<Scenario>) => {

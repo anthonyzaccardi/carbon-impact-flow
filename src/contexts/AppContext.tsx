@@ -1,9 +1,10 @@
 
-import { createContext, useEffect, ReactNode } from 'react';
+import { createContext, ReactNode } from 'react';
 import { AppContextType } from './types';
 import { useEntityState } from './hooks/useEntityState';
 import { useUIState } from './hooks/useUIState';
 import { useUtilityFunctions } from './hooks/useUtilityFunctions';
+import { useEffects } from './hooks/useEffects';
 import { useTrackCrud } from './hooks/useTrackCrud';
 import { useFactorCrud } from './hooks/useFactorCrud';
 import { useMeasurementCrud } from './hooks/useMeasurementCrud';
@@ -48,6 +49,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     getTrackStats
   } = useUtilityFunctions(tracks, factors, measurements, targets, initiatives);
 
+  // Use the new effects hook
+  useEffects(tracks, setTracks, targets, setTargets, calculateTrackMeasurementsValue);
+
   const trackCrud = useTrackCrud(tracks, setTracks, factors, measurements, targets);
   const factorCrud = useFactorCrud(factors, setFactors, measurements, setMeasurements);
   const measurementCrud = useMeasurementCrud(factors, measurements, setMeasurements);
@@ -55,32 +59,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const initiativeCrud = useInitiativeCrud(initiatives, setInitiatives, targets, extractPercentage);
   const scenarioCrud = useScenarioCrud(scenarios, setScenarios, targets, setTargets);
   const supplierCrud = useSupplierCrud(suppliers, setSuppliers);
-
-  // Effects for automatic calculations
-  useEffect(() => {
-    const updatedTracks = tracks.map(track => ({
-      ...track,
-      totalEmissions: calculateTrackMeasurementsValue(track.id)
-    }));
-    
-    if (JSON.stringify(updatedTracks) !== JSON.stringify(tracks)) {
-      setTracks(updatedTracks);
-    }
-  }, [measurements, calculateTrackMeasurementsValue]);
-
-  useEffect(() => {
-    const updatedTargets = targets.map(target => {
-      const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
-      if (target.targetValue !== targetValue) {
-        return { ...target, targetValue };
-      }
-      return target;
-    });
-    
-    if (JSON.stringify(updatedTargets) !== JSON.stringify(targets)) {
-      setTargets(updatedTargets);
-    }
-  }, [targets]);
 
   const value: AppContextType = {
     tracks,
