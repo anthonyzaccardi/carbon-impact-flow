@@ -64,6 +64,7 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
 
   function onSubmit(data: FormData) {
     if (mode === "create") {
+      // Ensure we pass all required fields
       createScenario({
         name: data.name,
         status: data.status

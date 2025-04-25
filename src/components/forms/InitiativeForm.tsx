@@ -58,7 +58,7 @@ const formSchema = z.object({
   trajectory: z.enum(["every_year", "linear"], {
     required_error: "Trajectory type is required.",
   }),
-  plan: z.enum(["-2%", "-4%", "-6%", "-8%", "-10%"], {
+  plan: z.enum(["-2%", "-4%", "-6%", "-8%", "-10%", "-15%", "-5%"], {
     required_error: "Reduction plan is required.",
   }),
   currency: z.string().min(1, {
@@ -100,29 +100,30 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
     calculateTrackMeasurementsValue
   } = useAppContext();
 
-  const formattedData = initialData
+  const defaultValues = initialData
     ? {
         ...initialData,
         startDate: new Date(initialData.startDate),
         endDate: new Date(initialData.endDate),
         targetIds: initialData.targetIds || [],
+        description: initialData.description || ""
       }
-    : undefined;
+    : {
+        name: "",
+        description: "",
+        startDate: new Date(),
+        endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
+        status: "not_started" as InitiativeStatus,
+        spend: 0,
+        trajectory: "linear" as TrajectoryType,
+        plan: "-6%" as PlanType,
+        currency: "USD",
+        targetIds: [],
+      };
 
-  const form = useForm<FormData>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: formattedData || {
-      name: "",
-      description: "",
-      startDate: new Date(),
-      endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
-      status: "not_started",
-      spend: 0,
-      trajectory: "linear",
-      plan: "-6%",
-      currency: "USD",
-      targetIds: [],
-    },
+    defaultValues,
   });
 
   const watchTargetIds = form.watch("targetIds");
@@ -352,6 +353,8 @@ const InitiativeForm: React.FC<InitiativeFormProps> = ({
                     <SelectItem value="-6%">-6%</SelectItem>
                     <SelectItem value="-8%">-8%</SelectItem>
                     <SelectItem value="-10%">-10%</SelectItem>
+                    <SelectItem value="-15%">-15%</SelectItem>
+                    <SelectItem value="-5%">-5%</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

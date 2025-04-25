@@ -59,6 +59,7 @@ export interface Target {
 export interface Initiative {
   id: string;
   name: string;
+  description: string; // Adding description which is used in the form
   startDate: string;
   endDate: string;
   status: InitiativeStatus;

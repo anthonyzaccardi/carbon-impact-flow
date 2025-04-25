@@ -64,7 +64,12 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
 
   function onSubmit(data: FormData) {
     if (mode === "create") {
-      createTrack(data);
+      // Ensure all required properties are passed and not optional
+      createTrack({
+        name: data.name,
+        emoji: data.emoji,
+        unit: data.unit
+      });
     } else if (mode === "edit" && initialData) {
       updateTrack(initialData.id, data);
     }

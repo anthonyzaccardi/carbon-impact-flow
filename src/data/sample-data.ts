@@ -227,6 +227,7 @@ export const initiatives: Initiative[] = [
   {
     id: generateId('initiative'),
     name: 'Energy Efficiency Program',
+    description: 'Implement energy efficiency measures across facilities',
     targetIds: [targets[0].id, targets[1].id],
     plan: '-15%' as PlanType,
     trajectory: 'linear',
@@ -242,6 +243,7 @@ export const initiatives: Initiative[] = [
   {
     id: generateId('initiative'),
     name: 'Renewable Energy Sourcing',
+    description: 'Transition to renewable energy sources',
     targetIds: [targets[1].id],
     plan: '-10%' as PlanType,
     trajectory: 'linear',
@@ -257,6 +259,7 @@ export const initiatives: Initiative[] = [
   {
     id: generateId('initiative'),
     name: 'Sustainable Commuting',
+    description: 'Encourage sustainable commuting options',
     targetIds: [targets[2].id],
     plan: '-5%' as PlanType,
     trajectory: 'linear',
