@@ -2,7 +2,7 @@
 import { Target } from "@/types";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface TargetSelectorProps {
@@ -16,6 +16,16 @@ export const TargetSelector = ({ targets, selectedTargets, onSelect, disabled }:
   if (targets.length === 0) {
     return <p className="text-sm text-muted-foreground">No targets available</p>;
   }
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      return isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid date';
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return 'Invalid date';
+    }
+  };
 
   return (
     <div className="space-y-2">
@@ -39,7 +49,7 @@ export const TargetSelector = ({ targets, selectedTargets, onSelect, disabled }:
               </Badge>
             </div>
             <span className="text-xs text-muted-foreground">
-              By {format(new Date(target.targetDate), 'MMM d, yyyy')}
+              By {formatDate(target.targetDate)}
             </span>
           </div>
         );

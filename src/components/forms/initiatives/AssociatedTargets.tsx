@@ -1,7 +1,7 @@
 
 import { Target } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 
 interface AssociatedTargetsProps {
   targets: Target[];
@@ -10,6 +10,16 @@ interface AssociatedTargetsProps {
 
 export const AssociatedTargets = ({ targets, isViewMode }: AssociatedTargetsProps) => {
   if (targets.length === 0) return null;
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      return isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid date';
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return 'Invalid date';
+    }
+  };
 
   return (
     <div>
@@ -27,7 +37,7 @@ export const AssociatedTargets = ({ targets, isViewMode }: AssociatedTargetsProp
               </Badge>
             </div>
             <span className="text-xs text-muted-foreground">
-              By {format(new Date(target.targetDate), 'MMM d, yyyy')}
+              By {formatDate(target.targetDate)}
             </span>
           </div>
         ))}

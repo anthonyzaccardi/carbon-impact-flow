@@ -2,6 +2,7 @@
 import { Target, Track } from "@/types";
 import DataTable from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
+import { format, isValid, parseISO } from "date-fns";
 
 interface ScenarioTargetTableProps {
   targets: Target[];
@@ -16,6 +17,16 @@ export const ScenarioTargetTable = ({
   onRowClick,
   onRemoveTarget 
 }: ScenarioTargetTableProps) => {
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      return isValid(date) ? format(date, 'PP') : 'Invalid date';
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return 'Invalid date';
+    }
+  };
+
   const columns = [
     {
       header: "Name",
@@ -52,7 +63,7 @@ export const ScenarioTargetTable = ({
     {
       header: "Target Date",
       accessorKey: "targetDate",
-      cell: (target: Target) => new Date(target.targetDate).toLocaleDateString(),
+      cell: (target: Target) => formatDate(target.targetDate),
     },
     {
       header: "Actions",
