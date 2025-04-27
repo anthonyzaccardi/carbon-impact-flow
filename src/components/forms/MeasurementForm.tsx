@@ -1,60 +1,13 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Measurement } from "@/types";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-
-const formSchema = z.object({
-  trackId: z.string().min(1, {
-    message: "Please select a track.",
-  }),
-  factorId: z.string().min(1, {
-    message: "Please select a factor.",
-  }),
-  supplierId: z.string().optional(),
-  date: z.date({
-    required_error: "Date is required.",
-  }),
-  quantity: z.coerce.number().positive({
-    message: "Quantity must be a positive number.",
-  }),
-  unit: z.string().min(1, {
-    message: "Unit is required.",
-  }),
-  notes: z.string().optional(),
-  status: z.enum(["active", "pending", "completed", "cancelled"]),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { measurementFormSchema, type MeasurementFormData } from "./measurements/schema";
+import MeasurementFormFields from "./measurements/MeasurementFormFields";
 
 interface MeasurementFormProps {
   mode: "create" | "edit" | "view";
@@ -68,13 +21,7 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
   onClose,
 }) => {
   const isViewMode = mode === "view";
-  const { 
-    createMeasurement, 
-    updateMeasurement, 
-    tracks, 
-    factors,
-    suppliers 
-  } = useAppContext();
+  const { createMeasurement, updateMeasurement, tracks, factors, suppliers } = useAppContext();
   
   const [availableFactors, setAvailableFactors] = useState(factors);
   const [selectedTrackUnit, setSelectedTrackUnit] = useState("");
@@ -87,8 +34,8 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
       }
     : undefined;
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<MeasurementFormData>({
+    resolver: zodResolver(measurementFormSchema),
     defaultValues: formattedData || {
       trackId: "",
       factorId: "",
@@ -109,19 +56,15 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
         (factor) => factor.trackId === watchTrackId
       );
       setAvailableFactors(filteredFactors);
-
-      const selectedTrack = tracks.find((track) => track.id === watchTrackId);
-      if (selectedTrack) {
-        setSelectedTrackUnit("tCO₂e");
-        form.setValue("unit", "tCO₂e");
-      }
+      setSelectedTrackUnit("tCO₂e");
+      form.setValue("unit", "tCO₂e");
 
       const currentFactor = form.getValues("factorId");
       if (currentFactor && !filteredFactors.some(f => f.id === currentFactor)) {
         form.setValue("factorId", "");
       }
     }
-  }, [watchTrackId, factors, tracks, form]);
+  }, [watchTrackId, factors, form]);
 
   useEffect(() => {
     if (watchFactorId && watchQuantity) {
@@ -133,7 +76,7 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
     }
   }, [watchFactorId, watchQuantity, factors]);
 
-  function onSubmit(data: FormData) {
+  function onSubmit(data: MeasurementFormData) {
     const formattedData = {
       ...data,
       date: format(data.date, "yyyy-MM-dd"),
@@ -157,238 +100,16 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="trackId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Track</FormLabel>
-              <Select
-                disabled={isViewMode}
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select track" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {tracks.map((track) => (
-                    <SelectItem key={track.id} value={track.id}>
-                      {track.emoji} {track.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <MeasurementFormFields
+          form={form}
+          isViewMode={isViewMode}
+          tracks={tracks}
+          factors={factors}
+          suppliers={suppliers}
+          availableFactors={availableFactors}
+          selectedTrackUnit={selectedTrackUnit}
+          calculatedValue={calculatedValue}
         />
-
-        <FormField
-          control={form.control}
-          name="factorId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Factor</FormLabel>
-              <Select
-                disabled={isViewMode || availableFactors.length === 0}
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select factor" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {availableFactors.map((factor) => (
-                    <SelectItem key={factor.id} value={factor.id}>
-                      {factor.name} ({factor.value} {factor.unit})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-              {availableFactors.length === 0 && watchTrackId && (
-                <p className="text-sm text-amber-500 mt-1">
-                  No factors available for this track. Please create a factor first.
-                </p>
-              )}
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="supplierId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Supplier (Optional)</FormLabel>
-              <Select
-                disabled={isViewMode}
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select supplier" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {suppliers.map((supplier) => (
-                    <SelectItem key={supplier.id} value={supplier.id}>
-                      {supplier.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isViewMode}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantity</FormLabel>
-                <FormControl>
-                  <Input type="number" step="0.01" {...field} disabled={isViewMode} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="unit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unit</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isViewMode} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes (Optional)</FormLabel>
-              <FormControl>
-                <Textarea {...field} disabled={isViewMode} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {watchFactorId && watchQuantity > 0 && (
-          <Card className="bg-accent/50">
-            <CardContent className="pt-6">
-              <h3 className="text-sm font-medium mb-2">Calculation Preview</h3>
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Quantity:</span>
-                  <p className="font-medium">{watchQuantity}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Factor:</span>
-                  <p className="font-medium">
-                    {factors.find((f) => f.id === watchFactorId)?.value || 0}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Result:</span>
-                  <p className="font-medium">
-                    {calculatedValue.toFixed(2)} {selectedTrackUnit}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {!isViewMode && (
           <div className="flex justify-end space-x-2">
@@ -417,3 +138,4 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
 };
 
 export default MeasurementForm;
+
