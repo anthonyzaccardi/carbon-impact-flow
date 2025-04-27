@@ -1,37 +1,17 @@
 
 import { Initiative } from "@/types";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
 import { useInitiativeForm } from "./useInitiativeForm";
 import { AssociatedTargets } from "./AssociatedTargets";
 import { TargetSelector } from "./TargetSelector";
-import { useAppContext } from "@/contexts/useAppContext";
-import { CalendarIcon } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { BasicInformationSection } from "./sections/BasicInformationSection";
+import { DatesSection } from "./sections/DatesSection";
+import { PlanSection } from "./sections/PlanSection";
+import { FinancialSection } from "./sections/FinancialSection";
+import { FormActions } from "./sections/FormActions";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 interface InitiativeFormProps {
   mode: "create" | "edit" | "view";
@@ -40,7 +20,6 @@ interface InitiativeFormProps {
 }
 
 const InitiativeForm = ({ mode, initialData, onClose }: InitiativeFormProps) => {
-  const { targets } = useAppContext();
   const { form, selectedTargets, calculatedAbsolute, onSubmit, isViewMode } = useInitiativeForm({
     mode,
     initialData,
@@ -50,50 +29,7 @@ const InitiativeForm = ({ mode, initialData, onClose }: InitiativeFormProps) => 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Basic Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isViewMode} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="not_started">Not Started</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="committed">Committed</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <BasicInformationSection form={form} isViewMode={isViewMode} />
 
         <FormField
           control={form.control}
@@ -109,203 +45,11 @@ const InitiativeForm = ({ mode, initialData, onClose }: InitiativeFormProps) => 
           )}
         />
 
-        {/* Dates */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isViewMode}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <DatesSection form={form} isViewMode={isViewMode} />
+        <PlanSection form={form} isViewMode={isViewMode} />
+        <FinancialSection form={form} isViewMode={isViewMode} />
 
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>End Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isViewMode}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Plan and Trajectory */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="plan"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Reduction Plan</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select plan" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="-2%">-2%</SelectItem>
-                    <SelectItem value="-4%">-4%</SelectItem>
-                    <SelectItem value="-6%">-6%</SelectItem>
-                    <SelectItem value="-8%">-8%</SelectItem>
-                    <SelectItem value="-10%">-10%</SelectItem>
-                    <SelectItem value="-15%">-15%</SelectItem>
-                    <SelectItem value="-5%">-5%</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="trajectory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Trajectory</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select trajectory" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="every_year">Every Year</SelectItem>
-                    <SelectItem value="linear">Linear</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Financial Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="spend"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Spend</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01" 
-                    {...field} 
-                    disabled={isViewMode} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="currency"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Currency</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                    <SelectItem value="GBP">GBP</SelectItem>
-                    <SelectItem value="CAD">CAD</SelectItem>
-                    <SelectItem value="AUD">AUD</SelectItem>
-                    <SelectItem value="JPY">JPY</SelectItem>
-                    <SelectItem value="CNY">CNY</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Impact Calculation */}
+        {/* Impact Calculation Card */}
         {isViewMode && selectedTargets.length > 0 && (
           <Card className="bg-accent/50">
             <CardContent className="pt-6">
@@ -334,7 +78,7 @@ const InitiativeForm = ({ mode, initialData, onClose }: InitiativeFormProps) => 
                 <FormLabel>Associated Targets</FormLabel>
                 <div className="border rounded-md p-4">
                   <TargetSelector
-                    targets={targets}
+                    targets={selectedTargets}
                     selectedTargets={field.value || []}
                     onSelect={(targetId) => {
                       const currentTargets = field.value || [];
@@ -354,21 +98,7 @@ const InitiativeForm = ({ mode, initialData, onClose }: InitiativeFormProps) => 
           <AssociatedTargets targets={selectedTargets} isViewMode />
         )}
 
-        {/* Form Actions */}
-        {!isViewMode ? (
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={onClose} type="button">
-              Cancel
-            </Button>
-            <Button type="submit">Save</Button>
-          </div>
-        ) : (
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={onClose} type="button">
-              Close
-            </Button>
-          </div>
-        )}
+        <FormActions isViewMode={isViewMode} onClose={onClose} />
       </form>
     </Form>
   );
