@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Initiative, Target, InitiativeStatus, TrajectoryType, PlanType } from "@/types";
 import { InitiativeFormData, initiativeFormSchema } from "./schema";
 import { useAppContext } from "@/contexts/useAppContext";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 
 interface UseInitiativeFormProps {
   mode: "create" | "edit" | "view";
@@ -18,13 +18,13 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
   const [selectedTargets, setSelectedTargets] = useState<Target[]>([]);
   const [calculatedAbsolute, setCalculatedAbsolute] = useState(0);
 
-  // Define defaultValues with proper type casting to satisfy TypeScript
+  // Define defaultValues with proper type casting and date validation
   const defaultValues: InitiativeFormData = initialData
     ? {
         name: initialData.name,
         description: initialData.description || "",
-        startDate: new Date(initialData.startDate),
-        endDate: new Date(initialData.endDate),
+        startDate: getValidDate(initialData.startDate),
+        endDate: getValidDate(initialData.endDate),
         status: initialData.status as InitiativeStatus,
         spend: initialData.spend,
         trajectory: initialData.trajectory as TrajectoryType,
@@ -52,6 +52,17 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
 
   const watchTargetIds = form.watch("targetIds");
   const watchPlan = form.watch("plan");
+
+  // Helper function to ensure dates are valid
+  function getValidDate(dateString: string): Date {
+    try {
+      const date = new Date(dateString);
+      return isValid(date) ? date : new Date();
+    } catch (error) {
+      console.error("Invalid date:", dateString);
+      return new Date();
+    }
+  }
 
   useEffect(() => {
     if (watchTargetIds && watchTargetIds.length > 0) {
@@ -82,10 +93,14 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
   }, [watchTargetIds, watchPlan, targets, calculateTrackMeasurementsValue, extractPercentage]);
 
   const onSubmit = (data: InitiativeFormData) => {
+    // Ensure we have valid dates before formatting
+    const startDate = isValid(data.startDate) ? format(data.startDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
+    const endDate = isValid(data.endDate) ? format(data.endDate, "yyyy-MM-dd") : format(new Date(new Date().setMonth(new Date().getMonth() + 6)), "yyyy-MM-dd");
+
     const formattedData = {
       ...data,
-      startDate: format(data.startDate, "yyyy-MM-dd"),
-      endDate: format(data.endDate, "yyyy-MM-dd"),
+      startDate,
+      endDate,
     };
 
     if (mode === "create") {

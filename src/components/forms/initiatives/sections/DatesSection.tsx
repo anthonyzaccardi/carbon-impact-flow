@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { InitiativeFormData } from "../schema";
@@ -34,7 +34,7 @@ export const DatesSection = ({ form, isViewMode }: DatesSectionProps) => {
                     )}
                     disabled={isViewMode}
                   >
-                    {field.value ? (
+                    {field.value && isValid(field.value) ? (
                       format(field.value, "PPP")
                     ) : (
                       <span>Pick a date</span>
@@ -74,7 +74,7 @@ export const DatesSection = ({ form, isViewMode }: DatesSectionProps) => {
                     )}
                     disabled={isViewMode}
                   >
-                    {field.value ? (
+                    {field.value && isValid(field.value) ? (
                       format(field.value, "PPP")
                     ) : (
                       <span>Pick a date</span>
