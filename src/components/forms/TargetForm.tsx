@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useAppContext } from '@/contexts/useAppContext';
 import { Target } from "@/types";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -84,10 +85,14 @@ const TargetForm: React.FC<TargetFormProps> = ({
     targets
   } = useAppContext();
 
+  // Ensure that targetDate is a valid Date object
   const formattedData = initialData
     ? {
         ...initialData,
-        targetDate: new Date(initialData.targetDate),
+        targetDate: initialData.targetDate ? 
+          // Safely parse the date string, defaulting to current date if invalid
+          new Date(initialData.targetDate) : 
+          new Date(),
       }
     : undefined;
 
@@ -291,7 +296,7 @@ const TargetForm: React.FC<TargetFormProps> = ({
                         )}
                         disabled={isViewMode}
                       >
-                        {field.value ? (
+                        {field.value && isValid(field.value) ? (
                           format(field.value, "PPP")
                         ) : (
                           <span>Pick a date</span>
