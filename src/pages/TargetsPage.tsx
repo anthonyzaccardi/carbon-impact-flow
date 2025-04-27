@@ -1,3 +1,4 @@
+
 import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
@@ -11,26 +12,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const TargetsPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { targets, tracks, scenarios, suppliers, openSidePanel } = useAppContext();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [trackFilter, setTrackFilter] = useState("all");
   const [scenarioFilter, setScenarioFilter] = useState("all");
+  const [supplierFilter, setSupplierFilter] = useState("all");
+  
+  // Parse URL query params for scenario filter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const scenarioParam = params.get('scenario');
+    if (scenarioParam) {
+      setScenarioFilter(scenarioParam);
+    }
+  }, [location]);
   
   const filteredTargets = targets.filter(target => {
     const matchesSearch = 
       target.name.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesTrack = trackFilter === "all" || target.trackId === trackFilter;
+    
     const matchesScenario = scenarioFilter === "all" || 
       (scenarioFilter === "none" && !target.scenarioId) ||
       target.scenarioId === scenarioFilter;
     
-    return matchesSearch && matchesTrack && matchesScenario;
+    const matchesSupplier = supplierFilter === "all" ||
+      (supplierFilter === "none" && !target.supplierId) ||
+      target.supplierId === supplierFilter;
+    
+    return matchesSearch && matchesTrack && matchesScenario && matchesSupplier;
   });
   
   const totalTargets = targets.length;
@@ -59,6 +78,15 @@ const TargetsPage = () => {
       }
     },
     {
+      header: "Supplier",
+      accessorKey: "supplierId",
+      cell: (item) => {
+        if (!item.supplierId) return "—";
+        const supplier = suppliers.find(s => s.id === item.supplierId);
+        return supplier ? supplier.name : item.supplierId;
+      }
+    },
+    {
       header: "Scenario",
       accessorKey: "scenarioId",
       cell: (item) => {
@@ -84,7 +112,11 @@ const TargetsPage = () => {
   ];
 
   const handleRowClick = (target) => {
-    openSidePanel('view', 'target', target);
+    if (target.scenarioId) {
+      navigate(`/scenarios/${target.scenarioId}/targets/${target.id}`);
+    } else {
+      openSidePanel('view', 'target', target);
+    }
   };
   
   const handleCreateNew = () => {
@@ -129,7 +161,7 @@ const TargetsPage = () => {
         <CardContent className="p-6">
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Reduction Summary</h3>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 flex-wrap md:flex-nowrap">
               <div>
                 <span className="text-2xl font-bold">{totalBaseline.toLocaleString()}</span>
                 <span className="text-muted-foreground ml-1">tCO2e</span>
@@ -162,10 +194,10 @@ const TargetsPage = () => {
       
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search targets..."
-            className="pl-8"
+            className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -188,7 +220,15 @@ const TargetsPage = () => {
         </Select>
         <Select
           value={scenarioFilter}
-          onValueChange={setScenarioFilter}
+          onValueChange={(value) => {
+            setScenarioFilter(value);
+            // Update URL if scenario filter changes
+            if (value === "all") {
+              navigate('/targets');
+            } else {
+              navigate(`/targets?scenario=${value}`);
+            }
+          }}
         >
           <SelectTrigger className="w-full md:w-[200px]">
             <SelectValue placeholder="Filter by scenario" />
@@ -199,6 +239,23 @@ const TargetsPage = () => {
             {scenarios.map((scenario) => (
               <SelectItem key={scenario.id} value={scenario.id}>
                 {scenario.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={supplierFilter}
+          onValueChange={setSupplierFilter}
+        >
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Filter by supplier" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Suppliers</SelectItem>
+            <SelectItem value="none">No Supplier</SelectItem>
+            {suppliers.map((supplier) => (
+              <SelectItem key={supplier.id} value={supplier.id}>
+                {supplier.name}
               </SelectItem>
             ))}
           </SelectContent>

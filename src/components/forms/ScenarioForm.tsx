@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Scenario } from "@/types";
+import { useState, useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -48,6 +49,15 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
     updateScenario,
     targets,
   } = useAppContext();
+  
+  const [scenarioTargets, setScenarioTargets] = useState<typeof targets>([]);
+
+  useEffect(() => {
+    if (initialData) {
+      const associatedTargets = targets.filter(target => target.scenarioId === initialData.id);
+      setScenarioTargets(associatedTargets);
+    }
+  }, [initialData, targets]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -56,11 +66,6 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
       status: "active",
     },
   });
-
-  // Get associated targets if in view or edit mode
-  const associatedTargets = initialData ? 
-    targets.filter(target => target.scenarioId === initialData.id) : 
-    [];
 
   function onSubmit(data: FormData) {
     if (mode === "create") {
@@ -124,11 +129,11 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
         />
 
         {/* Associated targets in view mode */}
-        {isViewMode && associatedTargets.length > 0 && (
+        {isViewMode && scenarioTargets.length > 0 && (
           <div>
             <h3 className="text-sm font-medium mb-2">Associated Targets</h3>
             <ul className="space-y-1">
-              {associatedTargets.map(target => (
+              {scenarioTargets.map(target => (
                 <li key={target.id} className="text-sm bg-accent/30 p-2 rounded-md">
                   <div className="font-medium">{target.name}</div>
                   <div className="text-muted-foreground text-xs">

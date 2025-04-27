@@ -13,6 +13,8 @@ import MeasurementsPage from "./pages/MeasurementsPage";
 import TargetsPage from "./pages/TargetsPage";
 import InitiativesPage from "./pages/InitiativesPage";
 import ScenariosPage from "./pages/ScenariosPage";
+import ScenarioDetailPage from "./pages/ScenarioDetailPage";
+import TargetDetailPage from "./pages/TargetDetailPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import NotFound from "./pages/NotFound";
 
@@ -79,6 +81,22 @@ const App = () => (
               element={
                 <MainLayout>
                   <ScenariosPage />
+                </MainLayout>
+              } 
+            />
+            <Route 
+              path="/scenarios/:scenarioId" 
+              element={
+                <MainLayout>
+                  <ScenarioDetailPage />
+                </MainLayout>
+              } 
+            />
+            <Route 
+              path="/scenarios/:scenarioId/targets/:targetId" 
+              element={
+                <MainLayout>
+                  <TargetDetailPage />
                 </MainLayout>
               } 
             />

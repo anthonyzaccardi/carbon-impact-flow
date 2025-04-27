@@ -9,7 +9,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Status } from '@/types';
+import { Status, InitiativeStatus } from '@/types';
 
 interface Column<T> {
   header: string;
@@ -28,6 +28,13 @@ const statusColorMap: Record<Status, string> = {
   pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
   completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+};
+
+const initiativeStatusColorMap: Record<InitiativeStatus, string> = {
+  not_started: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  in_progress: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  committed: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
 };
 
 function DataTable<T extends Record<string, any>>({ 
@@ -56,19 +63,26 @@ function DataTable<T extends Record<string, any>>({
             data.map((item, rowIndex) => (
               <TableRow 
                 key={rowIndex} 
-                className={onRowClick ? 'cursor-pointer table-row' : ''}
+                className={onRowClick ? 'cursor-pointer table-row hover:bg-muted/50' : ''}
                 onClick={() => onRowClick && onRowClick(item)}
               >
                 {columns.map((column, colIndex) => (
                   <TableCell key={colIndex}>
                     {column.cell ? column.cell(item) : (
-                      column.accessorKey === 'status' && typeof item[column.accessorKey] === 'string' ? (
-                        <Badge 
-                          className={statusColorMap[item[column.accessorKey] as Status] || 'bg-gray-100 text-gray-800'}
-                          variant="outline"
-                        >
-                          {item[column.accessorKey]}
-                        </Badge>
+                      column.accessorKey === 'status' ? (
+                        // Check if it's a target status or initiative status
+                        typeof item[column.accessorKey] === 'string' && (
+                          <Badge 
+                            className={
+                              item.hasOwnProperty('targetIds') 
+                                ? initiativeStatusColorMap[item[column.accessorKey] as InitiativeStatus] || 'bg-gray-100 text-gray-800' 
+                                : statusColorMap[item[column.accessorKey] as Status] || 'bg-gray-100 text-gray-800'
+                            }
+                            variant="outline"
+                          >
+                            {item[column.accessorKey].replace('_', ' ')}
+                          </Badge>
+                        )
                       ) : (
                         item[column.accessorKey]
                       )

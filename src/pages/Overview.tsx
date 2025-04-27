@@ -53,19 +53,20 @@ const Overview = () => {
     unit: track.unit,
   }));
 
-  // Calculate initiatives metrics
+  // Calculate initiatives metrics - Fix active initiatives count
+  const activeInitiatives = initiatives.filter(i => i.status === 'in_progress').length;
   const totalSpend = initiatives.reduce((sum, initiative) => sum + initiative.spend, 0);
   const budgetUtilization = totalSpend > 0 
     ? Math.round((totalSpend / (totalSpend * 1.2)) * 100) // Using a rough estimate for budget
     : 0;
   
   // Custom colors for the chart
-  const customColors = ['#9b87f5', '#D6BCFA', '#8E9196', '#F1F0FB', '#c084fc', '#a3a3a3'];
+  const customColors = ['#4F5D61', '#99B3B6', '#FF6E35', '#F1F0FB', '#c084fc', '#a3a3a3'];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold mb-4">Dashboard Overview</h1>
+        <h1 className="text-2xl font-semibold mb-2">Dashboard Overview</h1>
         <p className="text-muted-foreground mb-6">
           Welcome to the Carbon Impact Flow dashboard. Monitor your environmental metrics and reduction targets in real-time.
         </p>
@@ -87,7 +88,7 @@ const Overview = () => {
         />
         <StatCard 
           title="Active Initiatives" 
-          value={initiatives.filter(i => i.status === "in_progress").length}
+          value={activeInitiatives}
           description={`${budgetUtilization}% of budget utilized`}
           icon={<Target className="h-4 w-4 text-primary" />}
         />
@@ -147,7 +148,7 @@ const Overview = () => {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="value" fill="#9b87f5">
+                <Bar dataKey="value" fill="#4F5D61">
                   {emissionsByTrack.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={customColors[index % customColors.length]} />
                   ))}

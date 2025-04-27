@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAppContext } from '@/contexts/useAppContext';
 import { Initiative } from '@/types';
@@ -8,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import StatCard from '@/components/ui/stat-card';
-import InitiativeForm from '@/components/forms/initiatives/InitiativeForm';
 
 const InitiativesPage = () => {
   const { initiatives, targets, openSidePanel, extractPercentage } = useAppContext();
@@ -50,10 +50,9 @@ const InitiativesPage = () => {
   };
 
   const statusColorMap: Record<string, string> = {
-    'not_started': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-    'in_progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    'completed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-    'committed': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+    'not_started': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+    'in_progress': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    'completed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
   };
 
   const columns = [
@@ -113,7 +112,7 @@ const InitiativesPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Initiatives</h1>
+          <h1 className="text-2xl font-semibold mb-2">Initiatives</h1>
           <p className="text-muted-foreground">
             Manage climate action initiatives and interventions
           </p>

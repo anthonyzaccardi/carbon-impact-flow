@@ -1,3 +1,4 @@
+
 import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
@@ -85,9 +86,9 @@ const ScenariosPage = () => {
     }
   ];
 
-  // Handle row click - navigate to targets page filtered by this scenario
+  // Handle row click - navigate to scenario detail page
   const handleRowClick = (scenario) => {
-    navigate(`/targets?scenario=${scenario.id}`);
+    navigate(`/scenarios/${scenario.id}`);
   };
   
   // Handle create new
@@ -131,7 +132,7 @@ const ScenariosPage = () => {
             Create and manage planning scenarios
           </p>
         </div>
-        <Button onClick={handleCreateNew}>
+        <Button onClick={handleCreateNew} className="bg-primary hover:bg-primary/90">
           <Plus className="mr-2 h-4 w-4" />
           Add Scenario
         </Button>
