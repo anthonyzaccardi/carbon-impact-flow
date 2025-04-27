@@ -23,4 +23,3 @@ export const measurementFormSchema = z.object({
 });
 
 export type MeasurementFormData = z.infer<typeof measurementFormSchema>;
-

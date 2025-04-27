@@ -7,14 +7,14 @@ export interface Track {
   id: string;
   name: string;
   emoji: string;
-  totalEmissions: number; // Calculated field (sum of measurements)
+  totalEmissions: number;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Factor {
   id: string;
-  trackId: string; // Required - a factor must be associated with exactly one track
+  trackId: string;
   name: string;
   value: number;
   unit: string;
@@ -25,12 +25,12 @@ export interface Factor {
 
 export interface Measurement {
   id: string;
-  trackId: string; // Required - a measurement must be associated with exactly one track
+  trackId: string;
   factorId: string;
   supplierId?: string;
   date: string;
   quantity: number;
-  unit: string; // Inherited from factor
+  unit: string;
   calculatedValue: number;
   status: Status;
   notes?: string;
@@ -40,13 +40,13 @@ export interface Measurement {
 
 export interface Target {
   id: string;
-  trackId: string; // Required - a target must be associated with exactly one track
+  trackId: string;
   scenarioId?: string;
   supplierId?: string;
   name: string;
   description: string;
   baselineValue: number;
-  targetValue: number; // Auto-calculated
+  targetValue: number;
   targetPercentage: number;
   targetDate: string;
   status: Status;
@@ -64,7 +64,7 @@ export interface Initiative {
   spend: number;
   trajectory: TrajectoryType;
   plan: PlanType;
-  absolute: number; // Auto-calculated (sum of targets * plan)
+  absolute: number;
   targetIds: string[];
   currency: string;
   createdAt: string;
