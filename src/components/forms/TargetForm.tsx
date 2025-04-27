@@ -43,12 +43,18 @@ const TargetForm: React.FC<TargetFormProps> = ({
   });
 
   function onSubmit(data: TargetFormData) {
-    const targetData = {
-      ...data,
-      // Ensure targetDate is a string (already enforced by schema now)
-      targetDate: typeof data.targetDate === 'object' ? 
-        data.targetDate.toISOString().split('T')[0] : 
-        data.targetDate
+    // Ensure we have all required fields for a target
+    const targetData: Omit<Target, 'id' | 'createdAt' | 'updatedAt' | 'targetValue'> = {
+      trackId: data.trackId,
+      name: data.name,
+      description: data.description,
+      baselineValue: data.baselineValue,
+      targetPercentage: data.targetPercentage,
+      targetDate: data.targetDate,
+      status: data.status,
+      // Include optional fields if they exist
+      ...(data.scenarioId && { scenarioId: data.scenarioId }),
+      ...(data.supplierId && { supplierId: data.supplierId })
     };
     
     if (mode === "create") {
@@ -118,7 +124,6 @@ const TargetForm: React.FC<TargetFormProps> = ({
           </div>
         )}
       </form>
-      <span>tCO₂e</span>
     </Form>
   );
 };

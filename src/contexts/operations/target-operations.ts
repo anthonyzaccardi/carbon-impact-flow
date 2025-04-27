@@ -1,4 +1,3 @@
-
 import { toast } from 'sonner';
 import { Target, Initiative } from '@/types';
 import { generateId, getCurrentTimestamp } from '../utils';
@@ -20,9 +19,7 @@ export const createTargetOperation = (
   }
 
   // Ensure targetDate is a string
-  const targetDate = typeof target.targetDate === 'object' ? 
-    target.targetDate.toISOString().split('T')[0] : 
-    target.targetDate;
+  const targetDate = target.targetDate;
 
   const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
   const newTarget: Target = {
@@ -56,10 +53,8 @@ export const updateTargetOperation = (
     }
   }
 
-  // Ensure targetDate is a string if provided
-  const targetDate = target.targetDate && typeof target.targetDate === 'object' ? 
-    target.targetDate.toISOString().split('T')[0] : 
-    target.targetDate;
+  // Ensure targetDate remains as a string or we keep the existing one
+  const targetDate = target.targetDate || undefined;
 
   setTargets(targets.map(t => {
     if (t.id === id) {
