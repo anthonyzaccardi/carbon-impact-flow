@@ -112,8 +112,8 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
 
       const selectedTrack = tracks.find((track) => track.id === watchTrackId);
       if (selectedTrack) {
-        setSelectedTrackUnit(selectedTrack.unit);
-        form.setValue("unit", selectedTrack.unit);
+        setSelectedTrackUnit("tCO₂e");
+        form.setValue("unit", "tCO₂e");
       }
 
       const currentFactor = form.getValues("factorId");

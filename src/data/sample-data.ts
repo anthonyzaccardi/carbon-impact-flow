@@ -1,4 +1,3 @@
-
 import { 
   Track, Factor, Measurement, Target, 
   Initiative, Scenario, Supplier, 
@@ -12,7 +11,6 @@ export const tracks: Track[] = [
     id: generateId('track'),
     name: '🌐 GHG Emissions',
     emoji: '🌐',
-    unit: 'tCO2e',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     totalEmissions: 120000
@@ -21,7 +19,6 @@ export const tracks: Track[] = [
     id: generateId('track'),
     name: '💧 Water Usage',
     emoji: '💧',
-    unit: 'm³',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     totalEmissions: 85000

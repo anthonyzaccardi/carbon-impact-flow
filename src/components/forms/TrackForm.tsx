@@ -1,40 +1,13 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Track } from "@/types";
-
-// Remove 'unit' from the schema
-const formSchema = z.object({
-  name: z.string().min(3, {
-    message: "Track name must be at least 3 characters.",
-  }),
-  emoji: z.string().min(1, {
-    message: "Please select an emoji.",
-  }),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const emojis = ["🏭", "⚡", "🌐", "💧", "🗑️", "🌱", "🚗", "✈️", "🏢", "🌲"];
+import { trackFormSchema, TrackFormData } from "./tracks/schema";
+import TrackStats from "./tracks/TrackStats";
+import TrackFormFields from "./tracks/TrackFormFields";
 
 interface TrackFormProps {
   mode: "create" | "edit" | "view";
@@ -44,10 +17,10 @@ interface TrackFormProps {
 
 const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => {
   const isViewMode = mode === "view";
-  const { createTrack, updateTrack, getTrackStats } = useAppContext();
+  const { createTrack, updateTrack } = useAppContext();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<TrackFormData>({
+    resolver: zodResolver(trackFormSchema),
     defaultValues: initialData ? {
       name: initialData.name,
       emoji: initialData.emoji,
@@ -57,9 +30,8 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
     },
   });
 
-  function onSubmit(data: FormData) {
+  function onSubmit(data: TrackFormData) {
     if (mode === "create") {
-      // Ensure all required properties are passed and not optional
       createTrack({
         name: data.name,
         emoji: data.emoji,
@@ -70,76 +42,13 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
     onClose();
   }
 
-  // Get track stats for view mode
-  const trackStats = initialData ? getTrackStats(initialData.id) : { factorsCount: 0, measurementsCount: 0, targetsCount: 0 };
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isViewMode} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="emoji"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Emoji</FormLabel>
-                <Select
-                  disabled={isViewMode}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an emoji" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {emojis.map((emoji) => (
-                      <SelectItem key={emoji} value={emoji}>
-                        {emoji}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <TrackFormFields form={form} isViewMode={isViewMode} />
 
         {isViewMode && initialData && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="border rounded p-3">
-              <div className="text-sm text-muted-foreground">Factors</div>
-              <div className="text-lg font-semibold">{trackStats.factorsCount}</div>
-            </div>
-            <div className="border rounded p-3">
-              <div className="text-sm text-muted-foreground">Measurements</div>
-              <div className="text-lg font-semibold">{trackStats.measurementsCount}</div>
-            </div>
-            <div className="border rounded p-3">
-              <div className="text-sm text-muted-foreground">Targets</div>
-              <div className="text-lg font-semibold">{trackStats.targetsCount}</div>
-            </div>
-            <div className="border rounded p-3">
-              <div className="text-sm text-muted-foreground">Total Emissions</div>
-              <div className="text-lg font-semibold">{initialData.totalEmissions.toLocaleString()} tCO₂e</div>
-            </div>
-          </div>
+          <TrackStats track={initialData} />
         )}
 
         {!isViewMode && (
@@ -164,4 +73,3 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
 };
 
 export default TrackForm;
-
