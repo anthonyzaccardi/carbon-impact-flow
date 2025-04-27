@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2, Edit } from 'lucide-react';
@@ -143,30 +142,6 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
                   <div className="font-medium">{initiative.name}</div>
                   <div className="text-sm text-muted-foreground">
                     Plan: {initiative.plan} • Status: {initiative.status.replace('_', ' ')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      
-      case 'supplier':
-        const supplierTargets = targets.filter(t => t.supplierId === data.id);
-        if (supplierTargets.length === 0) return null;
-        
-        return (
-          <div className="mt-6 border-t pt-6">
-            <h3 className="text-lg font-medium mb-4">Related Targets</h3>
-            <div className="space-y-2">
-              {supplierTargets.map(target => (
-                <div 
-                  key={target.id} 
-                  className="p-3 bg-muted/50 rounded-md cursor-pointer hover:bg-muted"
-                  onClick={() => openSidePanel('view', 'target', target)}
-                >
-                  <div className="font-medium">{target.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Target: {target.targetPercentage}% reduction by {new Date(target.targetDate).getFullYear()}
                   </div>
                 </div>
               ))}
