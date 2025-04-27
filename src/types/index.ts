@@ -1,4 +1,3 @@
-
 export type Status = 'active' | 'pending' | 'completed' | 'cancelled';
 export type InitiativeStatus = 'not_started' | 'in_progress' | 'completed' | 'committed';
 export type TrajectoryType = 'every_year' | 'linear';
@@ -8,7 +7,6 @@ export interface Track {
   id: string;
   name: string;
   emoji: string;
-  unit: string;
   totalEmissions: number; // Calculated field (sum of measurements)
   createdAt: string;
   updatedAt: string;

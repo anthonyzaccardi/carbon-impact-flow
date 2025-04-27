@@ -22,6 +22,7 @@ import {
 import { useAppContext } from "@/contexts/useAppContext";
 import { Track } from "@/types";
 
+// Remove 'unit' from the schema
 const formSchema = z.object({
   name: z.string().min(3, {
     message: "Track name must be at least 3 characters.",
@@ -29,15 +30,11 @@ const formSchema = z.object({
   emoji: z.string().min(1, {
     message: "Please select an emoji.",
   }),
-  unit: z.string().min(1, {
-    message: "Unit is required.",
-  }),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const emojis = ["🏭", "⚡", "🌐", "💧", "🗑️", "🌱", "🚗", "✈️", "🏢", "🌲"];
-const units = ["tCO2e", "kgCO2", "gCO2", "CO2e"];
 
 interface TrackFormProps {
   mode: "create" | "edit" | "view";
@@ -54,11 +51,9 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
     defaultValues: initialData ? {
       name: initialData.name,
       emoji: initialData.emoji,
-      unit: initialData.unit,
     } : {
       name: "",
       emoji: "",
-      unit: "tCO2e",
     },
   });
 
@@ -68,7 +63,6 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
       createTrack({
         name: data.name,
         emoji: data.emoji,
-        unit: data.unit
       });
     } else if (mode === "edit" && initialData) {
       updateTrack(initialData.id, data);
@@ -126,35 +120,6 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
             )}
           />
         </div>
-        
-        <FormField
-          control={form.control}
-          name="unit"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Emissions Unit</FormLabel>
-              <Select
-                disabled={isViewMode}
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select unit" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {units.map((unit) => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         {isViewMode && initialData && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -172,7 +137,7 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
             </div>
             <div className="border rounded p-3">
               <div className="text-sm text-muted-foreground">Total Emissions</div>
-              <div className="text-lg font-semibold">{initialData.totalEmissions.toLocaleString()} {initialData.unit}</div>
+              <div className="text-lg font-semibold">{initialData.totalEmissions.toLocaleString()} tCO₂e</div>
             </div>
           </div>
         )}
@@ -199,3 +164,4 @@ const TrackForm: React.FC<TrackFormProps> = ({ mode, initialData, onClose }) => 
 };
 
 export default TrackForm;
+
