@@ -20,16 +20,6 @@ import {
 } from "@/components/ui/select";
 import { useAppContext } from '@/contexts/useAppContext';
 import { Supplier, Target } from "@/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -87,7 +77,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   onClose,
 }) => {
   const isViewMode = mode === "view";
-  const { createSupplier, updateSupplier, deleteSupplier, openSidePanel, targets } = useAppContext();
+  const { createSupplier, updateSupplier, targets, openSidePanel } = useAppContext();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   const linkedTargets = initialData 
@@ -122,19 +112,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       updateSupplier(initialData.id, formattedData);
     }
     onClose();
-  }
-  
-  function handleEdit() {
-    if (initialData) {
-      openSidePanel('edit', 'supplier', initialData);
-    }
-  }
-  
-  function handleDelete() {
-    if (initialData) {
-      deleteSupplier(initialData.id);
-      onClose();
-    }
   }
   
   function viewTarget(target: Target) {
@@ -294,41 +271,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
               Cancel
             </Button>
             <Button type="submit">Save</Button>
-          </div>
-        )}
-        
-        {isViewMode && (
-          <div className="flex justify-end space-x-2">
-            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you sure you want to delete this supplier?</DialogTitle>
-                  <DialogDescription>
-                    This action cannot be undone. This will permanently delete the supplier
-                    and remove the data from the server.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-                  <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            
-            <Button variant="outline" onClick={handleEdit} size="sm">
-              <Edit className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            
-            <Button variant="outline" onClick={onClose}>
-              Close
-            </Button>
           </div>
         )}
       </form>
