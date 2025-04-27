@@ -14,7 +14,8 @@ export const useUtilityFunctions = (
     return trackMeasurements.reduce((sum, measurement) => sum + measurement.calculatedValue, 0);
   };
   
-  const extractPercentage = (plan: string): number => {
+  const extractPercentage = (plan: string | undefined | null): number => {
+    if (!plan) return 0;
     return parseFloat(plan.replace('%', '')) / 100;
   };
   

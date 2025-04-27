@@ -30,6 +30,7 @@ const InitiativesPage = () => {
     if (initiativeTargets.length === 0) return 0;
     
     return initiativeTargets.reduce((sum, target) => {
+      // Handle potentially undefined plan value
       return sum + (target.targetValue * Math.abs(extractPercentage(initiative.plan)));
     }, 0);
   };

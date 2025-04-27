@@ -3,9 +3,9 @@ export const generateId = (prefix: string) => `${prefix}-${Date.now()}`;
 export const getCurrentTimestamp = () => new Date().toISOString();
 
 export const calculateInitiativeAbsoluteValue = (
-  initiative: { targetIds: string[]; plan: string },
+  initiative: { targetIds: string[]; plan: string | undefined | null },
   targets: Array<{ id: string; targetValue: number }>,
-  extractPercentage: (plan: string) => number
+  extractPercentage: (plan: string | undefined | null) => number
 ): number => {
   const initiativeTargets = targets.filter(t => initiative.targetIds.includes(t.id));
   
