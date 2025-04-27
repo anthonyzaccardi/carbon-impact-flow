@@ -13,6 +13,12 @@ export const createTargetOperation = (
     return;
   }
 
+  // Check if supplier is already assigned to another target
+  if (target.supplierId && targets.some(t => t.supplierId === target.supplierId)) {
+    toast.error('This supplier is already assigned to another target');
+    return;
+  }
+
   const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
   const newTarget: Target = {
     ...target,
@@ -31,6 +37,12 @@ export const updateTargetOperation = (
   id: string,
   target: Partial<Target>
 ) => {
+  // Check if supplier is already assigned to another target
+  if (target.supplierId && targets.some(t => t.id !== id && t.supplierId === target.supplierId)) {
+    toast.error('This supplier is already assigned to another target');
+    return;
+  }
+
   if (target.trackId === undefined) {
     const existingTarget = targets.find(t => t.id === id);
     if (existingTarget) {

@@ -81,6 +81,7 @@ const TargetForm: React.FC<TargetFormProps> = ({
     tracks,
     scenarios,
     suppliers,
+    targets
   } = useAppContext();
 
   const formattedData = initialData
@@ -129,6 +130,13 @@ const TargetForm: React.FC<TargetFormProps> = ({
       form.setValue("targetPercentage", parseFloat(newPercentage.toFixed(2)), { shouldDirty: true });
     }
   }, [watchBaselineValue, watchTargetPercentage, watchTargetValue, form]);
+
+  const availableSuppliers = suppliers.filter(supplier => {
+    if (mode === "edit" && initialData?.supplierId === supplier.id) {
+      return true;
+    }
+    return !targets.some(target => target.supplierId === supplier.id);
+  });
 
   function onSubmit(data: FormData) {
     const formattedData = {
@@ -232,11 +240,17 @@ const TargetForm: React.FC<TargetFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {suppliers.map((supplier) => (
-                      <SelectItem key={supplier.id} value={supplier.id}>
-                        {supplier.name}
+                    {availableSuppliers.length === 0 ? (
+                      <SelectItem disabled value="none">
+                        No available suppliers
                       </SelectItem>
-                    ))}
+                    ) : (
+                      availableSuppliers.map((supplier) => (
+                        <SelectItem key={supplier.id} value={supplier.id}>
+                          {supplier.name}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
