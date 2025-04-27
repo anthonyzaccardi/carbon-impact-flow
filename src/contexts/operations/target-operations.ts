@@ -19,9 +19,15 @@ export const createTargetOperation = (
     return;
   }
 
+  // Ensure targetDate is a string
+  const targetDate = typeof target.targetDate === 'object' ? 
+    target.targetDate.toISOString().split('T')[0] : 
+    target.targetDate;
+
   const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
   const newTarget: Target = {
     ...target,
+    targetDate,
     targetValue,
     id: generateId('target'),
     createdAt: getCurrentTimestamp(),
@@ -50,6 +56,11 @@ export const updateTargetOperation = (
     }
   }
 
+  // Ensure targetDate is a string if provided
+  const targetDate = target.targetDate && typeof target.targetDate === 'object' ? 
+    target.targetDate.toISOString().split('T')[0] : 
+    target.targetDate;
+
   setTargets(targets.map(t => {
     if (t.id === id) {
       const targetValue = target.baselineValue !== undefined && target.targetPercentage !== undefined
@@ -60,7 +71,8 @@ export const updateTargetOperation = (
       
       return { 
         ...t, 
-        ...target, 
+        ...target,
+        targetDate: targetDate || t.targetDate,
         targetValue,
         updatedAt: getCurrentTimestamp() 
       };

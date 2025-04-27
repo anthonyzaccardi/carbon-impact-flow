@@ -17,7 +17,7 @@ export const targetFormSchema = z.object({
   targetPercentage: z.coerce.number().min(0).max(100, {
     message: "Target percentage must be between 0 and 100.",
   }),
-  targetDate: z.string().or(z.date()),
+  targetDate: z.string(), // Changed to only accept string
   status: z.enum(["active", "pending", "completed", "cancelled"]),
 });
 

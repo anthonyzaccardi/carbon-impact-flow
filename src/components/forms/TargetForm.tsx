@@ -37,16 +37,24 @@ const TargetForm: React.FC<TargetFormProps> = ({
       description: "",
       baselineValue: 0,
       targetPercentage: 0,
-      targetDate: new Date(),
+      targetDate: new Date().toISOString().split('T')[0], // Format date as YYYY-MM-DD string
       status: "active",
     },
   });
 
   function onSubmit(data: TargetFormData) {
+    const targetData = {
+      ...data,
+      // Ensure targetDate is a string (already enforced by schema now)
+      targetDate: typeof data.targetDate === 'object' ? 
+        data.targetDate.toISOString().split('T')[0] : 
+        data.targetDate
+    };
+    
     if (mode === "create") {
-      createTarget(data);
+      createTarget(targetData);
     } else if (mode === "edit" && initialData) {
-      updateTarget(initialData.id, data);
+      updateTarget(initialData.id, targetData);
     }
     onClose();
   }
