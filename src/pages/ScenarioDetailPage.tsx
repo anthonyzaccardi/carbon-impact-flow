@@ -2,20 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/useAppContext';
-import DataTable from '@/components/ui/data-table';
-import StatCard from '@/components/ui/stat-card';
-import { Button } from '@/components/ui/button';
-import { Plus, ChevronLeft, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Target, Scenario } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { ScenarioHeader } from '@/components/scenarios/ScenarioHeader';
+import { ScenarioSummary } from '@/components/scenarios/ScenarioSummary';
+import { ScenarioTargetsSection } from '@/components/scenarios/ScenarioTargetsSection';
+import { Target, Scenario } from '@/types';
 
 const ScenarioDetailPage = () => {
   const { scenarioId } = useParams();
@@ -25,11 +16,9 @@ const ScenarioDetailPage = () => {
     targets, 
     tracks, 
     openSidePanel, 
-    updateTarget, 
-    createTarget 
+    updateTarget
   } = useAppContext();
   
-  const [searchTerm, setSearchTerm] = useState("");
   const [scenarioData, setScenarioData] = useState<Scenario | null>(null);
   const [scenarioTargets, setScenarioTargets] = useState<Target[]>([]);
   
@@ -44,19 +33,9 @@ const ScenarioDetailPage = () => {
     }
   }, [scenarioId, scenarios, targets]);
   
-  // Calculate metrics
-  const totalTargets = scenarioTargets.length;
-  const totalBaseline = scenarioTargets.reduce((sum, t) => sum + t.baselineValue, 0);
-  const totalReduction = scenarioTargets.reduce((sum, t) => sum + (t.baselineValue - t.targetValue), 0);
-  const reductionPercentage = totalBaseline > 0 ? ((totalReduction / totalBaseline) * 100).toFixed(1) : '0';
-  
   const handleBack = () => {
     navigate('/scenarios');
   };
-  
-  const filteredTargets = scenarioTargets.filter(target => 
-    target.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   
   const handleEditScenario = () => {
     if (scenarioData) {
@@ -74,7 +53,6 @@ const ScenarioDetailPage = () => {
   };
   
   const handleAttachExistingTarget = () => {
-    // Get targets not attached to this scenario
     const unattachedTargets = targets.filter(t => !t.scenarioId);
     
     if (unattachedTargets.length === 0) {
@@ -82,8 +60,6 @@ const ScenarioDetailPage = () => {
       return;
     }
     
-    // Show a dialog to select targets
-    // For now, just attach the first unattached target
     const targetToAttach = unattachedTargets[0];
     updateTarget(targetToAttach.id, { 
       ...targetToAttach, 
@@ -101,147 +77,26 @@ const ScenarioDetailPage = () => {
     }
   };
   
-  const columns = [
-    {
-      header: "Name",
-      accessorKey: "name",
-    },
-    {
-      header: "Track",
-      accessorKey: "trackId",
-      cell: (target: Target) => {
-        const track = tracks.find(t => t.id === target.trackId);
-        return track ? (
-          <div className="flex items-center">
-            <span className="mr-1">{track.emoji}</span>
-            <span>{track.name}</span>
-          </div>
-        ) : target.trackId;
-      }
-    },
-    {
-      header: "Target",
-      accessorKey: "targetPercentage",
-      cell: (target: Target) => `${target.targetPercentage}% reduction`,
-    },
-    {
-      header: "Baseline",
-      accessorKey: "baselineValue",
-      cell: (target: Target) => `${target.baselineValue.toLocaleString()} tCO2e`,
-    },
-    {
-      header: "Target Value",
-      accessorKey: "targetValue",
-      cell: (target: Target) => `${target.targetValue.toLocaleString()} tCO2e`,
-    },
-    {
-      header: "Target Date",
-      accessorKey: "targetDate",
-      cell: (target: Target) => new Date(target.targetDate).toLocaleDateString(),
-    },
-    {
-      header: "Actions",
-      accessorKey: "actions",
-      cell: (target: Target) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRemoveTarget(target.id);
-          }}
-        >
-          Remove
-        </Button>
-      )
-    }
-  ];
-  
   if (!scenarioData) {
     return <div className="p-6">Loading scenario details...</div>;
   }
   
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="mr-2" 
-            onClick={handleBack}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to Scenarios
-          </Button>
-          <h1 className="text-2xl font-semibold">
-            Scenario: {scenarioData.name}
-          </h1>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleEditScenario}>
-            Edit Scenario
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Target
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={handleCreateTarget}>
-                Create new target
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleAttachExistingTarget}>
-                Attach existing target
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      <ScenarioHeader
+        scenario={scenarioData}
+        onBack={handleBack}
+        onEdit={handleEditScenario}
+      />
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Scenario Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <StatCard 
-              title="Total Targets" 
-              value={totalTargets}
-            />
-            <StatCard 
-              title="Total Baseline" 
-              value={`${totalBaseline.toLocaleString()} tCO2e`}
-            />
-            <StatCard 
-              title="Total Reduction" 
-              value={`${totalReduction.toLocaleString()} tCO2e`}
-            />
-            <StatCard 
-              title="Reduction Percentage" 
-              value={`${reductionPercentage}%`}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <ScenarioSummary targets={scenarioTargets} />
       
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search targets..."
-          className="pl-10"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      
-      <DataTable
-        data={filteredTargets}
-        columns={columns}
+      <ScenarioTargetsSection
+        targets={scenarioTargets}
+        tracks={tracks}
+        onCreateTarget={handleCreateTarget}
+        onAttachExisting={handleAttachExistingTarget}
+        onRemoveTarget={handleRemoveTarget}
         onRowClick={handleRowClick}
       />
     </div>
