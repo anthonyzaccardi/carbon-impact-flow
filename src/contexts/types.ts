@@ -1,5 +1,5 @@
 
-import { SidePanel, Track, Factor, Measurement, Target, Initiative, Scenario, Supplier } from '../types';
+import { SidePanel, Track, Factor, Measurement, Target, Initiative, Scenario, Supplier, MeasurementStatus, Status } from '../types';
 
 export interface AppContextType {
   // Data

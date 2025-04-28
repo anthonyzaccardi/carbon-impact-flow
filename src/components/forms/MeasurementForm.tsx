@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useAppContext } from "@/contexts/useAppContext";
-import { Measurement } from "@/types";
+import { Measurement, MeasurementStatus } from "@/types";
 import { useEffect, useState } from "react";
 import { measurementFormSchema, type MeasurementFormData } from "./measurements/schema";
 import MeasurementFormFields from "./measurements/MeasurementFormFields";
@@ -43,7 +43,7 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
       date: new Date(),
       quantity: 0,
       unit: "",
-      status: "active",
+      status: "active" as MeasurementStatus,
     },
   });
 
@@ -85,7 +85,7 @@ const MeasurementForm: React.FC<MeasurementFormProps> = ({
       factorId: data.factorId,
       quantity: data.quantity,
       unit: data.unit,
-      status: data.status,
+      status: data.status as MeasurementStatus,
       notes: data.notes,
       supplierId: data.supplierId
     };

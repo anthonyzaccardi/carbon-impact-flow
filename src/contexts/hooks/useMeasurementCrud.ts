@@ -1,5 +1,5 @@
 
-import { Factor, Measurement } from '@/types';
+import { Factor, Measurement, MeasurementStatus } from '@/types';
 import { createMeasurementOperation, updateMeasurementOperation, deleteMeasurementOperation } from '../operations';
 
 export const useMeasurementCrud = (

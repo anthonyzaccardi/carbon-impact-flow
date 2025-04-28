@@ -1,6 +1,6 @@
 
 import { toast } from 'sonner';
-import { Measurement, Factor } from '@/types';
+import { Measurement, Factor, MeasurementStatus } from '@/types';
 import { generateId, getCurrentTimestamp } from '../utils';
 
 export const createMeasurementOperation = (

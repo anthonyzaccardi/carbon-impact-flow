@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAppContext } from "@/contexts/useAppContext";
-import { Target } from "@/types";
+import { Target, Status, TargetPercentage } from "@/types";
 import { targetFormSchema, type TargetFormData } from "./targets/schema";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
@@ -33,7 +33,7 @@ const TargetForm: React.FC<TargetFormProps> = ({
   const formattedData = initialData
     ? {
         ...initialData,
-        targetPercentage: String(initialData.targetPercentage),
+        targetPercentage: String(initialData.targetPercentage) as TargetPercentage,
       }
     : undefined;
 
@@ -44,9 +44,9 @@ const TargetForm: React.FC<TargetFormProps> = ({
       name: "",
       description: "",
       baselineValue: 0,
-      targetPercentage: "-5",
+      targetPercentage: "-5" as TargetPercentage,
       targetDate: new Date().toISOString().split('T')[0],
-      status: "not_started",
+      status: "not_started" as Status,
     },
   });
 

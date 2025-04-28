@@ -9,7 +9,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Status, InitiativeStatus } from '@/types';
+import { Status, InitiativeStatus, MeasurementStatus } from '@/types';
 
 interface Column<T> {
   header: string;
@@ -23,11 +23,17 @@ interface DataTableProps<T extends Record<string, any>> {
   onRowClick?: (item: T) => void;
 }
 
-const statusColorMap: Record<Status, string> = {
+const measurementStatusColorMap: Record<MeasurementStatus, string> = {
   active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
   completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+};
+
+const statusColorMap: Record<Status, string> = {
+  not_started: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  in_progress: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
 };
 
 const initiativeStatusColorMap: Record<InitiativeStatus, string> = {
@@ -70,13 +76,15 @@ function DataTable<T extends Record<string, any>>({
                   <TableCell key={colIndex}>
                     {column.cell ? column.cell(item) : (
                       column.accessorKey === 'status' ? (
-                        // Check if it's a target status or initiative status
+                        // Check which status type we're dealing with
                         typeof item[column.accessorKey] === 'string' && (
                           <Badge 
                             className={
                               item.hasOwnProperty('targetIds') 
-                                ? initiativeStatusColorMap[item[column.accessorKey] as InitiativeStatus] || 'bg-gray-100 text-gray-800' 
-                                : statusColorMap[item[column.accessorKey] as Status] || 'bg-gray-100 text-gray-800'
+                                ? initiativeStatusColorMap[item[column.accessorKey] as InitiativeStatus] || 'bg-gray-100 text-gray-800'
+                                : item.hasOwnProperty('calculatedValue')
+                                  ? measurementStatusColorMap[item[column.accessorKey] as MeasurementStatus] || 'bg-gray-100 text-gray-800'
+                                  : statusColorMap[item[column.accessorKey] as Status] || 'bg-gray-100 text-gray-800'
                             }
                             variant="outline"
                           >
