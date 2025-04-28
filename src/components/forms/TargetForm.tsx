@@ -4,10 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Target } from "@/types";
 import { targetFormSchema, type TargetFormData } from "./targets/schema";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 interface TargetFormProps {
   mode: "create" | "edit" | "view";
@@ -26,6 +33,7 @@ const TargetForm: React.FC<TargetFormProps> = ({
   const formattedData = initialData
     ? {
         ...initialData,
+        targetPercentage: String(initialData.targetPercentage),
       }
     : undefined;
 
@@ -36,27 +44,18 @@ const TargetForm: React.FC<TargetFormProps> = ({
       name: "",
       description: "",
       baselineValue: 0,
-      targetPercentage: 0,
-      targetDate: new Date().toISOString().split('T')[0], // Format date as YYYY-MM-DD string
-      status: "active",
+      targetPercentage: "-5",
+      targetDate: new Date().toISOString().split('T')[0],
+      status: "not_started",
     },
   });
 
   function onSubmit(data: TargetFormData) {
-    // Ensure we have all required fields for a target
-    const targetData: Omit<Target, 'id' | 'createdAt' | 'updatedAt' | 'targetValue'> = {
-      trackId: data.trackId,
-      name: data.name,
-      description: data.description,
-      baselineValue: data.baselineValue,
-      targetPercentage: data.targetPercentage,
-      targetDate: data.targetDate,
-      status: data.status,
-      // Include optional fields if they exist
-      ...(data.scenarioId && { scenarioId: data.scenarioId }),
-      ...(data.supplierId && { supplierId: data.supplierId })
+    const targetData = {
+      ...data,
+      targetPercentage: parseInt(data.targetPercentage),
     };
-    
+
     if (mode === "create") {
       createTarget(targetData);
     } else if (mode === "edit" && initialData) {
@@ -69,42 +68,147 @@ const TargetForm: React.FC<TargetFormProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div>
-          <Label htmlFor="trackId">Track ID</Label>
-          <Input id="trackId" {...form.register("trackId")} disabled={isViewMode} />
-        </div>
-        <div>
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" {...form.register("name")} disabled={isViewMode} />
-        </div>
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Input id="description" {...form.register("description")} disabled={isViewMode} />
-        </div>
-        <div>
-          <Label htmlFor="baselineValue">Baseline Value</Label>
-          <Input
-            type="number"
-            id="baselineValue"
-            {...form.register("baselineValue", { valueAsNumber: true })}
-            disabled={isViewMode}
+          <FormField
+            control={form.control}
+            name="trackId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Track ID</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
+
         <div>
-          <Label htmlFor="targetPercentage">Target Percentage</Label>
-          <Input
-            type="number"
-            id="targetPercentage"
-            {...form.register("targetPercentage", { valueAsNumber: true })}
-            disabled={isViewMode}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
+
         <div>
-          <Label htmlFor="targetDate">Target Date</Label>
-          <Input type="date" id="targetDate" {...form.register("targetDate")} disabled={isViewMode} />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+
         <div>
-          <Label htmlFor="status">Status</Label>
-          <Input id="status" {...form.register("status")} disabled={isViewMode} />
+          <FormField
+            control={form.control}
+            name="baselineValue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Baseline Value</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    disabled={isViewMode}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div>
+          <FormField
+            control={form.control}
+            name="targetPercentage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Target Percentage</FormLabel>
+                <Select
+                  disabled={isViewMode}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select percentage" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="-5">-5%</SelectItem>
+                    <SelectItem value="-10">-10%</SelectItem>
+                    <SelectItem value="-20">-20%</SelectItem>
+                    <SelectItem value="-30">-30%</SelectItem>
+                    <SelectItem value="-40">-40%</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div>
+          <FormField
+            control={form.control}
+            name="targetDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Target Date</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} disabled={isViewMode} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  disabled={isViewMode}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="not_started">Not Started</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {!isViewMode && (

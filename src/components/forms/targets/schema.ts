@@ -14,11 +14,13 @@ export const targetFormSchema = z.object({
   baselineValue: z.coerce.number().nonnegative({
     message: "Baseline value must be a non-negative number.",
   }),
-  targetPercentage: z.coerce.number().min(0).max(100, {
-    message: "Target percentage must be between 0 and 100.",
+  targetPercentage: z.enum(["-5", "-10", "-20", "-30", "-40"], {
+    required_error: "Target percentage is required.",
   }),
-  targetDate: z.string(), // Changed to only accept string
-  status: z.enum(["active", "pending", "completed", "cancelled"]),
+  targetDate: z.string(),
+  status: z.enum(["not_started", "in_progress", "completed"], {
+    required_error: "Status is required.",
+  }),
 });
 
 export type TargetFormData = z.infer<typeof targetFormSchema>;

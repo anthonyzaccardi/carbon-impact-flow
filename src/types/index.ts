@@ -1,7 +1,8 @@
-export type Status = 'active' | 'pending' | 'completed' | 'cancelled';
+export type Status = 'not_started' | 'in_progress' | 'completed';
 export type InitiativeStatus = 'not_started' | 'in_progress' | 'completed' | 'committed';
 export type TrajectoryType = 'every_year' | 'linear';
 export type PlanType = '-2%' | '-4%' | '-6%' | '-8%' | '-10%' | '-15%' | '-5%';
+export type TargetPercentage = '-5' | '-10' | '-20' | '-30' | '-40';
 
 export interface Track {
   id: string;
