@@ -18,13 +18,9 @@ export const createTargetOperation = (
     return;
   }
 
-  // Ensure targetDate is a string
-  const targetDate = target.targetDate;
-
   const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
   const newTarget: Target = {
     ...target,
-    targetDate,
     targetValue,
     id: generateId('target'),
     createdAt: getCurrentTimestamp(),
