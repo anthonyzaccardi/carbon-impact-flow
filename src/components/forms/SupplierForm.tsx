@@ -85,7 +85,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <SupplierFormFields isViewMode={isViewMode} />
         
-        {isViewMode && <LinkedTargets targets={linkedTargets} />}
+        {isViewMode && initialData && <LinkedTargets targets={linkedTargets} supplierId={initialData.id} />}
         
         {!isViewMode && (
           <div className="flex justify-end space-x-2">
