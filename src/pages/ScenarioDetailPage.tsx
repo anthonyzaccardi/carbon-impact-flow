@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/useAppContext';
@@ -5,6 +6,7 @@ import { toast } from 'sonner';
 import { ScenarioHeader } from '@/components/scenarios/ScenarioHeader';
 import { ScenarioSummary } from '@/components/scenarios/ScenarioSummary';
 import { ScenarioTargetsSection } from '@/components/scenarios/ScenarioTargetsSection';
+import { ExistingTargetsSelector } from '@/components/scenarios/targets/ExistingTargetsSelector';
 import { Target, Scenario } from '@/types';
 
 const ScenarioDetailPage = () => {
