@@ -95,6 +95,6 @@ export interface Supplier {
 export interface SidePanel {
   isOpen: boolean;
   type: 'create' | 'edit' | 'view';
-  entityType: 'track' | 'factor' | 'measurement' | 'target' | 'initiative' | 'scenario' | 'supplier' | 'custom';
+  entityType: 'track' | 'factor' | 'measurement' | 'target' | 'initiative' | 'scenario' | 'supplier' | 'custom' | 'initiative-targets';
   data?: any;
 }
