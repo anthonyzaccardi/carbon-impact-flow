@@ -10,6 +10,7 @@ import ScenarioForm from '@/components/forms/ScenarioForm';
 import SupplierForm from '@/components/forms/SupplierForm';
 import { SidePanel } from '@/types';
 import { useAppContext } from '@/contexts/useAppContext';
+import { InitiativeTargetSelector } from '@/components/initiatives/InitiativeTargetSelector';
 
 interface SidePanelContentProps {
   sidePanel: SidePanel;
@@ -251,6 +252,19 @@ const SidePanelContent = ({ sidePanel, onClose }: SidePanelContentProps) => {
         />
         {renderRelatedEntities()}
       </>
+    );
+  }
+  
+  else if (entityType === 'initiative-targets' && data) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Manage Targets</h2>
+        <p className="text-sm text-muted-foreground">Select targets to attach to this initiative</p>
+        <InitiativeTargetSelector 
+          initiativeId={data.id} 
+          onClose={onClose}
+        />
+      </div>
     );
   }
   

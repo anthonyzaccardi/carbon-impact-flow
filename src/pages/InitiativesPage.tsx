@@ -103,10 +103,29 @@ const InitiativesPage = () => {
     {
       header: 'Targets',
       accessorKey: 'targetIds',
-      cell: (initiative: Initiative) => (
-        <span className="line-clamp-1">{getTargetNames(initiative.targetIds)}</span>
-      )
-    },
+      cell: (initiative: Initiative) => {
+        const attachedTargets = targets.filter(t => initiative.targetIds.includes(t.id));
+        return (
+          <div className="flex flex-wrap gap-2">
+            {attachedTargets.map(target => (
+              <Badge key={target.id} variant="secondary">
+                {target.name}
+              </Badge>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                openSidePanel('view', 'initiative-targets', initiative);
+              }}
+            >
+              Manage
+            </Button>
+          </div>
+        );
+      }
+    }
   ];
 
   return (
