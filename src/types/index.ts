@@ -1,4 +1,3 @@
-
 export type Status = 'not_started' | 'in_progress' | 'completed';
 export type MeasurementStatus = 'active' | 'pending' | 'completed' | 'cancelled';
 export type InitiativeStatus = 'not_started' | 'in_progress' | 'completed' | 'committed';
@@ -96,6 +95,6 @@ export interface Supplier {
 export interface SidePanel {
   isOpen: boolean;
   type: 'create' | 'edit' | 'view';
-  entityType: 'track' | 'factor' | 'measurement' | 'target' | 'initiative' | 'scenario' | 'supplier';
+  entityType: 'track' | 'factor' | 'measurement' | 'target' | 'initiative' | 'scenario' | 'supplier' | 'custom';
   data?: any;
 }
