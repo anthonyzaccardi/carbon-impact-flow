@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/useAppContext';
@@ -8,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, ChevronLeft, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Target, Initiative, Scenario } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { ExistingInitiativesSelector } from '@/components/targets/initiatives/ExistingInitiativesSelector';
 
 const statusColorMap = {
   not_started: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
@@ -32,10 +32,7 @@ const TargetDetailPage = () => {
     targets, 
     initiatives,
     tracks, 
-    openSidePanel, 
-    addTargetsToInitiative, 
-    removeTargetFromInitiative,
-    createInitiative
+    openSidePanel 
   } = useAppContext();
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,11 +47,9 @@ const TargetDetailPage = () => {
     if (target) {
       setTargetData(target);
       
-      // Find initiatives for this target
       const filteredInitiatives = initiatives.filter(i => i.targetIds.includes(targetId));
       setTargetInitiatives(filteredInitiatives);
       
-      // Get scenario data if available
       if (scenarioId) {
         const scenario = scenarios.find(s => s.id === scenarioId);
         if (scenario) {
@@ -64,7 +59,6 @@ const TargetDetailPage = () => {
     }
   }, [targetId, scenarioId, targets, initiatives, scenarios]);
   
-  // Calculate metrics
   const totalInitiatives = targetInitiatives.length;
   const activeInitiatives = targetInitiatives.filter(i => i.status === 'in_progress').length;
   const totalSpend = targetInitiatives.reduce((sum, i) => sum + i.spend, 0);
@@ -97,22 +91,17 @@ const TargetDetailPage = () => {
   };
   
   const handleAttachExistingInitiative = () => {
-    if (!targetData) return;
+    if (!targetId) return;
     
-    // Get initiatives not attached to this target
-    const unattachedInitiatives = initiatives.filter(i => !i.targetIds.includes(targetData.id));
-    
-    if (unattachedInitiatives.length === 0) {
-      toast.error("No unattached initiatives available");
-      return;
-    }
-    
-    // Show a dialog to select initiatives
-    // For now, just attach the first unattached initiative
-    const initiativeToAttach = unattachedInitiatives[0];
-    addTargetsToInitiative(initiativeToAttach.id, [targetData.id]);
-    
-    toast.success(`Attached initiative: ${initiativeToAttach.name}`);
+    openSidePanel('view', 'custom', {
+      title: "Attach Existing Initiatives",
+      content: (
+        <ExistingInitiativesSelector
+          targetId={targetId}
+          onClose={() => openSidePanel('view', 'custom', { isOpen: false })}
+        />
+      ),
+    });
   };
   
   const handleRemoveInitiative = (initiativeId: string) => {
@@ -183,7 +172,6 @@ const TargetDetailPage = () => {
     return <div className="p-6">Loading target details...</div>;
   }
   
-  // Find track for this target
   const track = tracks.find(t => t.id === targetData.trackId);
   
   return (
@@ -333,7 +321,26 @@ const TargetDetailPage = () => {
       </div>
       
       <div className="space-y-4">
-        <h2 className="text-xl font-medium">Initiatives ({totalInitiatives})</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-medium">Initiatives ({totalInitiatives})</h2>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Initiative
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleCreateInitiative}>
+                Create new initiative
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAttachExistingInitiative}>
+                Attach existing initiative
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
