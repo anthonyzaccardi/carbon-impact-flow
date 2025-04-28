@@ -8,6 +8,7 @@ import { ScenarioTargetTable } from "./targets/ScenarioTargetTable";
 interface ScenarioTargetsSectionProps {
   targets: Target[];
   tracks: Track[];
+  scenarioId: string;
   onCreateTarget: () => void;
   onAttachExisting: () => void;
   onRemoveTarget: (targetId: string) => void;
@@ -17,6 +18,7 @@ interface ScenarioTargetsSectionProps {
 export const ScenarioTargetsSection = ({
   targets,
   tracks,
+  scenarioId,
   onCreateTarget,
   onAttachExisting,
   onRemoveTarget,
@@ -36,6 +38,7 @@ export const ScenarioTargetsSection = ({
           onSearchChange={setSearchTerm}
         />
         <TargetActions
+          scenarioId={scenarioId}
           onCreateTarget={onCreateTarget}
           onAttachExisting={onAttachExisting}
         />

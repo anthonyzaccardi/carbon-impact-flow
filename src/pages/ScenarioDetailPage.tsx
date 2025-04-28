@@ -94,6 +94,7 @@ const ScenarioDetailPage = () => {
       <ScenarioTargetsSection
         targets={scenarioTargets}
         tracks={tracks}
+        scenarioId={scenarioId as string}
         onCreateTarget={handleCreateTarget}
         onAttachExisting={handleAttachExistingTarget}
         onRemoveTarget={handleRemoveTarget}

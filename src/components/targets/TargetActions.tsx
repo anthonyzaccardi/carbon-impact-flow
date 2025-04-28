@@ -7,15 +7,38 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
-import { Target } from "@/types";
+import { ExistingTargetsSelector } from "@/components/scenarios/targets/ExistingTargetsSelector";
+import { useAppContext } from "@/contexts/useAppContext";
 
 interface TargetActionsProps {
   onCreateTarget: () => void;
   onAttachExisting: () => void;
+  scenarioId?: string;
 }
 
-export const TargetActions = ({ onCreateTarget, onAttachExisting }: TargetActionsProps) => {
+export const TargetActions = ({
+  onCreateTarget,
+  onAttachExisting,
+  scenarioId,
+}: TargetActionsProps) => {
+  const { openSidePanel } = useAppContext();
+
+  const handleAttachExisting = () => {
+    if (scenarioId) {
+      openSidePanel("view", "custom", {
+        title: "Attach Existing Targets",
+        content: (
+          <ExistingTargetsSelector
+            scenarioId={scenarioId}
+            onClose={() => openSidePanel("view", "custom", { isOpen: false })}
+          />
+        ),
+      });
+    } else {
+      onAttachExisting();
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,9 +51,11 @@ export const TargetActions = ({ onCreateTarget, onAttachExisting }: TargetAction
         <DropdownMenuItem onClick={onCreateTarget}>
           Create new target
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={onAttachExisting}>
-          Attach existing target
-        </DropdownMenuItem>
+        {scenarioId && (
+          <DropdownMenuItem onClick={handleAttachExisting}>
+            Attach existing target
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
