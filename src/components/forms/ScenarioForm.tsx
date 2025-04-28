@@ -12,13 +12,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Scenario } from "@/types";
 import { useState, useEffect } from "react";
@@ -27,7 +20,6 @@ const formSchema = z.object({
   name: z.string().min(3, {
     message: "Scenario name must be at least 3 characters.",
   }),
-  status: z.enum(["active", "pending", "completed", "cancelled"]),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -63,21 +55,17 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       name: "",
-      status: "active",
     },
   });
 
   function onSubmit(data: FormData) {
     if (mode === "create") {
-      // Ensure we pass all required fields
       createScenario({
         name: data.name,
-        status: data.status
       });
     } else if (mode === "edit" && initialData) {
       updateScenario(initialData.id, {
         name: data.name,
-        status: data.status
       });
     }
     onClose();
@@ -95,34 +83,6 @@ const ScenarioForm: React.FC<ScenarioFormProps> = ({
               <FormControl>
                 <Input {...field} disabled={isViewMode} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select
-                disabled={isViewMode}
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}
