@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/useAppContext';
@@ -53,20 +52,17 @@ const ScenarioDetailPage = () => {
   };
   
   const handleAttachExistingTarget = () => {
-    const unattachedTargets = targets.filter(t => !t.scenarioId);
+    if (!scenarioId) return;
     
-    if (unattachedTargets.length === 0) {
-      toast.error("No unattached targets available");
-      return;
-    }
-    
-    const targetToAttach = unattachedTargets[0];
-    updateTarget(targetToAttach.id, { 
-      ...targetToAttach, 
-      scenarioId: scenarioId 
+    openSidePanel('view', 'custom', {
+      title: "Attach Existing Targets",
+      content: (
+        <ExistingTargetsSelector
+          scenarioId={scenarioId}
+          onClose={() => openSidePanel('view', 'custom', { isOpen: false })}
+        />
+      ),
     });
-    
-    toast.success(`Attached target: ${targetToAttach.name}`);
   };
   
   const handleRemoveTarget = (targetId: string) => {
