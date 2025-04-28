@@ -1,19 +1,25 @@
+
 import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 interface SupplierFormFieldsProps {
   isViewMode: boolean;
 }
+
 const industries = ["Agriculture", "Construction", "Education", "Energy", "Financial Services", "Healthcare", "Hospitality", "Information Technology", "Manufacturing", "Mining", "Real Estate", "Retail", "Transportation", "Utilities", "Waste Management"];
 const currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY"];
+
 export const SupplierFormFields = ({
   isViewMode
 }: SupplierFormFieldsProps) => {
   const {
     control
   } = useFormContext();
-  return <>
+  
+  return (
+    <>
       <FormField control={control} name="name" render={({
       field
     }) => <FormItem>
@@ -97,5 +103,6 @@ export const SupplierFormFields = ({
               <FormMessage />
             </FormItem>} />
       </div>
-    </>;
+    </>
+  );
 };

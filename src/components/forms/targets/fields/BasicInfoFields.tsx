@@ -63,7 +63,7 @@ export const BasicInfoFields = ({ form, isViewMode }: BasicInfoFieldsProps) => {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="none">No supplier</SelectItem>
+                <SelectItem value="no-supplier">No supplier</SelectItem>
                 {suppliers.map((supplier) => (
                   <SelectItem key={supplier.id} value={supplier.id}>
                     {supplier.name}
