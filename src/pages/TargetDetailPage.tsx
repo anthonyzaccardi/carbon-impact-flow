@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/useAppContext';
@@ -7,6 +6,8 @@ import { ExistingInitiativesSelector } from '@/components/targets/initiatives/Ex
 import { TargetHeader } from '@/components/targets/detail/TargetHeader';
 import { TargetSummary } from '@/components/targets/detail/TargetSummary';
 import { TargetInitiatives } from '@/components/targets/detail/TargetInitiatives';
+import { useInitiativeMetrics } from '@/hooks/useInitiativeMetrics';
+import { Target, Initiative, Scenario } from '@/types';
 
 const TargetDetailPage = () => {
   const { scenarioId, targetId } = useParams();
@@ -47,11 +48,9 @@ const TargetDetailPage = () => {
     return <div className="p-6">Loading target details...</div>;
   }
   
+  const { totalInitiatives, activeInitiatives, totalSpend, totalImpact } = useInitiativeMetrics(targetInitiatives);
+  
   const track = tracks.find(t => t.id === targetData.trackId);
-  const totalInitiatives = targetInitiatives.length;
-  const activeInitiatives = targetInitiatives.filter(i => i.status === 'in_progress').length;
-  const totalSpend = targetInitiatives.reduce((sum, i) => sum + i.spend, 0);
-  const totalImpact = targetInitiatives.reduce((sum, i) => sum + i.absolute, 0);
   
   const handleBack = () => {
     if (scenarioId) {

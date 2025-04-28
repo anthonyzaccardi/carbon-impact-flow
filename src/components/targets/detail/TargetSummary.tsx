@@ -1,13 +1,14 @@
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Target, Track } from "@/types";
 
 interface TargetSummaryProps {
   target: Target;
   track: Track | undefined;
+  totalImpact: number;
+  totalSpend: number;
 }
 
-export const TargetSummary = ({ target, track }: TargetSummaryProps) => {
+export const TargetSummary = ({ target, track, totalImpact, totalSpend }: TargetSummaryProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-2">

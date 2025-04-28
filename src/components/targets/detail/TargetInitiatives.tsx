@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Initiative } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Search, Plus } from "lucide-react";
