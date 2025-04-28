@@ -17,7 +17,7 @@ export const ExistingInitiativesSelector = ({
   const { initiatives, addTargetsToInitiative } = useAppContext();
   const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([]);
 
-  // Get initiatives not already attached to this target
+  // Filter initiatives that are not already attached to this target
   const availableInitiatives = initiatives.filter(i => !i.targetIds.includes(targetId));
 
   const handleInitiativeClick = (initiativeId: string) => {
