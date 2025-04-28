@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import MainContent from './MainContent';
 import { useAppContext } from '@/contexts/useAppContext';
 import SidePanel from '@/components/ui/side-panel';
-import SidePanelContent from './SidePanelContent';
+import SidePanelContent from '@/components/side-panel/SidePanelContent';
 import { getSidePanelTitle } from '@/utils/side-panel-utils';
 
 interface MainLayoutProps {
