@@ -10,6 +10,7 @@ import TargetForm from '@/components/forms/TargetForm';
 import InitiativeForm from '@/components/forms/initiatives/InitiativeForm';
 import ScenarioForm from '@/components/forms/ScenarioForm';
 import SupplierForm from '@/components/forms/SupplierForm';
+import { SidePanel } from '@/types';
 
 interface EntitySidePanelProps {
   type: 'view' | 'create' | 'edit';
@@ -27,14 +28,15 @@ export const EntitySidePanel: React.FC<EntitySidePanelProps> = ({
   const { openSidePanel } = useAppContext();
   
   const handleEntityClick = (type: string, entityData: any) => {
-    openSidePanel('view', type as any, entityData);
+    // Cast the entityType to the appropriate type expected by openSidePanel
+    openSidePanel('view', type as SidePanel['entityType'], entityData);
   };
 
   const renderActionButtons = () => {
     if (type !== 'view') return null;
     return (
       <EntityActions 
-        onEdit={() => openSidePanel('edit', entityType, data)}
+        onEdit={() => openSidePanel('edit', entityType as SidePanel['entityType'], data)}
         onDelete={onClose} 
       />
     );
