@@ -7,7 +7,8 @@ export const useSupplierCrud = (
   setSuppliers: (suppliers: Supplier[]) => void
 ) => {
   const createSupplier = (supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => {
-    return createSupplierOperation(suppliers, setSuppliers, supplier);
+    const newSupplierId = createSupplierOperation(suppliers, setSuppliers, supplier);
+    return newSupplierId;
   };
 
   const updateSupplier = (id: string, supplier: Partial<Supplier>) => {
