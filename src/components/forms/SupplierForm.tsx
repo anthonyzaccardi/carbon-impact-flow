@@ -79,7 +79,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
 
     if (mode === "create") {
       // Create the supplier first, then update targets with the new supplier ID
-      const newSupplierId = createSupplier(formattedData);
+      const newSupplierId: string = createSupplier(formattedData);
       
       // Attach any pending targets to the newly created supplier
       pendingTargetIds.forEach(targetId => {
