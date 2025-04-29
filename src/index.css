@@ -5,35 +5,35 @@
 
 @layer base {
   :root {
-    --background: 252 250 255;
-    --foreground: 240 10% 15%; /* Dark #1A1F2C */
+    --background: 0 0% 100%;
+    --foreground: 200 10% 34%; /* Grey #4F5D61 */
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    --card-foreground: 200 10% 34%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
-    --primary: 255 80% 75%; /* Purple #9b87f5 */
+    --popover-foreground: 200 10% 34%;
+    --primary: 200 10% 34%; /* Grey #4F5D61 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 260 30% 54%; /* Darker Purple #7E69AB */
+    --secondary: 188 15% 66%; /* Light Blue #99B3B6 */
     --secondary-foreground: 0 0% 100%;
-    --accent: 196 75% 49%; /* Bright Blue #1EAEDB */
+    --accent: 16 100% 60%; /* Orange #FF6E35 */
     --accent-foreground: 0 0% 100%;
-    --muted: 252 30% 95%;
+    --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 270 20% 92%;
-    --input: 270 20% 92%;
-    --ring: 255 80% 75%;
+    --border: 200 10% 90%;
+    --input: 200 10% 90%;
+    --ring: 200 10% 50%;
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 15%; 
-    --sidebar-primary: 255 80% 75%;
+    --sidebar-background: 200 10% 98%;
+    --sidebar-foreground: 200 10% 34%; 
+    --sidebar-primary: 200 10% 34%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 196 75% 49%;
+    --sidebar-accent: 16 100% 60%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 270 20% 92%;
-    --sidebar-ring: 255 80% 75%;
+    --sidebar-border: 200 10% 88%;
+    --sidebar-ring: 200 10% 50%;
   }
 }
 
@@ -43,18 +43,6 @@
   }
   body {
     @apply bg-background text-foreground font-inter antialiased tracking-tight;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold leading-tight;
-  }
-  
-  h1 {
-    @apply text-3xl font-bold;
-  }
-  
-  h2 {
-    @apply text-2xl;
   }
 }
 
@@ -86,22 +74,4 @@
 
 .animate-slide-in {
   animation: slideIn 0.3s ease forwards;
-}
-
-/* Modern card styling */
-.eco-card {
-  @apply bg-white rounded-xl shadow-md border border-border transition-all hover:shadow-lg;
-}
-
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-purple;
-}
-
-/* Navigation active link styling */
-.nav-item.active {
-  @apply bg-eco-purple/10 text-eco-purple font-medium !important;
-}
-
-.nav-item.active svg {
-  @apply text-eco-purple !important;
 }

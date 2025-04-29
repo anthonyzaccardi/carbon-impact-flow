@@ -71,8 +71,6 @@ export default {
 				},
                 eco: {
                     purple: '#9b87f5',
-                    darkPurple: '#7E69AB',
-                    brightBlue: '#1EAEDB',
                     dark: '#1A1F2C',
                     gray: '#8E9196',
                     lightPurple: '#D6BCFA',
@@ -116,14 +114,6 @@ export default {
                 'fade-out': {
                     '0%': { opacity: '1' },
                     '100%': { opacity: '0' }
-                },
-                'scale-in': {
-                    '0%': { transform: 'scale(0.95)', opacity: '0' },
-                    '100%': { transform: 'scale(1)', opacity: '1' }
-                },
-                'slide-in-bottom': {
-                    '0%': { transform: 'translateY(10px)', opacity: '0' },
-                    '100%': { transform: 'translateY(0)', opacity: '1' }
                 }
 			},
 			animation: {
@@ -132,14 +122,8 @@ export default {
                 'slide-in-right': 'slide-in-right 0.3s ease-out',
                 'slide-out-right': 'slide-out-right 0.3s ease-out',
                 'fade-in': 'fade-in 0.3s ease-out',
-                'fade-out': 'fade-out 0.3s ease-out',
-                'scale-in': 'scale-in 0.2s ease-out',
-                'slide-in-bottom': 'slide-in-bottom 0.3s ease-out',
-			},
-            backgroundImage: {
-                'gradient-purple': 'linear-gradient(135deg, #9b87f5 0%, #D6BCFA 100%)',
-                'gradient-sidebar': 'linear-gradient(180deg, #9b87f5 0%, #7E69AB 100%)',
-            }
+                'fade-out': 'fade-out 0.3s ease-out'
+			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
