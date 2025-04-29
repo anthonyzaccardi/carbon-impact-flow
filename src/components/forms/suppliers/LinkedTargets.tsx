@@ -1,3 +1,4 @@
+
 import { useAppContext } from "@/contexts/useAppContext";
 import { Target } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -49,8 +50,8 @@ export const LinkedTargets = ({
     });
   };
 
-  // Handle attaching selected targets
-  const handleAttachTargets = () => {
+  // Handle saving multiple selected targets
+  const handleSaveSelection = () => {
     if (selectedTargetIds.length === 0) return;
 
     if (supplierId) {
@@ -159,7 +160,7 @@ export const LinkedTargets = ({
             <Table>
               <TableHeader className="sticky top-0 bg-background">
                 <TableRow>
-                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="w-[50px]">Select</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Track</TableHead>
                   <TableHead>Target</TableHead>
@@ -175,7 +176,7 @@ export const LinkedTargets = ({
                     <TableRow key={target.id} className={isAlreadyLinked ? "opacity-50" : ""}>
                       <TableCell>
                         <Checkbox 
-                          checked={selectedTargetIds.includes(target.id)} 
+                          checked={selectedTargetIds.includes(target.id) || isAlreadyLinked} 
                           disabled={isAlreadyLinked}
                           onCheckedChange={() => handleSelect(target.id)}
                         />
@@ -199,7 +200,7 @@ export const LinkedTargets = ({
           </ScrollArea>
           
           <Button 
-            onClick={handleAttachTargets}
+            onClick={handleSaveSelection}
             disabled={selectedTargetIds.length === 0}
             className="w-full"
           >
