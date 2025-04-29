@@ -6,7 +6,7 @@ export const useSupplierCrud = (
   suppliers: Supplier[],
   setSuppliers: (suppliers: Supplier[]) => void
 ) => {
-  const createSupplier = (supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const createSupplier = (supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>): string => {
     const newSupplierId = createSupplierOperation(suppliers, setSuppliers, supplier);
     return newSupplierId;
   };
