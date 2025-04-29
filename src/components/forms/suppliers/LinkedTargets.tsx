@@ -2,10 +2,12 @@ import { useAppContext } from "@/contexts/useAppContext";
 import { Target } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Check, X } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface LinkedTargetsProps {
   targets: Target[];
@@ -22,8 +24,8 @@ export const LinkedTargets = ({
   pendingTargetIds = [],
   setPendingTargetIds = () => {}
 }: LinkedTargetsProps) => {
-  const { targets: allTargets, updateTarget } = useAppContext();
-  const [selectedTargetId, setSelectedTargetId] = useState<string>("");
+  const { targets: allTargets, updateTarget, tracks } = useAppContext();
+  const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>([]);
 
   // Include both currently linked targets and pending targets for display
   const displayTargets = [
@@ -31,29 +33,53 @@ export const LinkedTargets = ({
     ...allTargets.filter(t => pendingTargetIds.includes(t.id) && !targets.some(lt => lt.id === t.id))
   ];
 
-  // Filter out targets that already have a supplier (except those pending for this supplier)
+  // Get targets that are available (not linked to any supplier except current one)
   const availableTargets = allTargets.filter(t => 
-    !t.supplierId || (supplierId && t.supplierId === supplierId) || pendingTargetIds.includes(t.id)
+    !t.supplierId || (supplierId && t.supplierId === supplierId)
   );
 
-  const handleAttachTarget = () => {
-    if (!selectedTargetId) return;
-
-    const target = allTargets.find(t => t.id === selectedTargetId);
-    if (target) {
-      if (supplierId) {
-        // If we have a supplierId (edit mode), update target immediately
-        updateTarget(target.id, { ...target, supplierId });
-        toast.success("Target attached to supplier");
+  // Handle checkbox selection
+  const handleSelect = (targetId: string) => {
+    setSelectedTargetIds(prev => {
+      if (prev.includes(targetId)) {
+        return prev.filter(id => id !== targetId);
       } else {
-        // Otherwise, add to pending targets (create mode)
-        setPendingTargetIds([...pendingTargetIds, selectedTargetId]);
-        toast.success("Target will be attached after supplier creation");
+        return [...prev, targetId];
       }
-      setSelectedTargetId("");
-    }
+    });
   };
 
+  // Handle attaching selected targets
+  const handleAttachTargets = () => {
+    if (selectedTargetIds.length === 0) return;
+
+    if (supplierId) {
+      // If we have a supplierId (edit mode), update targets immediately
+      selectedTargetIds.forEach(targetId => {
+        const target = allTargets.find(t => t.id === targetId);
+        if (target) {
+          updateTarget(targetId, { ...target, supplierId });
+        }
+      });
+      toast.success(`${selectedTargetIds.length} target(s) attached to supplier`);
+    } else {
+      // Otherwise, add to pending targets (create mode)
+      const newPendingIds = [...pendingTargetIds];
+      
+      selectedTargetIds.forEach(id => {
+        if (!newPendingIds.includes(id)) {
+          newPendingIds.push(id);
+        }
+      });
+      
+      setPendingTargetIds(newPendingIds);
+      toast.success(`${selectedTargetIds.length} target(s) will be attached after supplier creation`);
+    }
+    
+    setSelectedTargetIds([]);
+  };
+
+  // Handle detaching a target
   const handleDetachTarget = (targetId: string) => {
     if (supplierId) {
       // If we have a supplierId (edit mode), update target immediately
@@ -70,6 +96,22 @@ export const LinkedTargets = ({
   };
 
   const isPending = (targetId: string) => !supplierId && pendingTargetIds.includes(targetId);
+  
+  // Check if a target is already linked to this supplier or pending
+  const isLinkedOrPending = (targetId: string) => {
+    return displayTargets.some(t => t.id === targetId) || pendingTargetIds.includes(targetId);
+  };
+  
+  // Get track name for a target
+  const getTrackName = (trackId: string) => {
+    const track = tracks.find(t => t.id === trackId);
+    return track ? track.name : 'Unknown';
+  };
+  
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
 
   return (
     <div className="space-y-4">
@@ -111,34 +153,59 @@ export const LinkedTargets = ({
       </div>
 
       {!isViewMode && availableTargets.length > 0 && (
-        <div className="flex gap-2">
-          <Select
-            value={selectedTargetId}
-            onValueChange={setSelectedTargetId}
-          >
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Select a target to attach" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableTargets
-                .filter(target => 
-                  !displayTargets.some(t => t.id === target.id) && 
-                  !pendingTargetIds.includes(target.id)
-                )
-                .map((target) => (
-                <SelectItem key={target.id} value={target.id}>
-                  {target.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="space-y-4">
+          <h4 className="text-base font-medium">Select targets to attach</h4>
+          <ScrollArea className="h-64 border rounded-md">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background">
+                <TableRow>
+                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Track</TableHead>
+                  <TableHead>Target</TableHead>
+                  <TableHead>Target Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {availableTargets.map(target => {
+                  // Check if target is already linked or pending
+                  const isAlreadyLinked = isLinkedOrPending(target.id);
+                  
+                  return (
+                    <TableRow key={target.id} className={isAlreadyLinked ? "opacity-50" : ""}>
+                      <TableCell>
+                        <Checkbox 
+                          checked={selectedTargetIds.includes(target.id)} 
+                          disabled={isAlreadyLinked}
+                          onCheckedChange={() => handleSelect(target.id)}
+                        />
+                      </TableCell>
+                      <TableCell>{target.name}</TableCell>
+                      <TableCell>{getTrackName(target.trackId)}</TableCell>
+                      <TableCell>{target.targetPercentage}% reduction</TableCell>
+                      <TableCell>{formatDate(target.targetDate)}</TableCell>
+                    </TableRow>
+                  );
+                })}
+                {availableTargets.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center p-4 text-muted-foreground">
+                      No available targets
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+          
           <Button 
-            onClick={handleAttachTarget}
-            disabled={!selectedTargetId}
-            className="flex items-center gap-1"
+            onClick={handleAttachTargets}
+            disabled={selectedTargetIds.length === 0}
+            className="w-full"
           >
-            <Plus className="h-4 w-4" />
-            Attach
+            {supplierId 
+              ? `Attach ${selectedTargetIds.length} selected target(s)` 
+              : `Add ${selectedTargetIds.length} target(s) to be attached`}
           </Button>
         </div>
       )}
