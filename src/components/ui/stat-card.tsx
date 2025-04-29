@@ -25,9 +25,10 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => {
   return (
     <Card className={cn("overflow-hidden", className)}>
+      <div className="h-1 bg-gradient-purple"></div>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
-          <div>
+          <div className="animate-slide-in-bottom opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '0.1s' }}>
             <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
             <h3 className="text-2xl font-semibold">{value}</h3>
             {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
@@ -43,7 +44,7 @@ const StatCard: React.FC<StatCardProps> = ({
           </div>
           
           {icon && (
-            <div className="bg-primary/10 p-2 rounded-md">
+            <div className="bg-eco-purple/10 p-2 rounded-md text-eco-purple animate-slide-in-bottom opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '0.2s' }}>
               {icon}
             </div>
           )}

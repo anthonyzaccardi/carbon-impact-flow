@@ -50,10 +50,10 @@ const SidePanel: React.FC<SidePanelProps> = ({
         aria-hidden="true"
       />
       
-      <div className="side-panel animate-slide-in-right">
-        <div className="border-b border-border p-4 flex items-center justify-between">
+      <div className="side-panel animate-slide-in-right bg-white">
+        <div className="p-4 flex items-center justify-between border-b border-border bg-gradient-purple text-white">
           <h2 className="text-lg font-medium">{title}</h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/10 hover:text-white">
             <X className="h-4 w-4" />
           </Button>
         </div>

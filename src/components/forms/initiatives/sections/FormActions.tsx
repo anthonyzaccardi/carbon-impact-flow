@@ -18,11 +18,11 @@ export const FormActions = ({ isViewMode, onClose }: FormActionsProps) => {
   }
 
   return (
-    <div className="flex justify-end space-x-2">
+    <div className="flex justify-end space-x-3">
       <Button variant="outline" onClick={onClose} type="button">
         Cancel
       </Button>
-      <Button type="submit">Save</Button>
+      <Button type="submit" className="px-6">Save</Button>
     </div>
   );
 };

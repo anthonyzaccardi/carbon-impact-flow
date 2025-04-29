@@ -22,11 +22,12 @@ interface ScenarioCardProps {
 export const ScenarioCard = ({ scenario, trackGroups, stats, onClick }: ScenarioCardProps) => {
   return (
     <Card 
-      className="hover:shadow-md transition-shadow cursor-pointer"
+      className="hover:shadow-md transition-shadow cursor-pointer animate-scale-in overflow-hidden"
       onClick={onClick}
     >
+      <div className="h-2 w-full bg-gradient-purple"></div>
       <CardHeader>
-        <CardTitle>{scenario.name}</CardTitle>
+        <CardTitle className="text-lg font-semibold">{scenario.name}</CardTitle>
         <CardDescription>
           {stats.startYear && stats.endYear ? 
             `${stats.startYear} - ${stats.endYear}` : 
@@ -46,7 +47,7 @@ export const ScenarioCard = ({ scenario, trackGroups, stats, onClick }: Scenario
                       <span className="mr-1">{track.emoji}</span>
                       <span>{track.name}</span>
                     </div>
-                    <span className="text-green-500">
+                    <span className="text-green-500 font-medium">
                       -{totalReduction.toLocaleString()} tCO2e
                     </span>
                   </li>
@@ -58,8 +59,8 @@ export const ScenarioCard = ({ scenario, trackGroups, stats, onClick }: Scenario
           </div>
           
           <div className="pt-2 mt-2 border-t flex justify-between text-sm">
-            <span>Total Reduction:</span>
-            <span className="font-bold">{stats.totalReduction.toLocaleString()} tCO2e</span>
+            <span className="font-medium">Total Reduction:</span>
+            <span className="font-bold text-eco-darkPurple">{stats.totalReduction.toLocaleString()} tCO2e</span>
           </div>
         </div>
       </CardContent>

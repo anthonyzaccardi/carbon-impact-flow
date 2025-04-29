@@ -15,7 +15,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { sidePanel, closeSidePanel } = useAppContext();
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar />
       <MainContent>{children}</MainContent>
       

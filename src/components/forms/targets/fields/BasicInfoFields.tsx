@@ -16,26 +16,26 @@ export const BasicInfoFields = ({ form, isViewMode }: BasicInfoFieldsProps) => {
   const { tracks, suppliers } = useAppContext();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <FormField
         control={form.control}
         name="trackId"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Track</FormLabel>
+            <FormLabel className="font-medium">Track</FormLabel>
             <Select
               disabled={isViewMode}
               onValueChange={field.onChange}
               value={field.value}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="w-full border-input hover:border-eco-purple/70 focus:border-eco-purple transition-colors">
                   <SelectValue placeholder="Select a track" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
                 {tracks.map((track) => (
-                  <SelectItem key={track.id} value={track.id}>
+                  <SelectItem key={track.id} value={track.id} className="hover:bg-eco-purple/10 focus:bg-eco-purple/10">
                     {track.name}
                   </SelectItem>
                 ))}
@@ -51,21 +51,21 @@ export const BasicInfoFields = ({ form, isViewMode }: BasicInfoFieldsProps) => {
         name="supplierId"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Supplier (Optional)</FormLabel>
+            <FormLabel className="font-medium">Supplier (Optional)</FormLabel>
             <Select
               disabled={isViewMode}
               onValueChange={field.onChange}
               value={field.value || ""}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="w-full border-input hover:border-eco-purple/70 focus:border-eco-purple transition-colors">
                   <SelectValue placeholder="Select a supplier" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="no-supplier">No supplier</SelectItem>
+                <SelectItem value="no-supplier" className="hover:bg-eco-purple/10 focus:bg-eco-purple/10">No supplier</SelectItem>
                 {suppliers.map((supplier) => (
-                  <SelectItem key={supplier.id} value={supplier.id}>
+                  <SelectItem key={supplier.id} value={supplier.id} className="hover:bg-eco-purple/10 focus:bg-eco-purple/10">
                     {supplier.name}
                   </SelectItem>
                 ))}
@@ -81,11 +81,12 @@ export const BasicInfoFields = ({ form, isViewMode }: BasicInfoFieldsProps) => {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Name</FormLabel>
+            <FormLabel className="font-medium">Name</FormLabel>
             <FormControl>
               <Input
                 disabled={isViewMode}
                 placeholder="Enter target name"
+                className="hover:border-eco-purple/70 focus:border-eco-purple transition-colors"
                 {...field}
               />
             </FormControl>
@@ -99,11 +100,12 @@ export const BasicInfoFields = ({ form, isViewMode }: BasicInfoFieldsProps) => {
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel className="font-medium">Description</FormLabel>
             <FormControl>
               <Textarea
                 disabled={isViewMode}
                 placeholder="Enter target description"
+                className="hover:border-eco-purple/70 focus:border-eco-purple transition-colors resize-none"
                 {...field}
               />
             </FormControl>
