@@ -7,15 +7,17 @@ export const createSupplierOperation = (
   suppliers: Supplier[],
   setSuppliers: (suppliers: Supplier[]) => void,
   supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>
-) => {
+): string => {
+  const id = generateId('supplier');
   const newSupplier: Supplier = {
     ...supplier,
-    id: generateId('supplier'),
+    id,
     createdAt: getCurrentTimestamp(),
     updatedAt: getCurrentTimestamp()
   };
   setSuppliers([...suppliers, newSupplier]);
   toast.success(`Created supplier: ${supplier.name}`);
+  return id;
 };
 
 export const updateSupplierOperation = (

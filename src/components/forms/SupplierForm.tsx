@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +8,7 @@ import { Supplier } from "@/types";
 import { SupplierFormFields } from "./suppliers/SupplierFormFields";
 import { LinkedTargets } from "./suppliers/LinkedTargets";
 import { FormActions } from "./initiatives/sections/FormActions";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -45,7 +45,10 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   onClose,
 }) => {
   const isViewMode = mode === "view";
-  const { createSupplier, updateSupplier, targets } = useAppContext();
+  const { createSupplier, updateSupplier, targets, updateTarget } = useAppContext();
+  
+  // Keep track of targets to link to the supplier being created
+  const [pendingTargetIds, setPendingTargetIds] = useState<string[]>([]);
   
   const linkedTargets = initialData 
     ? targets.filter(target => target.supplierId === initialData.id)
@@ -74,7 +77,16 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     };
 
     if (mode === "create") {
-      createSupplier(formattedData);
+      // Create the supplier first, then update targets with the new supplier ID
+      const newSupplierId = createSupplier(formattedData);
+      
+      // Attach any pending targets to the newly created supplier
+      pendingTargetIds.forEach(targetId => {
+        const target = targets.find(t => t.id === targetId);
+        if (target) {
+          updateTarget(targetId, { ...target, supplierId: newSupplierId });
+        }
+      });
     } else if (mode === "edit" && initialData) {
       updateSupplier(initialData.id, formattedData);
     }
@@ -89,7 +101,9 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         <LinkedTargets 
           targets={linkedTargets} 
           supplierId={initialData?.id} 
-          isViewMode={isViewMode} 
+          isViewMode={isViewMode}
+          pendingTargetIds={pendingTargetIds}
+          setPendingTargetIds={setPendingTargetIds}
         />
         
         <FormActions isViewMode={isViewMode} onClose={onClose} />
