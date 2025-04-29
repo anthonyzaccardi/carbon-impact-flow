@@ -8,6 +8,7 @@ import { useAppContext } from '@/contexts/useAppContext';
 import { Supplier } from "@/types";
 import { SupplierFormFields } from "./suppliers/SupplierFormFields";
 import { LinkedTargets } from "./suppliers/LinkedTargets";
+import { FormActions } from "./initiatives/sections/FormActions";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -85,16 +86,13 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <SupplierFormFields isViewMode={isViewMode} />
         
-        {isViewMode && initialData && <LinkedTargets targets={linkedTargets} supplierId={initialData.id} />}
+        <LinkedTargets 
+          targets={linkedTargets} 
+          supplierId={initialData?.id} 
+          isViewMode={isViewMode} 
+        />
         
-        {!isViewMode && (
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={onClose} type="button">
-              Cancel
-            </Button>
-            <Button type="submit">Save</Button>
-          </div>
-        )}
+        <FormActions isViewMode={isViewMode} onClose={onClose} />
       </form>
     </Form>
   );

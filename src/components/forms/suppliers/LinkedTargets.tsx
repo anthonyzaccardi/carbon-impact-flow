@@ -6,21 +6,23 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Plus, Check, X } from "lucide-react";
 
 interface LinkedTargetsProps {
   targets: Target[];
-  supplierId: string;
+  supplierId?: string;
+  isViewMode: boolean;
 }
 
-export const LinkedTargets = ({ targets, supplierId }: LinkedTargetsProps) => {
+export const LinkedTargets = ({ targets, supplierId, isViewMode }: LinkedTargetsProps) => {
   const { targets: allTargets, updateTarget } = useAppContext();
   const [selectedTargetId, setSelectedTargetId] = useState<string>("");
 
   // Filter out targets that already have a supplier
-  const availableTargets = allTargets.filter(t => !t.supplierId);
+  const availableTargets = allTargets.filter(t => !t.supplierId || (supplierId && t.supplierId === supplierId));
 
   const handleAttachTarget = () => {
-    if (!selectedTargetId) return;
+    if (!selectedTargetId || !supplierId) return;
 
     const target = allTargets.find(t => t.id === selectedTargetId);
     if (target) {
@@ -47,28 +49,32 @@ export const LinkedTargets = ({ targets, supplierId }: LinkedTargetsProps) => {
             <p className="text-sm text-muted-foreground">No targets linked to this supplier</p>
           ) : (
             targets.map((target) => (
-              <div key={target.id} className="flex items-center justify-between p-2 border rounded-md">
+              <div key={target.id} className="flex items-center justify-between p-3 border rounded-md bg-muted/10">
                 <div>
                   <p className="font-medium">{target.name}</p>
-                  <p className="text-sm text-muted-foreground">{target.description}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline">{target.targetPercentage}% reduction</Badge>
+                    <Badge variant="outline">{target.status.replace('_', ' ')}</Badge>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{target.status.replace('_', ' ')}</Badge>
+                {!isViewMode && (
                   <Button 
-                    variant="outline" 
+                    variant="ghost" 
                     size="sm" 
                     onClick={() => handleDetachTarget(target.id)}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
-                    Detach
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Detach</span>
                   </Button>
-                </div>
+                )}
               </div>
             ))
           )}
         </div>
       </div>
 
-      {availableTargets.length > 0 && (
+      {!isViewMode && availableTargets.length > 0 && (
         <div className="flex gap-2">
           <Select
             value={selectedTargetId}
@@ -78,7 +84,9 @@ export const LinkedTargets = ({ targets, supplierId }: LinkedTargetsProps) => {
               <SelectValue placeholder="Select a target to attach" />
             </SelectTrigger>
             <SelectContent>
-              {availableTargets.map((target) => (
+              {availableTargets
+                .filter(target => !targets.some(t => t.id === target.id))
+                .map((target) => (
                 <SelectItem key={target.id} value={target.id}>
                   {target.name}
                 </SelectItem>
@@ -88,7 +96,9 @@ export const LinkedTargets = ({ targets, supplierId }: LinkedTargetsProps) => {
           <Button 
             onClick={handleAttachTarget}
             disabled={!selectedTargetId}
+            className="flex items-center gap-1"
           >
+            <Plus className="h-4 w-4" />
             Attach
           </Button>
         </div>
