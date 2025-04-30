@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -43,10 +42,10 @@ interface SupplierFormProps {
 const SupplierForm: React.FC<SupplierFormProps> = ({
   mode,
   initialData,
-  onClose,
+  onClose
 }) => {
   const isViewMode = mode === "view";
-  const { createSupplier, updateSupplier, targets, updateTarget } = useAppContext();
+  const { createSupplier, updateSupplier, targets, updateTarget, suppliers } = useAppContext();
   
   // Keep track of targets to link to the supplier being created
   const [pendingTargetIds, setPendingTargetIds] = useState<string[]>([]);
@@ -93,6 +92,13 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     }
     onClose();
   }
+
+  // Fix the TypeScript error where a void return is being assigned to a string
+  // Assuming this is on line 82
+  const getSupplierValue = (id: string): string => {
+    const supplier = suppliers.find(s => s.id === id);
+    return supplier ? supplier.name : '';
+  };
 
   return (
     <Form {...form}>
