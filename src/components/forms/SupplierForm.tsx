@@ -43,10 +43,10 @@ interface SupplierFormProps {
 const SupplierForm: React.FC<SupplierFormProps> = ({
   mode,
   initialData,
-  onClose
+  onClose,
 }) => {
   const isViewMode = mode === "view";
-  const { createSupplier, updateSupplier, targets, updateTarget, suppliers } = useAppContext();
+  const { createSupplier, updateSupplier, targets, updateTarget } = useAppContext();
   
   // Keep track of targets to link to the supplier being created
   const [pendingTargetIds, setPendingTargetIds] = useState<string[]>([]);
@@ -93,12 +93,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     }
     onClose();
   }
-
-  // Fix the TypeScript error: ensure this function returns a string
-  const getSupplierValue = (id: string): string => {
-    const supplier = suppliers.find(s => s.id === id);
-    return supplier ? supplier.name : '';
-  };
 
   return (
     <Form {...form}>

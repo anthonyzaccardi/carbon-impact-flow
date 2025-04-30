@@ -2,7 +2,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
@@ -22,9 +21,10 @@ const StatCard: React.FC<StatCardProps> = ({
   icon,
   description,
   trend,
-  className
+  className,
 }) => {
-  return <Card className={cn("overflow-hidden", className)}>
+  return (
+    <Card className={cn("overflow-hidden", className)}>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -33,28 +33,24 @@ const StatCard: React.FC<StatCardProps> = ({
             {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
             
             {trend && (
-              <div className="flex items-center mt-2">
-                {trend.isPositive ? (
-                  <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
-                ) : (
-                  <ArrowDownIcon className="h-4 w-4 text-red-500 mr-1" />
-                )}
-                <span className={cn(
-                  "text-xs font-medium",
-                  trend.isPositive ? "text-green-500" : "text-red-500"
-                )}>
-                  {trend.value.toFixed(1)}%
+              <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                <span className="font-medium">
+                  {trend.isPositive ? '+' : ''}{trend.value}%
                 </span>
+                <span className="ml-1 text-xs text-muted-foreground">vs previous period</span>
               </div>
             )}
           </div>
           
-          {icon && <div className="bg-primary/10 p-2 rounded-md">
+          {icon && (
+            <div className="bg-primary/10 p-2 rounded-md">
               {icon}
-            </div>}
+            </div>
+          )}
         </div>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };
 
 export default StatCard;
