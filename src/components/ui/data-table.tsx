@@ -24,23 +24,23 @@ interface DataTableProps<T extends Record<string, any>> {
 }
 
 const measurementStatusColorMap: Record<MeasurementStatus, string> = {
-  active: 'bg-success/10 text-success',
-  pending: 'bg-warning/10 text-warning',
-  completed: 'bg-primary/10 text-primary',
-  cancelled: 'bg-error/10 text-error',
+  active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 const statusColorMap: Record<Status, string> = {
-  not_started: 'bg-secondary text-text-secondary',
-  in_progress: 'bg-warning/10 text-warning',
-  completed: 'bg-success/10 text-success',
+  not_started: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  in_progress: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
 };
 
 const initiativeStatusColorMap: Record<InitiativeStatus, string> = {
-  not_started: 'bg-secondary text-text-secondary',
-  in_progress: 'bg-warning/10 text-warning',
-  completed: 'bg-success/10 text-success',
-  committed: 'bg-primary/10 text-primary'
+  not_started: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  in_progress: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  committed: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
 };
 
 function DataTable<T extends Record<string, any>>({ 
@@ -49,19 +49,19 @@ function DataTable<T extends Record<string, any>>({
   onRowClick 
 }: DataTableProps<T>) {
   return (
-    <div className="rounded-lg border overflow-hidden">
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
             {columns.map((column, index) => (
-              <TableHead key={index} className="bg-muted text-text-secondary font-medium">{column.header}</TableHead>
+              <TableHead key={index}>{column.header}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="text-center p-4 text-text-tertiary">
+              <TableCell colSpan={columns.length} className="text-center p-4 text-muted-foreground">
                 No data available
               </TableCell>
             </TableRow>
@@ -69,7 +69,7 @@ function DataTable<T extends Record<string, any>>({
             data.map((item, rowIndex) => (
               <TableRow 
                 key={rowIndex} 
-                className={onRowClick ? 'cursor-pointer hover:bg-secondary/50 transition-colors' : ''}
+                className={onRowClick ? 'cursor-pointer table-row hover:bg-muted/50' : ''}
                 onClick={() => onRowClick && onRowClick(item)}
               >
                 {columns.map((column, colIndex) => (
@@ -81,10 +81,10 @@ function DataTable<T extends Record<string, any>>({
                           <Badge 
                             className={
                               item.hasOwnProperty('targetIds') 
-                                ? initiativeStatusColorMap[item[column.accessorKey] as InitiativeStatus] || 'bg-secondary text-text-secondary'
+                                ? initiativeStatusColorMap[item[column.accessorKey] as InitiativeStatus] || 'bg-gray-100 text-gray-800'
                                 : item.hasOwnProperty('calculatedValue')
-                                  ? measurementStatusColorMap[item[column.accessorKey] as MeasurementStatus] || 'bg-secondary text-text-secondary'
-                                  : statusColorMap[item[column.accessorKey] as Status] || 'bg-secondary text-text-secondary'
+                                  ? measurementStatusColorMap[item[column.accessorKey] as MeasurementStatus] || 'bg-gray-100 text-gray-800'
+                                  : statusColorMap[item[column.accessorKey] as Status] || 'bg-gray-100 text-gray-800'
                             }
                             variant="outline"
                           >

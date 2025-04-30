@@ -6,49 +6,34 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 220 10% 40%;
+    --foreground: 200 10% 34%; /* Grey #4F5D61 */
     --card: 0 0% 100%;
-    --card-foreground: 220 10% 40%;
+    --card-foreground: 200 10% 34%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 10% 40%;
-    --sidebar-background: 210 10% 19%;
-    --sidebar-foreground: 0 0% 100%;
-    --primary: 215 90% 55%;
+    --popover-foreground: 200 10% 34%;
+    --primary: 200 10% 34%; /* Grey #4F5D61 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 5% 98%;
-    --secondary-foreground: 220 10% 40%;
-    --muted: 220 5% 96%;
-    --muted-foreground: 220 5% 48%;
-    --accent: 215 90% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 70% 54%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 215 90% 55%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 224 30% 10%;
-    --foreground: 0 0% 100%;
-    --card: 224 30% 10%;
-    --card-foreground: 0 0% 100%;
-    --popover: 224 30% 10%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 215 90% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 30% 16%;
+    --secondary: 188 15% 66%; /* Light Blue #99B3B6 */
     --secondary-foreground: 0 0% 100%;
-    --muted: 220 30% 16%;
-    --muted-foreground: 220 5% 65%;
-    --accent: 215 90% 55%;
+    --accent: 16 100% 60%; /* Orange #FF6E35 */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 70% 54%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
-    --ring: 215 90% 55%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 200 10% 90%;
+    --input: 200 10% 90%;
+    --ring: 200 10% 50%;
+    --radius: 0.75rem;
+
+    --sidebar-background: 200 10% 98%;
+    --sidebar-foreground: 200 10% 34%; 
+    --sidebar-primary: 200 10% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 16 100% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 200 10% 88%;
+    --sidebar-ring: 200 10% 50%;
   }
 }
 
@@ -56,21 +41,8 @@
   * {
     @apply border-border;
   }
-  
   body {
     @apply bg-background text-foreground font-inter antialiased tracking-tight;
-  }
-  
-  h1 {
-    @apply text-2xl font-semibold text-foreground;
-  }
-  
-  h2 {
-    @apply text-lg font-semibold text-foreground;
-  }
-  
-  h3 {
-    @apply text-base font-semibold text-foreground;
   }
 }
 
@@ -82,101 +54,13 @@
 }
 
 .side-panel {
-  @apply fixed right-0 top-0 z-50 h-full w-[400px] bg-background border-l border-border shadow-lg transform transition-transform duration-300;
+  @apply fixed right-0 top-0 z-50 h-full w-[450px] bg-background border-l border-border shadow-lg transform transition-transform duration-300;
 }
 
 .side-panel-overlay {
   @apply fixed inset-0 bg-black/20 backdrop-blur-sm z-40;
 }
 
-/* Intercom-style cards */
-.intercom-card {
-  @apply bg-white rounded-lg shadow-card p-6;
-}
-
-/* Intercom-style buttons */
-.btn-primary {
-  @apply bg-primary text-primary-foreground rounded-md px-4 py-2.5 text-sm font-medium transition-all hover:opacity-90;
-}
-
-.btn-secondary {
-  @apply bg-white text-primary border border-primary rounded-md px-4 py-2.5 text-sm font-medium transition-all hover:bg-primary/5;
-}
-
-.btn-tertiary {
-  @apply bg-transparent text-primary rounded-md px-4 py-2.5 text-sm font-medium transition-all hover:bg-primary/5;
-}
-
-/* Intercom-style form elements */
-.intercom-input {
-  @apply h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
-}
-
-/* Intercom-style table */
-.intercom-table {
-  @apply w-full divide-y divide-border;
-}
-
-.intercom-table th {
-  @apply bg-muted text-text-secondary px-4 py-3 text-left text-sm font-medium;
-}
-
-.intercom-table td {
-  @apply px-4 py-4 text-sm;
-}
-
-.intercom-table tr {
-  @apply hover:bg-muted/50 transition-colors;
-}
-
-.intercom-table tr:nth-child(even) {
-  @apply bg-secondary/50;
-}
-
-/* Intercom-style sidebar navigation */
-.sidebar-nav-item {
-  @apply flex items-center gap-3 rounded-md px-3 py-4 text-sidebar-foreground/90 hover:bg-white/10 transition-colors;
-}
-
-.sidebar-nav-item.active {
-  @apply border-l-4 border-l-accent bg-white/5;
-}
-
-.sidebar-section-header {
-  @apply text-xs uppercase text-sidebar-foreground/60 font-medium tracking-wider px-4 py-2;
-}
-
-/* Intercom-style status indicators */
-.status-pill {
-  @apply inline-flex h-6 items-center rounded-full px-3 text-xs font-medium;
-}
-
-.status-pill.success {
-  @apply bg-success/10 text-success;
-}
-
-.status-pill.warning {
-  @apply bg-warning/10 text-warning;
-}
-
-.status-pill.error {
-  @apply bg-error/10 text-error;
-}
-
-/* Intercom-style stat cards */
-.stat-card {
-  @apply bg-white rounded-lg shadow-card p-6 flex flex-col;
-}
-
-.stat-card .value {
-  @apply text-2xl font-semibold;
-}
-
-.stat-card .label {
-  @apply text-sm text-text-secondary;
-}
-
-/* Animations */
 @keyframes slideIn {
   from {
     opacity: 0;

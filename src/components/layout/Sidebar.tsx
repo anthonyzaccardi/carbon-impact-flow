@@ -14,8 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Lightbulb,
-  PlayCircle,
-  ChevronDown
+  PlayCircle
 } from 'lucide-react';
 
 const NavItem = ({ 
@@ -34,11 +33,13 @@ const NavItem = ({
       <NavLink 
         to={to} 
         className={({ isActive }) => 
-          `sidebar-nav-item ${isActive ? 'active' : ''} ${expanded ? 'pl-3' : 'justify-center'}`
+          `flex items-center p-2 rounded-md mb-1 transition-colors duration-200
+          ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-primary/5 text-foreground/80'} 
+          ${expanded ? 'justify-start' : 'justify-center'} nav-item ${isActive ? 'active' : ''}`
         }
       >
-        <Icon className="h-5 w-5 flex-shrink-0" />
-        {expanded && <span className="text-sm">{label}</span>}
+        <Icon className="h-5 w-5" />
+        {expanded && <span className="ml-3 text-sm">{label}</span>}
       </NavLink>
     </li>
   );
@@ -61,18 +62,20 @@ const NavGroupItem = ({
     <li className="mb-1">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`sidebar-nav-item ${expanded ? 'justify-between' : 'justify-center'}`}
+        className={`flex items-center w-full p-2 rounded-md transition-colors duration-200
+          hover:bg-primary/5 text-foreground/80
+          ${expanded ? 'justify-start' : 'justify-center'}`}
       >
-        <div className="flex items-center gap-3">
-          <Icon className="h-5 w-5 flex-shrink-0" />
-          {expanded && <span className="text-sm">{label}</span>}
-        </div>
+        <Icon className="h-5 w-5" />
         {expanded && (
-          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <>
+            <span className="ml-3 text-sm flex-grow text-left">{label}</span>
+            <ChevronRight className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+          </>
         )}
       </button>
       {(isOpen || !expanded) && (
-        <ul className={`${expanded ? 'ml-7 mt-1' : 'mt-1'} space-y-1`}>
+        <ul className={`${expanded ? 'ml-7' : 'mt-1'} space-y-1`}>
           {children}
         </ul>
       )}
@@ -85,60 +88,50 @@ const Sidebar = () => {
   
   return (
     <div 
-      className={`fixed top-0 left-0 h-screen bg-sidebar border-r border-sidebar-border
-      ${sidebarExpanded ? 'w-[260px]' : 'w-16'} flex flex-col z-10 transition-all duration-300`}
+      className={`fixed top-0 left-0 h-screen bg-sidebar border-r border-border
+      ${sidebarExpanded ? 'w-60' : 'w-16'} flex flex-col z-10 transition-all duration-300`}
     >
-      <div className="p-4 flex items-center justify-between border-b border-sidebar-border h-16">
+      <div className="p-4 flex items-center border-b border-border">
         {sidebarExpanded && (
-          <h2 className="text-lg font-semibold text-white">Carbon Impact</h2>
+          <h2 className="text-lg font-semibold mr-auto">Carbon Impact</h2>
         )}
         <Button 
           variant="ghost" 
           size="sm" 
-          className={`${sidebarExpanded ? '' : 'mx-auto'} p-1 text-white hover:bg-white/10`} 
+          className={`${sidebarExpanded ? '' : 'mx-auto'} p-1`} 
           onClick={toggleSidebar}
         >
           {sidebarExpanded ? <ChevronLeft /> : <ChevronRight />}
         </Button>
       </div>
 
-      <nav className="flex-1 p-3 space-y-6">
-        <div>
-          {sidebarExpanded && <p className="sidebar-section-header">OVERVIEW</p>}
-          <ul className="space-y-1 mt-2">
-            <NavItem to="/" icon={Home} label="Dashboard" expanded={sidebarExpanded} />
-          </ul>
-        </div>
-        
-        <div>
-          {sidebarExpanded && <p className="sidebar-section-header">MEASURE</p>}
-          <ul className="space-y-1 mt-2">
-            <NavItem to="/tracks" icon={BarChart} label="Tracks" expanded={sidebarExpanded} />
-            <NavItem to="/factors" icon={Database} label="Factors" expanded={sidebarExpanded} />
-            <NavItem to="/measurements" icon={Activity} label="Measurements" expanded={sidebarExpanded} />
-          </ul>
-        </div>
-        
-        <div>
-          {sidebarExpanded && <p className="sidebar-section-header">PLAN & ACT</p>}
-          <ul className="space-y-1 mt-2">
+      <nav className="flex-1 p-2">
+        <ul>
+          <NavItem to="/" icon={Home} label="Overview" expanded={sidebarExpanded} />
+          <NavItem to="/tracks" icon={BarChart} label="Tracks" expanded={sidebarExpanded} />
+          <NavItem to="/factors" icon={Database} label="Factors" expanded={sidebarExpanded} />
+          <NavItem to="/measurements" icon={Activity} label="Measurements" expanded={sidebarExpanded} />
+          
+          {/* Act group with sub-navigation */}
+          <NavGroupItem icon={PlayCircle} label="Act" expanded={sidebarExpanded}>
             <NavItem to="/targets" icon={Target} label="Targets" expanded={sidebarExpanded} />
             <NavItem to="/initiatives" icon={Lightbulb} label="Initiatives" expanded={sidebarExpanded} />
             <NavItem to="/scenarios" icon={Settings} label="Scenarios" expanded={sidebarExpanded} />
-            <NavItem to="/suppliers" icon={Users} label="Suppliers" expanded={sidebarExpanded} />
-          </ul>
-        </div>
+          </NavGroupItem>
+          
+          <NavItem to="/suppliers" icon={Users} label="Suppliers" expanded={sidebarExpanded} />
+        </ul>
       </nav>
       
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-border p-4">
         {sidebarExpanded ? (
-          <div className="text-xs text-sidebar-foreground/60">
+          <div className="text-xs text-muted-foreground">
             <p>Carbon Impact Flow</p>
             <p>v1.0.0</p>
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="h-2 w-2 bg-primary rounded-full"></div>
+            <div className="h-2 w-2 bg-eco-purple rounded-full"></div>
           </div>
         )}
       </div>
