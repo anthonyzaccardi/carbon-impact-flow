@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
@@ -13,6 +14,7 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
+  chart?: React.ReactNode;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -22,6 +24,7 @@ const StatCard: React.FC<StatCardProps> = ({
   description,
   trend,
   className,
+  chart,
 }) => {
   return (
     <Card className={cn("overflow-hidden", className)}>
@@ -34,6 +37,7 @@ const StatCard: React.FC<StatCardProps> = ({
             
             {trend && (
               <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                {trend.isPositive ? <ArrowUp className="h-4 w-4 mr-1" /> : <ArrowDown className="h-4 w-4 mr-1" />}
                 <span className="font-medium">
                   {trend.isPositive ? '+' : ''}{trend.value}%
                 </span>
@@ -48,6 +52,12 @@ const StatCard: React.FC<StatCardProps> = ({
             </div>
           )}
         </div>
+        
+        {chart && (
+          <div className="mt-4">
+            {chart}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

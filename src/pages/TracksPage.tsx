@@ -1,8 +1,12 @@
+
 import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import StatCard from "@/components/ui/stat-card";
 import { Plus } from "lucide-react";
+import MiniBarChart from "@/components/charts/MiniBarChart";
+import MiniDonutChart from "@/components/charts/MiniDonutChart";
+import ProgressIndicator from "@/components/charts/ProgressIndicator";
 
 const TracksPage = () => {
   const { tracks, openSidePanel, getTrackStats } = useAppContext();
@@ -11,6 +15,17 @@ const TracksPage = () => {
   const totalTracks = tracks.length;
   const totalEmissions = tracks.reduce((sum, track) => sum + track.totalEmissions, 0);
   const averageEmissions = totalTracks > 0 ? totalEmissions / totalTracks : 0;
+  
+  // Sample data for charts
+  const trackEmissionsData = tracks.slice(0, 5).map(track => ({
+    name: track.name,
+    value: track.totalEmissions
+  }));
+  
+  const trackDistributionData = tracks.map(track => ({
+    name: track.name,
+    value: track.totalEmissions
+  }));
   
   // Table columns
   const columns = [
@@ -85,14 +100,28 @@ const TracksPage = () => {
         <StatCard 
           title="Total Tracks" 
           value={totalTracks}
+          chart={<MiniBarChart 
+            data={trackEmissionsData} 
+            height={60} 
+            color="#9b87f5" 
+          />}
         />
         <StatCard 
           title="Total Emissions" 
           value={`${totalEmissions.toLocaleString()} tCO2e`}
+          chart={<MiniDonutChart 
+            data={trackDistributionData.slice(0, 4)} 
+            height={80} 
+          />}
         />
         <StatCard 
           title="Avg. per Track" 
           value={`${averageEmissions.toLocaleString()} tCO2e`}
+          chart={<ProgressIndicator 
+            current={averageEmissions} 
+            target={totalEmissions} 
+            color="#8B5CF6" 
+          />}
         />
       </div>
       

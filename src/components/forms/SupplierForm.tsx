@@ -79,7 +79,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
 
     if (mode === "create") {
       // Create the supplier first, then update targets with the new supplier ID
-      const newSupplierId: string = createSupplier(formattedData);
+      const newSupplierId = createSupplier(formattedData);
       
       // Attach any pending targets to the newly created supplier
       pendingTargetIds.forEach(targetId => {
@@ -88,10 +88,14 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           updateTarget(targetId, { ...target, supplierId: newSupplierId });
         }
       });
+      
+      return newSupplierId;
     } else if (mode === "edit" && initialData) {
       updateSupplier(initialData.id, formattedData);
+      return initialData.id;
     }
-    onClose();
+    
+    return "";
   }
 
   return (
