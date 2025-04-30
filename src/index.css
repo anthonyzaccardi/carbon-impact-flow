@@ -139,7 +139,7 @@
 }
 
 .sidebar-nav-item.active {
-  @apply border-l-3 border-l-accent bg-white/5;
+  @apply border-l-4 border-l-accent bg-white/5;
 }
 
 .sidebar-section-header {
