@@ -22,7 +22,6 @@ export const updateExistingSupplier = (
     name: '',
     email: '',
     phone: '',
-    address: '',
     industry: '',
     contactPerson: '',
     emissionFactors: [],

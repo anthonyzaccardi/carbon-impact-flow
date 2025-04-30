@@ -49,8 +49,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     getTrackStats
   } = useUtilityFunctions(tracks, factors, measurements, targets, initiatives);
 
-  // Use the new effects hook
-  useEffects(tracks, setTracks, targets, setTargets, calculateTrackMeasurementsValue);
+  // Use the effects hook
+  useEffects(tracks, setTracks, targets, setTargets);
 
   const trackCrud = useTrackCrud(tracks, setTracks, factors, measurements, targets);
   const factorCrud = useFactorCrud(factors, setFactors, measurements, setMeasurements);
