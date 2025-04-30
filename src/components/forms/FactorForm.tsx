@@ -30,7 +30,7 @@ const formSchema = z.object({
 });
 type FormData = z.infer<typeof formSchema>;
 const categories = ["Stationary Combustion", "Mobile Combustion", "Purchased Electricity", "Business Travel", "Employee Commuting", "Waste Disposal", "Water", "Materials", "Transportation", "Processing"];
-const units = ["kgCO2e/kWh", "kgCO2e/L", "kgCO2e/km", "kgCO2e/kg", "kgCO2e/m³", "tCO2e/tonne"];
+const units = ["kWh", "liter", "km", "kg", "m³", "tonne"];
 interface FactorFormProps {
   mode: "create" | "edit" | "view";
   initialData?: Factor;
