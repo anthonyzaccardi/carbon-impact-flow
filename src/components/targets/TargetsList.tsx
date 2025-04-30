@@ -1,10 +1,7 @@
 
 import { Target, Track } from "@/types";
-import DataTable from "@/components/ui/data-table";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
 
 interface TargetsListProps {
   targets: Target[];
@@ -14,78 +11,58 @@ interface TargetsListProps {
 }
 
 export const TargetsList = ({ targets, tracks, onRowClick, onRemoveTarget }: TargetsListProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredTargets = targets.filter(target => 
-    target.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const columns = [
-    {
-      header: "Name",
-      accessorKey: "name",
-    },
-    {
-      header: "Track",
-      accessorKey: "trackId",
-      cell: (target: Target) => {
-        const track = tracks.find(t => t.id === target.trackId);
-        return track ? (
-          <div className="flex items-center">
-            <span className="mr-1">{track.emoji}</span>
-            <span>{track.name}</span>
-          </div>
-        ) : target.trackId;
-      }
-    },
-    {
-      header: "Target",
-      accessorKey: "targetPercentage",
-      cell: (target: Target) => `${target.targetPercentage}% reduction`,
-    },
-    {
-      header: "Target Date",
-      accessorKey: "targetDate",
-      cell: (target: Target) => new Date(target.targetDate).toLocaleDateString(),
-    },
-    {
-      header: "Status",
-      accessorKey: "status",
-    },
-    ...(onRemoveTarget ? [{
-      header: "Actions",
-      accessorKey: "actions",
-      cell: (target: Target) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemoveTarget(target.id);
-          }}
-        >
-          Remove
-        </Button>
-      )
-    }] : [])
-  ];
-
   return (
-    <>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search targets..."
-          className="pl-10"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <DataTable
-        data={filteredTargets}
-        columns={columns}
-        onRowClick={onRowClick}
-      />
-    </>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="text-[#444448] font-medium">Name</TableHead>
+          <TableHead className="text-[#444448] font-medium">Track</TableHead>
+          <TableHead className="text-[#444448] font-medium">Target</TableHead>
+          <TableHead className="text-[#444448] font-medium">Target Date</TableHead>
+          <TableHead className="text-[#444448] font-medium">Status</TableHead>
+          {onRemoveTarget && <TableHead className="text-[#444448] font-medium">Actions</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {targets.map((target) => (
+          <TableRow 
+            key={target.id} 
+            className="hover:bg-[#F9F9FA] cursor-pointer"
+            onClick={() => onRowClick(target)}
+          >
+            <TableCell>{target.name}</TableCell>
+            <TableCell>
+              {(() => {
+                const track = tracks.find(t => t.id === target.trackId);
+                return track ? (
+                  <div className="flex items-center">
+                    <span className="mr-1">{track.emoji}</span>
+                    <span>{track.name}</span>
+                  </div>
+                ) : target.trackId;
+              })()}
+            </TableCell>
+            <TableCell>{`${target.targetPercentage}% reduction`}</TableCell>
+            <TableCell>{new Date(target.targetDate).toLocaleDateString()}</TableCell>
+            <TableCell>{target.status}</TableCell>
+            {onRemoveTarget && (
+              <TableCell>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveTarget(target.id);
+                  }}
+                  className="text-[#286EF1] hover:bg-[#F9F9FA]"
+                >
+                  Remove
+                </Button>
+              </TableCell>
+            )}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };

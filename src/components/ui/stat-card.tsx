@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
@@ -24,32 +23,31 @@ const StatCard: React.FC<StatCardProps> = ({
   className,
 }) => {
   return (
-    <Card className={cn("overflow-hidden", className)}>
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-            <h3 className="text-2xl font-semibold">{value}</h3>
-            {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
-            
-            {trend && (
-              <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                <span className="font-medium">
-                  {trend.isPositive ? '+' : ''}{trend.value}%
-                </span>
-                <span className="ml-1 text-xs text-muted-foreground">vs previous period</span>
-              </div>
-            )}
-          </div>
+    <div className={cn("border border-[#EEEEEE] rounded-lg p-5 bg-white", className)}>
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-sm text-[#71717A] mb-1">{title}</p>
+          <h3 className="text-2xl font-semibold text-[#333336]">{value}</h3>
+          {description && <p className="text-[13px] text-[#71717A] mt-1">{description}</p>}
           
-          {icon && (
-            <div className="bg-primary/10 p-2 rounded-md">
-              {icon}
+          {trend && (
+            <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-[#1FCC83]' : 'text-[#D64141]'}`}>
+              <span className="font-medium">
+                {trend.isPositive ? '+' : ''}{trend.value}%
+              </span>
+              <span className="ml-1 text-xs text-[#71717A]">—</span>
+              <span className="ml-1 text-xs text-[#71717A]">vs previous period</span>
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+        
+        {icon && (
+          <div className="text-[#717175]">
+            {icon}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

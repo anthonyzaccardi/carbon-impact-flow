@@ -1,42 +1,39 @@
 
-import { toast } from 'sonner';
-import { Supplier } from '@/types';
-import { generateId, getCurrentTimestamp } from '../utils';
+import { v4 as uuidv4 } from 'uuid';
+import { Supplier } from '../../types';
 
-export const createSupplierOperation = (
-  suppliers: Supplier[],
-  setSuppliers: (suppliers: Supplier[]) => void,
-  supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>
-): string => {
-  const id = generateId('supplier');
+export const createNewSupplier = (supplier: Omit<Supplier, 'id'>): Supplier => {
   const newSupplier: Supplier = {
-    ...supplier,
-    id,
-    createdAt: getCurrentTimestamp(),
-    updatedAt: getCurrentTimestamp()
+    id: uuidv4(),
+    ...supplier
   };
-  setSuppliers([...suppliers, newSupplier]);
-  toast.success(`Created supplier: ${supplier.name}`);
-  return id;
+  
+  return newSupplier;
 };
 
-export const updateSupplierOperation = (
-  suppliers: Supplier[],
-  setSuppliers: (suppliers: Supplier[]) => void,
-  id: string,
-  supplier: Partial<Supplier>
-) => {
-  setSuppliers(suppliers.map(s =>
-    s.id === id ? { ...s, ...supplier, updatedAt: getCurrentTimestamp() } : s
-  ));
-  toast.success(`Updated supplier: ${supplier.name || id}`);
+export const updateExistingSupplier = (
+  supplierId: string, 
+  supplierData: Partial<Supplier>
+): Supplier => {
+  // In a real application, this would make an API call
+  // For now, we just return the updated supplier
+  return {
+    id: supplierId,
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    industry: '',
+    contactPerson: '',
+    emissionFactors: [],
+    notes: '',
+    status: 'active',
+    ...supplierData
+  };
 };
 
-export const deleteSupplierOperation = (
-  suppliers: Supplier[],
-  setSuppliers: (suppliers: Supplier[]) => void,
-  id: string
-) => {
-  setSuppliers(suppliers.filter(s => s.id !== id));
-  toast.success(`Deleted supplier: ${id}`);
+export const deleteExistingSupplier = async (supplierId: string): Promise<void> => {
+  // In a real application, this would make an API call
+  // For now, we just return a promise that resolves immediately
+  return Promise.resolve();
 };

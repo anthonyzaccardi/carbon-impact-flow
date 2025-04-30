@@ -6,34 +6,34 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 200 10% 34%; /* Grey #4F5D61 */
+    --foreground: 215 5% 22%; /* Gray #333336 */
     --card: 0 0% 100%;
-    --card-foreground: 200 10% 34%;
+    --card-foreground: 215 5% 22%;
     --popover: 0 0% 100%;
-    --popover-foreground: 200 10% 34%;
-    --primary: 200 10% 34%; /* Grey #4F5D61 */
+    --popover-foreground: 215 5% 22%;
+    --primary: 215 89% 56%; /* Blue #286EF1 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 188 15% 66%; /* Light Blue #99B3B6 */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 210 15% 97%; /* Light Blue #F2F7FF */
+    --secondary-foreground: 215 5% 22%;
     --accent: 16 100% 60%; /* Orange #FF6E35 */
     --accent-foreground: 0 0% 100%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 56%; /* Red #D64141 */
     --destructive-foreground: 0 0% 98%;
-    --border: 200 10% 90%;
-    --input: 200 10% 90%;
-    --ring: 200 10% 50%;
-    --radius: 0.75rem;
+    --border: 0 0% 93%; /* #EEEEEE */
+    --input: 0 0% 93%;
+    --ring: 215 89% 56%;
+    --radius: 0.5rem;
 
-    --sidebar-background: 200 10% 98%;
-    --sidebar-foreground: 200 10% 34%; 
-    --sidebar-primary: 200 10% 34%;
+    --sidebar-background: 0 0% 100%; /* White #FFFFFF */
+    --sidebar-foreground: 215 5% 22%; 
+    --sidebar-primary: 215 89% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 16 100% 60%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 200 10% 88%;
-    --sidebar-ring: 200 10% 50%;
+    --sidebar-border: 0 0% 93%;
+    --sidebar-ring: 215 89% 56%;
   }
 }
 
@@ -54,7 +54,7 @@
 }
 
 .side-panel {
-  @apply fixed right-0 top-0 z-50 h-full w-[450px] bg-background border-l border-border shadow-lg transform transition-transform duration-300;
+  @apply fixed right-0 top-0 z-50 h-full w-[450px] bg-background border-l border-border transform transition-transform duration-300;
 }
 
 .side-panel-overlay {
@@ -74,4 +74,93 @@
 
 .animate-slide-in {
   animation: slideIn 0.3s ease forwards;
+}
+
+/* Trial notification banner */
+.trial-notification {
+  @apply bg-[#F9F9FA] text-[#333336] h-7 w-full flex items-center justify-between px-4 text-xs;
+}
+
+/* Intercom style navigation */
+.nav-item {
+  @apply flex items-center py-2 px-4 text-[#333336] text-sm transition-all;
+}
+
+.nav-item.active {
+  @apply bg-[#F2F7FF] border-l-4 border-[#286EF1] font-medium;
+}
+
+.nav-item:hover:not(.active) {
+  @apply bg-[#F9F9FA];
+}
+
+/* Intercom style cards */
+.intercom-card {
+  @apply border border-[#EEEEEE] rounded-lg p-5 bg-white;
+}
+
+.intercom-title {
+  @apply text-[22px] font-semibold text-[#333336];
+}
+
+.intercom-subtitle {
+  @apply text-base font-semibold text-[#333336];
+}
+
+.intercom-text {
+  @apply text-sm text-[#444448];
+}
+
+.intercom-text-secondary {
+  @apply text-[13px] text-[#71717A];
+}
+
+/* Intercom style buttons */
+.intercom-button-primary {
+  @apply bg-[#286EF1] text-white rounded-lg px-4 h-9 text-sm font-medium;
+}
+
+.intercom-button-secondary {
+  @apply bg-white border border-[#286EF1] text-[#286EF1] rounded-lg px-4 h-9 text-sm font-medium;
+}
+
+.intercom-button-tertiary {
+  @apply bg-transparent text-[#286EF1] rounded-lg px-4 h-9 text-sm font-medium;
+}
+
+/* Intercom style tables */
+.intercom-table th {
+  @apply text-sm font-medium text-[#444448] p-4 border-b border-[#EEEEEE];
+}
+
+.intercom-table td {
+  @apply text-sm text-[#444448] p-4 border-b border-[#EEEEEE];
+}
+
+.intercom-table tr:hover {
+  @apply bg-[#F9F9FA];
+}
+
+/* Intercom style metrics */
+.metric-value {
+  @apply text-2xl font-semibold text-[#333336];
+}
+
+.metric-label {
+  @apply text-sm text-[#71717A];
+}
+
+/* Intercom style inputs */
+.intercom-input {
+  @apply h-9 px-3 border border-[#DDDDDD] rounded-lg text-sm focus:border-[#286EF1] focus:ring-1 focus:ring-[#286EF1];
+}
+
+/* Report folder headers */
+.report-folder-header {
+  @apply text-xs uppercase tracking-wider text-[#71717A] font-medium my-3 px-4;
+}
+
+/* Count badges */
+.count-badge {
+  @apply bg-[#F4F4F5] text-[#71717A] text-xs px-2 py-0.5 rounded-full ml-auto;
 }
