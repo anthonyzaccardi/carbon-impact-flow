@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -93,8 +94,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     onClose();
   }
 
-  // Fix the TypeScript error where a void return is being assigned to a string
-  // Assuming this is on line 82
+  // Fix the TypeScript error: ensure this function returns a string
   const getSupplierValue = (id: string): string => {
     const supplier = suppliers.find(s => s.id === id);
     return supplier ? supplier.name : '';
