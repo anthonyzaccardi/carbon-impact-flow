@@ -11,11 +11,14 @@ const MainContent = ({ children }: MainContentProps) => {
 
   return (
     <main className="flex-1 relative">
+      <div className="h-2 bg-primary w-full fixed z-10" />
       <div 
-        className={`w-full min-h-screen pt-6 pb-6 px-4 md:px-6 transition-all duration-300
-          ${sidebarExpanded ? 'md:pl-64' : 'md:pl-20'}`}
+        className={`w-full min-h-screen pt-10 pb-6 transition-all duration-300
+          ${sidebarExpanded ? 'ml-[260px]' : 'ml-16'}`}
       >
-        {children}
+        <div className="px-6">
+          {children}
+        </div>
       </div>
     </main>
   );

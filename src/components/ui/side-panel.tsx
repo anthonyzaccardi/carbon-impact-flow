@@ -50,7 +50,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
         aria-hidden="true"
       />
       
-      <div className="side-panel animate-slide-in-right">
+      <div className="side-panel animate-slide-in-right w-[400px] min-w-[400px] max-w-[40%]">
         <div className="border-b border-border p-4 flex items-center justify-between">
           <h2 className="text-lg font-medium">{title}</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
