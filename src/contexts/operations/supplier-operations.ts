@@ -5,7 +5,9 @@ import { Supplier } from '../../types';
 export const createNewSupplier = (supplier: Omit<Supplier, 'id'>): Supplier => {
   const newSupplier: Supplier = {
     id: uuidv4(),
-    ...supplier
+    ...supplier,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
   
   return newSupplier;
@@ -24,9 +26,9 @@ export const updateExistingSupplier = (
     phone: '',
     industry: '',
     contactPerson: '',
-    emissionFactors: [],
-    notes: '',
-    status: 'active',
+    currency: 'USD',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     ...supplierData
   };
 };

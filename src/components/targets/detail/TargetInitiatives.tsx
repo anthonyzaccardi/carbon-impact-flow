@@ -4,7 +4,7 @@ import { Initiative } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import DataTable from "@/components/ui/data-table";
+import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { 
   DropdownMenu,
