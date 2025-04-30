@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -14,17 +12,15 @@ interface StatCardProps {
   };
   className?: string;
 }
-
 const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   icon,
   description,
   trend,
-  className,
+  className
 }) => {
-  return (
-    <Card className={cn("overflow-hidden", className)}>
+  return <Card className={cn("overflow-hidden", className)}>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -32,25 +28,14 @@ const StatCard: React.FC<StatCardProps> = ({
             <h3 className="text-2xl font-semibold">{value}</h3>
             {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
             
-            {trend && (
-              <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                <span className="font-medium">
-                  {trend.isPositive ? '+' : ''}{trend.value}%
-                </span>
-                <span className="ml-1 text-xs text-muted-foreground">vs previous period</span>
-              </div>
-            )}
+            {trend}
           </div>
           
-          {icon && (
-            <div className="bg-primary/10 p-2 rounded-md">
+          {icon && <div className="bg-primary/10 p-2 rounded-md">
               {icon}
-            </div>
-          )}
+            </div>}
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default StatCard;
