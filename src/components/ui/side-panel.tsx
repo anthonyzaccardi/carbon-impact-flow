@@ -45,20 +45,15 @@ const SidePanel: React.FC<SidePanelProps> = ({
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+        className="side-panel-overlay animate-fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
       
-      <div className="fixed right-0 top-0 z-50 h-full w-[450px] bg-white border-l border-[#EEEEEE] transform transition-transform duration-300 animate-slide-in-right">
-        <div className="border-b border-[#EEEEEE] p-4 flex items-center justify-between">
-          <h2 className="text-[16px] font-semibold text-[#333336]">{title}</h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onClose}
-            className="hover:bg-[#F9F9FA] text-[#71717A]"
-          >
+      <div className="side-panel animate-slide-in-right">
+        <div className="border-b border-border p-4 flex items-center justify-between">
+          <h2 className="text-lg font-medium">{title}</h2>
+          <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>

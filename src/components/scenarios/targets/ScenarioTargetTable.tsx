@@ -1,6 +1,6 @@
 
 import { Target, Track } from "@/types";
-import { DataTable } from "@/components/ui/data-table";
+import DataTable from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { format, isValid, parseISO } from "date-fns";
 

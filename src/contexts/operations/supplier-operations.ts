@@ -1,40 +1,42 @@
 
-import { v4 as uuidv4 } from 'uuid';
-import { Supplier } from '../../types';
+import { toast } from 'sonner';
+import { Supplier } from '@/types';
+import { generateId, getCurrentTimestamp } from '../utils';
 
-export const createNewSupplier = (supplier: Omit<Supplier, 'id'>): Supplier => {
+export const createSupplierOperation = (
+  suppliers: Supplier[],
+  setSuppliers: (suppliers: Supplier[]) => void,
+  supplier: Omit<Supplier, 'id' | 'createdAt' | 'updatedAt'>
+): string => {
+  const id = generateId('supplier');
   const newSupplier: Supplier = {
-    id: uuidv4(),
     ...supplier,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    id,
+    createdAt: getCurrentTimestamp(),
+    updatedAt: getCurrentTimestamp()
   };
-  
-  return newSupplier;
+  setSuppliers([...suppliers, newSupplier]);
+  toast.success(`Created supplier: ${supplier.name}`);
+  return id;
 };
 
-export const updateExistingSupplier = (
-  supplierId: string, 
-  supplierData: Partial<Supplier>
-): Supplier => {
-  // In a real application, this would make an API call
-  // For now, we just return the updated supplier
-  return {
-    id: supplierId,
-    name: '',
-    email: '',
-    phone: '',
-    industry: '',
-    contactPerson: '',
-    currency: 'USD',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    ...supplierData
-  };
+export const updateSupplierOperation = (
+  suppliers: Supplier[],
+  setSuppliers: (suppliers: Supplier[]) => void,
+  id: string,
+  supplier: Partial<Supplier>
+) => {
+  setSuppliers(suppliers.map(s =>
+    s.id === id ? { ...s, ...supplier, updatedAt: getCurrentTimestamp() } : s
+  ));
+  toast.success(`Updated supplier: ${supplier.name || id}`);
 };
 
-export const deleteExistingSupplier = async (supplierId: string): Promise<void> => {
-  // In a real application, this would make an API call
-  // For now, we just return a promise that resolves immediately
-  return Promise.resolve();
+export const deleteSupplierOperation = (
+  suppliers: Supplier[],
+  setSuppliers: (suppliers: Supplier[]) => void,
+  id: string
+) => {
+  setSuppliers(suppliers.filter(s => s.id !== id));
+  toast.success(`Deleted supplier: ${id}`);
 };
