@@ -1,25 +1,77 @@
 
 import React from 'react';
-import { ResponsiveContainer, BarChart, Bar, Tooltip } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, Tooltip, XAxis, Cell } from 'recharts';
+import { cn } from '@/lib/utils';
 
 interface MiniBarChartProps {
   data: Array<{ name: string; value: number }>;
   color?: string;
   height?: number;
+  showAxis?: boolean;
+  activeIndex?: number;
+  className?: string;
+  variant?: 'default' | 'gradient';
 }
 
-const MiniBarChart = ({ data, color = "#8B5CF6", height = 40 }: MiniBarChartProps) => {
+const MiniBarChart = ({ 
+  data, 
+  color = "#10B981", 
+  height = 40,
+  showAxis = false,
+  activeIndex,
+  className,
+  variant = 'default'
+}: MiniBarChartProps) => {
+  const gradientId = `barGradient-${Math.random().toString(36).substring(2, 9)}`;
+  
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-        <Bar dataKey="value" fill={color} radius={[2, 2, 0, 0]} />
+    <ResponsiveContainer width="100%" height={height} className={className}>
+      <BarChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: showAxis ? 15 : 5 }}>
+        {variant === 'gradient' && (
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity={0.8} />
+              <stop offset="100%" stopColor={color} stopOpacity={0.3} />
+            </linearGradient>
+          </defs>
+        )}
+        
+        {showAxis && (
+          <XAxis 
+            dataKey="name" 
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 10, fill: '#888' }}
+            height={10}
+          />
+        )}
+        
+        <Bar 
+          dataKey="value"
+          fill={variant === 'gradient' ? `url(#${gradientId})` : color}
+          radius={[2, 2, 0, 0]}
+          animationDuration={1000}
+          animationEasing="ease-out"
+        >
+          {data.map((entry, index) => (
+            <Cell 
+              key={`cell-${index}`}
+              fillOpacity={activeIndex !== undefined ? (index === activeIndex ? 1 : 0.4) : 1} 
+            />
+          ))}
+        </Bar>
+        
         <Tooltip
+          cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
           content={({ active, payload }) => {
             if (active && payload && payload.length) {
               return (
-                <div className="bg-background border border-border p-1 text-xs rounded shadow-sm">
+                <div className={cn(
+                  "bg-background border border-border p-2 text-xs rounded shadow-md",
+                  "animate-scale-in"
+                )}>
                   <p className="font-medium">{payload[0].payload.name}</p>
-                  <p>{payload[0].value}</p>
+                  <p className="text-primary">{payload[0].value}</p>
                 </div>
               );
             }

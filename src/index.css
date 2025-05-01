@@ -11,7 +11,7 @@
     --card-foreground: 200 10% 34%;
     --popover: 0 0% 100%;
     --popover-foreground: 200 10% 34%;
-    --primary: 200 10% 34%; /* Grey #4F5D61 */
+    --primary: 162 75% 40%; /* Eco Green #10B981 */
     --primary-foreground: 0 0% 100%;
     --secondary: 188 15% 66%; /* Light Blue #99B3B6 */
     --secondary-foreground: 0 0% 100%;
@@ -35,6 +35,37 @@
     --sidebar-border: 200 10% 88%;
     --sidebar-ring: 200 10% 50%;
   }
+
+  .dark {
+    --background: 200 10% 10%;
+    --foreground: 0 0% 95%;
+    --card: 200 10% 15%;
+    --card-foreground: 0 0% 95%;
+    --popover: 200 10% 15%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 162 75% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 188 15% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 16 100% 55%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 200 10% 20%;
+    --muted-foreground: 0 0% 70%;
+    --destructive: 0 84.2% 50.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 200 10% 20%;
+    --input: 200 10% 20%;
+    --ring: 200 10% 60%;
+
+    --sidebar-background: 200 10% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 162 75% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 16 100% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 200 10% 20%;
+    --sidebar-ring: 200 10% 60%;
+  }
 }
 
 @layer base {
@@ -44,12 +75,22 @@
   body {
     @apply bg-background text-foreground font-inter antialiased tracking-tight;
   }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tighter;
+  }
 }
 
 @font-face {
   font-family: 'Inter';
   src: url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   font-weight: 400 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap');
+  font-weight: 500 700;
   font-style: normal;
 }
 
@@ -74,4 +115,26 @@
 
 .animate-slide-in {
   animation: slideIn 0.3s ease forwards;
+}
+
+@layer components {
+  .card-interactive {
+    @apply transition-all duration-200 hover:shadow-card-hover;
+  }
+  
+  .card-gradient {
+    @apply bg-gradient-to-tr from-eco-green/80 to-eco-teal/50;
+  }
+
+  .glass-panel {
+    @apply bg-background/80 backdrop-blur-sm border border-border/50;
+  }
+  
+  .btn-eco {
+    @apply bg-gradient-eco text-white hover:opacity-90 transition-opacity;
+  }
+  
+  .data-label {
+    @apply text-xs uppercase tracking-wider font-medium text-muted-foreground;
+  }
 }

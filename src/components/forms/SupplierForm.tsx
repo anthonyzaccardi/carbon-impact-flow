@@ -95,7 +95,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       return initialData.id;
     }
     
-    return "";
+    return ""; // Return empty string as default to fix TypeScript error
   }
 
   return (

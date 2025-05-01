@@ -1,11 +1,13 @@
 
 import { useAppContext } from "@/contexts/useAppContext";
 import StatCard from "@/components/ui/stat-card";
-import { Activity, ArrowUp, Users, Calendar, Cloud } from "lucide-react";
+import { Activity, ArrowUp, Users, Calendar, Cloud, Battery, Leaf, TrendingUp } from "lucide-react";
 import MiniSparkline from "@/components/charts/MiniSparkline";
 import MiniBarChart from "@/components/charts/MiniBarChart";
 import MiniDonutChart from "@/components/charts/MiniDonutChart";
 import ProgressIndicator from "@/components/charts/ProgressIndicator";
+import BreadcrumbNav from "@/components/ui/breadcrumb-nav";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Overview = () => {
   const {
@@ -21,9 +23,9 @@ const Overview = () => {
     return sum + trackEmissions;
   }, 0);
   
-  const emissionsChange = 5.2; // Example trend, replace with actual calculation if needed
+  const emissionsChange = 5.2; // Example trend
   
-  // Sample data for charts - in a real application, you would calculate these from actual data
+  // Sample data for charts
   const emissionsData = [
     { name: 'Jan', value: 5200 },
     { name: 'Feb', value: 4800 },
@@ -51,36 +53,41 @@ const Overview = () => {
   };
 
   return (
-    <div className="p-6 px-0 py-0">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Overview Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Track your environmental impact metrics and progress
+    <div className="space-y-6 animate-fade-in">
+      <BreadcrumbNav items={[{ label: "Overview", icon: <TrendingUp className="h-4 w-4" /> }]} />
+      
+      <div className="mb-8">
+        <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">Overview Dashboard</h1>
+        <p className="text-muted-foreground max-w-3xl">
+          Track your environmental impact metrics and progress toward reduction goals across all emission sources.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Total Tracks" 
-          value={tracks.length.toString()} 
+          value={tracks.length} 
           description="Active emission tracking categories" 
-          icon={<Activity className="text-purple-500" />} 
-          chart={<MiniBarChart data={trackDistributionData} height={60} />}
+          icon={<Activity className="h-5 w-5" />}
+          iconVariant="subtle"
+          chart={<MiniBarChart data={trackDistributionData} color="#10B981" height={60} />}
         />
 
         <StatCard 
           title="Active Measurements" 
-          value={measurements.length.toString()} 
+          value={measurements.length} 
           description="Total recorded measurements" 
-          icon={<Calendar className="text-blue-500" />}
+          icon={<Calendar className="h-5 w-5" />}
+          iconVariant="subtle"
           chart={<MiniSparkline data={measurementTrendsData} color="#1EAEDB" height={60} />}
         />
 
         <StatCard 
           title="Set Targets" 
-          value={targets.length.toString()} 
+          value={targets.length} 
           description="Emission reduction targets" 
-          icon={<ArrowUp className="text-green-500" />}
+          icon={<ArrowUp className="h-5 w-5" />}
+          iconVariant="subtle"
           chart={<ProgressIndicator 
             current={targetProgressData.current} 
             target={targetProgressData.target} 
@@ -90,9 +97,10 @@ const Overview = () => {
 
         <StatCard 
           title="Ongoing Initiatives" 
-          value={initiatives.length.toString()} 
+          value={initiatives.length} 
           description="Active reduction programs" 
-          icon={<Users className="text-orange-500" />}
+          icon={<Users className="h-5 w-5" />}
+          iconVariant="subtle"
           chart={<MiniBarChart 
             data={initiatives.slice(0, 5).map((i, idx) => ({ 
               name: `Initiative ${idx + 1}`, 
@@ -102,21 +110,75 @@ const Overview = () => {
             height={60} 
           />}
         />
-        
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <StatCard 
           title="Total Emissions" 
           value={`${totalEmissions.toLocaleString(undefined, {
             maximumFractionDigits: 2
           })} tCO₂e`} 
           description="Carbon dioxide equivalent" 
-          icon={<Cloud className="text-gray-500" />} 
-          className="md:col-span-2 lg:col-span-4" 
+          icon={<Cloud className="h-5 w-5" />}
+          variant="gradient" 
+          className="md:col-span-3" 
+          size="lg"
           trend={{
             value: emissionsChange,
             isPositive: false
           }}
-          chart={<MiniSparkline data={emissionsData} color="#64748B" height={60} />}
+          chart={<MiniSparkline data={emissionsData} color="rgba(255,255,255,0.8)" height={60} />}
         />
+
+        <Card className="md:col-span-2">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-medium mb-4">Emission Sources</h3>
+            <div className="space-y-4">
+              {tracks.slice(0, 5).map((track, idx) => (
+                <div key={track.id} className="flex items-center gap-4">
+                  <div className="bg-primary/10 p-2 rounded-md">
+                    {track.emoji}
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex justify-between">
+                      <span className="font-medium">{track.name}</span>
+                      <span>{track.totalEmissions.toLocaleString()} tCO₂e</span>
+                    </div>
+                    <ProgressIndicator 
+                      current={track.totalEmissions}
+                      target={totalEmissions}
+                      color={['#10B981', '#1EAEDB', '#F97316', '#8B5CF6', '#FBBF24'][idx % 5]}
+                      size="sm"
+                      variant="slim"
+                      showLabels={false}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-medium mb-4">Reduction Goals</h3>
+            <div className="flex items-center justify-center h-[200px]">
+              <MiniDonutChart
+                data={[
+                  { name: 'Achieved', value: targetProgressData.current },
+                  { name: 'Remaining', value: targetProgressData.target - targetProgressData.current }
+                ]}
+                colors={["#10B981", "#D1D5DB"]}
+                height={180}
+              />
+            </div>
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                {((targetProgressData.current / targetProgressData.target) * 100).toFixed(1)}% Complete
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
