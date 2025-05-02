@@ -107,7 +107,7 @@ const MeasurementsPage = () => {
       cell: (item) => `${item.quantity} ${item.unit}`,
     },
     {
-      header: "Calculated Value",
+      header: "Calculated value",
       accessorKey: "calculatedValue",
       cell: (item) => `${item.calculatedValue.toLocaleString()} tCO₂e`,
     }
