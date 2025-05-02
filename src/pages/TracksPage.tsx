@@ -81,14 +81,6 @@ const TracksPage = () => {
   };
 
   return (
-    <PageLayout 
-      title="Factors" 
-      description="Manage conversion factors for emission calculations"
-      breadcrumbItems={[
-        { label: "Dashboard", href: "/" },
-        { label: "Tracks" }
-      ]}
-    >
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
