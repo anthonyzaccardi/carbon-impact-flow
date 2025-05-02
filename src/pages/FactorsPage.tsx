@@ -121,7 +121,7 @@ const FactorsPage = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard 
-          title="Total Factors" 
+          title="Total factors" 
           value={totalFactors}
           chart={<MiniBarChart 
             data={factorsByTrack} 
@@ -141,7 +141,7 @@ const FactorsPage = () => {
           />}
         />
         <StatCard 
-          title="Total Measurements" 
+          title="Total measurements" 
           value={measurements.length}
           chart={<MiniBarChart 
             data={Array.from({ length: 6 }, (_, i) => ({
