@@ -142,7 +142,7 @@ const MeasurementsPage = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard 
-          title="Total Measurements" 
+          title="Total measurements" 
           value={totalMeasurements}
           chart={<MiniSparkline 
             data={measurementTrendsData} 
@@ -151,7 +151,7 @@ const MeasurementsPage = () => {
           />}
         />
         <StatCard 
-          title="Total Calculated" 
+          title="Total calculated" 
           value={`${totalEmissions.toLocaleString()} tCO2e`}
           chart={<MiniBarChart 
             data={emissionsByTrackData} 
@@ -160,7 +160,7 @@ const MeasurementsPage = () => {
           />}
         />
         <StatCard 
-          title="Latest Entry" 
+          title="Latest entry" 
           value={latestDate}
           chart={<MiniSparkline 
             data={Array.from({ length: 7 }, (_, i) => ({
