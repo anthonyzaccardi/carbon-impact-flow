@@ -97,7 +97,7 @@ const ScenariosPage = () => {
         </div>
         <Button onClick={handleCreateNew} className="bg-primary hover:bg-primary/90">
           <Plus className="mr-2 h-4 w-4" />
-          Add Scenario
+          Add scenario
         </Button>
       </div>
       
