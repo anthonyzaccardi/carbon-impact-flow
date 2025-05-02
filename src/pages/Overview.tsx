@@ -65,7 +65,7 @@ const Overview = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          title="Total tracks" 
+          title="Total Tracks" 
           value={tracks.length} 
           description="Active emission tracking categories" 
           icon={<Activity className="h-5 w-5" />}
@@ -74,7 +74,7 @@ const Overview = () => {
         />
 
         <StatCard 
-          title="Active measurements" 
+          title="Active Measurements" 
           value={measurements.length} 
           description="Total recorded measurements" 
           icon={<Calendar className="h-5 w-5" />}
@@ -83,7 +83,7 @@ const Overview = () => {
         />
 
         <StatCard 
-          title="Set targets" 
+          title="Set Targets" 
           value={targets.length} 
           description="Emission reduction targets" 
           icon={<ArrowUp className="h-5 w-5" />}
@@ -96,7 +96,7 @@ const Overview = () => {
         />
 
         <StatCard 
-          title="Ongoing initiatives" 
+          title="Ongoing Initiatives" 
           value={initiatives.length} 
           description="Active reduction programs" 
           icon={<Users className="h-5 w-5" />}
@@ -114,7 +114,7 @@ const Overview = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <StatCard 
-          title="Total emissions" 
+          title="Total Emissions" 
           value={`${totalEmissions.toLocaleString(undefined, {
             maximumFractionDigits: 2
           })} tCO₂e`} 
@@ -132,7 +132,7 @@ const Overview = () => {
 
         <Card className="md:col-span-2">
           <CardContent className="p-6">
-            <h3 className="text-lg font-medium mb-4">Emission Sources</h3>
+            <h3 className="text-lg font-medium mb-4">Emission sources</h3>
             <div className="space-y-4">
               {tracks.slice(0, 5).map((track, idx) => (
                 <div key={track.id} className="flex items-center gap-4">
@@ -161,7 +161,7 @@ const Overview = () => {
 
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-medium mb-4">Reduction Goals</h3>
+            <h3 className="text-lg font-medium mb-4">Reduction goals</h3>
             <div className="flex items-center justify-center h-[200px]">
               <MiniDonutChart
                 data={[
