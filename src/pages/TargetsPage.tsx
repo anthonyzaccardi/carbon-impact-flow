@@ -31,7 +31,7 @@ const TargetsPage = () => {
 
   return (
     <PageLayout 
-      title="Reduction Targets" 
+      title="Targets" 
       description="Set and track emission reduction goals"
       breadcrumbItems={[
         { label: "Home", href: "/" },
