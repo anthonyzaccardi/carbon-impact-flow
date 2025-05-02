@@ -136,7 +136,7 @@ const MeasurementsPage = () => {
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Measurement
+          Add measurement
         </Button>
       </div>
       
