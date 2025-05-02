@@ -11,7 +11,7 @@ interface TargetsSummaryProps {
   targets: Target[];
 }
 
-export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
+export const TargetsSummary = ({ targets = [] }: TargetsSummaryProps) => {
   // Calculate metrics
   const totalTargets = targets.length;
   const totalBaseline = targets.reduce((sum, t) => sum + t.baselineValue, 0);
@@ -19,7 +19,7 @@ export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
   const averageReduction = targets.length > 0 ? 
     targets.reduce((sum, t) => sum + t.targetPercentage, 0) / targets.length : 0;
 
-  // Sample data for charts
+  // Prepare chart data with safety checks
   const reductionByTargetData = targets.slice(0, 5).map((target, idx) => ({
     name: `Target ${idx + 1}`,
     value: target.baselineValue - target.targetValue
@@ -27,7 +27,7 @@ export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
   
   const targetPercentageData = targets.slice(0, 5).map((target, idx) => ({
     name: `Target ${idx + 1}`,
-    value: target.targetPercentage
+    value: Math.abs(target.targetPercentage)
   }));
   
   const targetDistributionData = targets.slice(0, 4).map((target, idx) => ({
@@ -35,13 +35,16 @@ export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
     value: target.targetValue
   }));
 
+  // Create empty data placeholder for empty targets
+  const emptyData = [{ name: 'No data', value: 0 }];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <StatCard 
         title="Total Targets" 
         value={totalTargets}
         chart={<MiniBarChart 
-          data={reductionByTargetData} 
+          data={reductionByTargetData.length ? reductionByTargetData : emptyData} 
           color="#8B5CF6" 
           height={60} 
         />}
@@ -50,10 +53,10 @@ export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
         title="Total Baseline" 
         value={`${totalBaseline.toLocaleString()} tCO2e`}
         chart={<MiniSparkline 
-          data={targets.slice(0, 6).map((t, idx) => ({
+          data={targets.length ? targets.slice(0, 6).map((t, idx) => ({
             name: `${idx}`,
             value: t.baselineValue
-          }))}
+          })) : emptyData}
           color="#1EAEDB" 
           height={60} 
         />}
@@ -63,7 +66,7 @@ export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
         value={`${totalReduction.toLocaleString()} tCO2e`}
         chart={<ProgressIndicator 
           current={totalReduction} 
-          target={totalBaseline * 0.4} // Assuming a 40% reduction goal
+          target={totalBaseline * 0.4 || 1} // Prevent division by zero
           color="#10B981" 
         />}
       />
@@ -71,7 +74,7 @@ export const TargetsSummary = ({ targets }: TargetsSummaryProps) => {
         title="Average Reduction" 
         value={`${averageReduction.toFixed(1)}%`}
         chart={<MiniDonutChart 
-          data={targetDistributionData} 
+          data={targetDistributionData.length ? targetDistributionData : emptyData} 
           colors={["#8B5CF6", "#1EAEDB", "#10B981", "#F97316"]}
           height={80} 
         />}

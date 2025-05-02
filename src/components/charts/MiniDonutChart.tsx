@@ -11,13 +11,25 @@ interface MiniDonutChartProps {
 }
 
 const MiniDonutChart = ({ 
-  data, 
+  data = [], 
   colors = ["#8B5CF6", "#1EAEDB", "#9b87f5", "#7E69AB"], 
   height = 80,
   showLegend = false,
   interactive = true
 }: MiniDonutChartProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  // Safeguard against empty data
+  if (!data || data.length === 0) {
+    return (
+      <div 
+        style={{ height: `${height}px` }} 
+        className="w-full flex items-center justify-center text-xs text-muted-foreground"
+      >
+        No data available
+      </div>
+    );
+  }
 
   const onPieEnter = interactive ? (_, index) => {
     setActiveIndex(index);

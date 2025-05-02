@@ -12,7 +12,7 @@ interface MiniSparklineProps {
 }
 
 const MiniSparkline = ({ 
-  data, 
+  data = [], 
   color = "#1EAEDB", 
   height = 40,
   showAxis = false,
@@ -21,6 +21,18 @@ const MiniSparkline = ({
 }: MiniSparklineProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const gradientId = `sparkline-gradient-${Math.random().toString(36).substring(2, 9)}`;
+
+  // Safeguard against empty data
+  if (!data || data.length === 0) {
+    return (
+      <div 
+        style={{ height: `${height}px` }} 
+        className="w-full flex items-center justify-center text-xs text-muted-foreground"
+      >
+        No data available
+      </div>
+    );
+  }
 
   const handleMouseMove = interactive ? (props) => {
     if (props && props.activeTooltipIndex !== undefined) {
@@ -74,7 +86,7 @@ const MiniSparkline = ({
           animationEasing="ease-out"
         />
         
-        {activeIndex !== null && (
+        {activeIndex !== null && activeIndex >= 0 && activeIndex < data.length && (
           <ReferenceDot 
             x={data[activeIndex].name} 
             y={data[activeIndex].value} 

@@ -1,15 +1,14 @@
 
 import { useAppContext } from "@/contexts/useAppContext";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { TrendingDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { TargetActions } from "@/components/targets/TargetActions";
 import { TargetsList } from "@/components/targets/TargetsList";
 import { TargetsSummary } from "@/components/targets/TargetsSummary";
+import PageLayout from "@/components/layout/PageLayout";
 
 const TargetsPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { targets, tracks, scenarios, openSidePanel } = useAppContext();
 
@@ -31,13 +30,17 @@ const TargetsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <PageLayout 
+      title="Reduction Targets" 
+      description="Set and track emission reduction goals"
+      breadcrumbItems={[
+        { label: "Home", href: "/" },
+        { label: "Targets", icon: <TrendingDown className="h-4 w-4" /> }
+      ]}
+    >
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Reduction Targets</h1>
-          <p className="text-muted-foreground">
-            Set and track emission reduction goals
-          </p>
+          {/* Title and description are now in PageLayout */}
         </div>
         <TargetActions
           onCreateTarget={handleCreateTarget}
@@ -52,7 +55,7 @@ const TargetsPage = () => {
         tracks={tracks}
         onRowClick={handleRowClick}
       />
-    </div>
+    </PageLayout>
   );
 };
 
