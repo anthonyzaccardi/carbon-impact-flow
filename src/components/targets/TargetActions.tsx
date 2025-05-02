@@ -44,7 +44,7 @@ export const TargetActions = ({
       <DropdownMenuTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Add Target
+          Add target
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
