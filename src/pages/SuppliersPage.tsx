@@ -92,7 +92,7 @@ const SuppliersPage = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard 
-          title="Total Suppliers" 
+          title="Total suppliers" 
           value={totalSuppliers}
         />
         <StatCard 
@@ -100,7 +100,7 @@ const SuppliersPage = () => {
           value={new Set(suppliers.map(s => s.industry)).size}
         />
         <StatCard 
-          title="Suppliers with Targets" 
+          title="Suppliers with targets" 
           value={suppliers.filter(s => getTargetCount(s.id) > 0).length}
         />
       </div>
