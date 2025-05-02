@@ -6,65 +6,65 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 200 10% 34%; /* Grey #4F5D61 */
+    --foreground: 0 0% 20%; /* Notion text color - dark gray */
     --card: 0 0% 100%;
-    --card-foreground: 200 10% 34%;
+    --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 200 10% 34%;
-    --primary: 162 75% 40%; /* Eco Green #10B981 */
+    --popover-foreground: 0 0% 20%;
+    --primary: 240 5.9% 10%; /* Notion primary color - almost black */
     --primary-foreground: 0 0% 100%;
-    --secondary: 188 15% 66%; /* Light Blue #99B3B6 */
-    --secondary-foreground: 0 0% 100%;
-    --accent: 16 100% 60%; /* Orange #FF6E35 */
-    --accent-foreground: 0 0% 100%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --secondary: 0 0% 96%; /* Notion secondary - light gray */
+    --secondary-foreground: 0 0% 20%;
+    --accent: 220 14% 96%; /* Notion accent - light blue gray */
+    --accent-foreground: 240 5.9% 10%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 0 0% 50%; /* Medium gray for muted text */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 200 10% 90%;
-    --input: 200 10% 90%;
-    --ring: 200 10% 50%;
-    --radius: 0.75rem;
+    --border: 0 0% 92%; /* Notion border color - very light gray */
+    --input: 0 0% 92%;
+    --ring: 0 0% 80%;
+    --radius: 0.375rem; /* Smaller radius for Notion-like UI */
 
-    --sidebar-background: 200 10% 98%;
-    --sidebar-foreground: 200 10% 34%; 
-    --sidebar-primary: 200 10% 34%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 20%; 
+    --sidebar-primary: 0 0% 20%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 16 100% 60%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 200 10% 88%;
-    --sidebar-ring: 200 10% 50%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 0% 80%;
   }
 
   .dark {
-    --background: 200 10% 10%;
+    --background: 0 0% 9%;
     --foreground: 0 0% 95%;
-    --card: 200 10% 15%;
+    --card: 0 0% 12%;
     --card-foreground: 0 0% 95%;
-    --popover: 200 10% 15%;
+    --popover: 0 0% 12%;
     --popover-foreground: 0 0% 95%;
-    --primary: 162 75% 40%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 188 15% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --accent: 16 100% 55%;
-    --accent-foreground: 0 0% 100%;
-    --muted: 200 10% 20%;
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 95%;
+    --accent: 210 8% 18%;
+    --accent-foreground: 0 0% 95%;
+    --muted: 0 0% 16%;
     --muted-foreground: 0 0% 70%;
     --destructive: 0 84.2% 50.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 200 10% 20%;
-    --input: 200 10% 20%;
-    --ring: 200 10% 60%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 30%;
 
-    --sidebar-background: 200 10% 8%;
+    --sidebar-background: 0 0% 9%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 162 75% 40%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 16 100% 55%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 200 10% 20%;
-    --sidebar-ring: 200 10% 60%;
+    --sidebar-primary: 0 0% 95%;
+    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-accent: 210 8% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 0 0% 30%;
   }
 }
 
@@ -73,10 +73,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter antialiased tracking-tight;
+    @apply bg-background text-foreground font-inter antialiased tracking-normal;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold tracking-tighter;
+    @apply font-heading font-medium tracking-tight;
   }
 }
 
@@ -95,17 +95,17 @@
 }
 
 .side-panel {
-  @apply fixed right-0 top-0 z-50 h-full w-[450px] bg-background border-l border-border shadow-lg transform transition-transform duration-300;
+  @apply fixed right-0 top-0 z-50 h-full w-[450px] bg-background border-l border-border shadow-md transform transition-transform duration-300;
 }
 
 .side-panel-overlay {
-  @apply fixed inset-0 bg-black/20 backdrop-blur-sm z-40;
+  @apply fixed inset-0 bg-black/10 backdrop-blur-sm z-40;
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(10px);
   }
   to {
     opacity: 1;
@@ -114,27 +114,40 @@
 }
 
 .animate-slide-in {
-  animation: slideIn 0.3s ease forwards;
+  animation: slideIn 0.25s ease forwards;
 }
 
 @layer components {
   .card-interactive {
-    @apply transition-all duration-200 hover:shadow-card-hover;
+    @apply transition-all duration-200 hover:shadow-sm;
   }
   
   .card-gradient {
-    @apply bg-gradient-to-tr from-eco-green/80 to-eco-teal/50;
+    @apply bg-gradient-to-tr from-accent/30 to-background;
   }
 
   .glass-panel {
-    @apply bg-background/80 backdrop-blur-sm border border-border/50;
+    @apply bg-background/90 backdrop-blur-sm border border-border/50;
   }
   
-  .btn-eco {
-    @apply bg-gradient-eco text-white hover:opacity-90 transition-opacity;
+  .btn-notion {
+    @apply bg-primary text-white hover:bg-primary/90 transition-opacity;
   }
   
   .data-label {
-    @apply text-xs uppercase tracking-wider font-medium text-muted-foreground;
+    @apply text-xs uppercase tracking-wide font-medium text-muted-foreground;
+  }
+  
+  /* Notion-like UI components */
+  .notion-card {
+    @apply bg-background border border-border rounded-md shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  .notion-input {
+    @apply bg-background focus:border-primary/20 focus:ring-1 focus:ring-primary/20;
+  }
+  
+  .notion-button {
+    @apply rounded-md font-medium text-sm transition-colors;
   }
 }

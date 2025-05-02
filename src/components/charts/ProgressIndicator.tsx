@@ -16,7 +16,7 @@ interface ProgressIndicatorProps {
 const ProgressIndicator = ({ 
   current, 
   target, 
-  color = "#10B981", 
+  color = "#000000", 
   showLabels = true,
   size = 'md',
   variant = 'default',
@@ -29,15 +29,15 @@ const ProgressIndicator = ({
   // Size configuration
   const sizeConfig = {
     sm: 'h-1',
-    md: 'h-2',
-    lg: 'h-3'
+    md: 'h-1.5',
+    lg: 'h-2'
   };
 
   // Variant configuration
   const variantConfig = {
     default: '',
     slim: 'rounded-full overflow-hidden',
-    gradient: `bg-gradient-to-r from-${color}/20 to-${color}/50 overflow-hidden`
+    gradient: `bg-accent/30 overflow-hidden`
   };
 
   return (
@@ -47,7 +47,7 @@ const ProgressIndicator = ({
         className={cn(
           sizeConfig[size],
           variantConfig[variant],
-          "transition-all duration-300"
+          "transition-all duration-300 bg-secondary"
         )}
         style={{ 
           '--progress-background': color 

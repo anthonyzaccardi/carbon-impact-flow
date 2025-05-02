@@ -26,14 +26,14 @@ interface BreadcrumbNavProps {
 
 const BreadcrumbNav = ({ items, className, showHome = true }: BreadcrumbNavProps) => {
   return (
-    <Breadcrumb className={cn("mb-6", className)}>
+    <Breadcrumb className={cn("mb-4", className)}>
       <BreadcrumbList>
         {showHome && (
           <>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link to="/" className="flex items-center hover:text-primary">
-                  <Home className="h-4 w-4" />
+                  <Home className="h-3.5 w-3.5" />
                 </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -48,17 +48,17 @@ const BreadcrumbNav = ({ items, className, showHome = true }: BreadcrumbNavProps
             <React.Fragment key={item.label}>
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage className="flex items-center">
-                    {item.icon && <span className="mr-1.5">{item.icon}</span>}
+                  <BreadcrumbPage className="flex items-center text-sm">
+                    {item.icon && <span className="mr-1">{item.icon}</span>}
                     {item.label}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
                     <Link 
                       to={item.href || '#'} 
-                      className="flex items-center hover:text-primary transition-colors"
+                      className="flex items-center hover:text-primary transition-colors text-sm"
                     >
-                      {item.icon && <span className="mr-1.5">{item.icon}</span>}
+                      {item.icon && <span className="mr-1">{item.icon}</span>}
                       {item.label}
                     </Link>
                   </BreadcrumbLink>

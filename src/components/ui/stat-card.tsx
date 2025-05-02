@@ -34,30 +34,30 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => {
   // Calculate size classes
   const sizeClasses = {
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
+    sm: 'p-3',
+    md: 'p-4',
+    lg: 'p-6',
   };
 
   // Calculate variant classes
   const variantClasses = {
     default: '',
-    gradient: 'bg-gradient-eco text-white',
-    outlined: 'border-2 border-primary/20',
+    gradient: 'bg-accent/30',
+    outlined: 'border border-border',
     glass: 'glass-panel',
   };
 
   // Calculate icon variant classes
   const iconVariantClasses = {
     default: '',
-    circle: 'rounded-full p-3',
-    subtle: 'bg-primary/10 p-2 rounded-md',
+    circle: 'rounded-full p-2',
+    subtle: 'bg-accent/30 p-2 rounded-md',
   };
 
   return (
     <Card 
       className={cn(
-        "overflow-hidden transition-all duration-200 hover:shadow-card-hover", 
+        "overflow-hidden transition-all duration-200 hover:shadow-sm", 
         variantClasses[variant],
         className
       )}
@@ -67,20 +67,20 @@ const StatCard: React.FC<StatCardProps> = ({
           <div>
             <p className={cn(
               "text-sm font-medium mb-1", 
-              variant === 'gradient' ? 'text-white/80' : 'text-muted-foreground'
+              "text-muted-foreground"
             )}>
               {title}
             </p>
             <h3 className={cn(
-              "text-2xl font-semibold", 
-              size === 'lg' && 'text-3xl'
+              "text-xl font-medium", 
+              size === 'lg' && 'text-2xl'
             )}>
               {value}
             </h3>
             {description && (
               <p className={cn(
                 "text-sm mt-1", 
-                variant === 'gradient' ? 'text-white/70' : 'text-muted-foreground'
+                "text-muted-foreground"
               )}>
                 {description}
               </p>
@@ -89,22 +89,17 @@ const StatCard: React.FC<StatCardProps> = ({
             {trend && (
               <div className={`flex items-center mt-2 text-sm ${
                 trend.isPositive 
-                  ? 'text-eco-green' 
+                  ? 'text-green-600' 
                   : 'text-red-500'
               }`}>
                 {trend.isPositive 
-                  ? <ArrowUp className="h-4 w-4 mr-1" /> 
-                  : <ArrowDown className="h-4 w-4 mr-1" />
+                  ? <ArrowUp className="h-3 w-3 mr-1" /> 
+                  : <ArrowDown className="h-3 w-3 mr-1" />
                 }
                 <span className="font-medium">
                   {trend.isPositive ? '+' : ''}{trend.value}%
                 </span>
-                <span className={cn(
-                  "ml-1 text-xs", 
-                  variant === 'gradient' 
-                    ? 'text-white/60' 
-                    : 'text-muted-foreground'
-                )}>
+                <span className="ml-1 text-xs text-muted-foreground">
                   vs previous period
                 </span>
               </div>
@@ -115,8 +110,8 @@ const StatCard: React.FC<StatCardProps> = ({
             <div className={cn(
               iconVariantClasses[iconVariant],
               variant === 'gradient' 
-                ? 'bg-white/20 text-white' 
-                : 'text-primary'
+                ? 'text-primary' 
+                : 'text-muted-foreground'
             )}>
               {icon}
             </div>
@@ -124,16 +119,9 @@ const StatCard: React.FC<StatCardProps> = ({
         </div>
         
         {chart && (
-          <div className={cn("mt-4", size === 'sm' ? 'mt-2' : 'mt-4')}>
+          <div className={cn("mt-3", size === 'sm' ? 'mt-2' : 'mt-4')}>
             {chart}
           </div>
-        )}
-
-        {variant === 'gradient' && (
-          <div 
-            className="absolute bottom-0 right-0 w-24 h-24 rounded-full bg-white/10 -mr-8 -mb-8"
-            aria-hidden="true"
-          />
         )}
       </CardContent>
     </Card>

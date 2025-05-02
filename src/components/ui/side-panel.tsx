@@ -68,7 +68,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       const timer = setTimeout(() => {
         setIsRendered(false);
         document.body.style.overflow = ''; // Restore scrolling when panel is closed
-      }, 300); // Match this to animation duration
+      }, 200); // Match this to animation duration
       
       return () => clearTimeout(timer);
     }
@@ -88,7 +88,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       {/* Backdrop */}
       <div 
         className={cn(
-          "fixed inset-0 bg-black/20 backdrop-blur-sm z-40",
+          "fixed inset-0 bg-black/5 backdrop-blur-sm z-40",
           isOpen ? "animate-fade-in" : "animate-fade-out"
         )}
         onClick={onClose}
@@ -98,7 +98,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       {/* Panel */}
       <div 
         className={cn(
-          "fixed top-0 z-50 h-full bg-background border-border shadow-lg transform transition-transform duration-300",
+          "fixed top-0 z-50 h-full bg-background border-border shadow-md transform transition-transform duration-200",
           positionClasses[position],
           widthClasses[width],
           position === 'right' ? 'border-l' : 'border-r',
@@ -107,16 +107,16 @@ const SidePanel: React.FC<SidePanelProps> = ({
             : animationClasses[position].exit
         )}
       >
-        <div className="border-b border-border p-4 flex items-center justify-between bg-background sticky top-0 z-10">
-          <h2 className="text-lg font-medium">{title}</h2>
+        <div className="border-b border-border p-3 flex items-center justify-between bg-background sticky top-0 z-10">
+          <h2 className="text-base font-medium">{title}</h2>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </Button>
         </div>
         
-        <ScrollArea className="h-[calc(100%-4rem)] w-full">
-          <div className="p-6">
+        <ScrollArea className="h-[calc(100%-3.25rem)] w-full">
+          <div className="p-4">
             {children}
           </div>
         </ScrollArea>

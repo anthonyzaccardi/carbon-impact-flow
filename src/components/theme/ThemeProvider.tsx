@@ -24,11 +24,14 @@ export function ThemeProvider({
   children,
   defaultTheme = 'system',
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<ThemeMode>(defaultTheme);
+  const [theme, setTheme] = useState<ThemeMode>(
+    () => (localStorage.getItem('theme') as ThemeMode) || defaultTheme
+  );
 
   useEffect(() => {
     const root = window.document.documentElement;
     
+    localStorage.setItem('theme', theme);
     root.classList.remove('light', 'dark');
     
     if (theme === 'system') {

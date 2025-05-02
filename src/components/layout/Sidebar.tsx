@@ -34,12 +34,12 @@ const NavItem = ({
         to={to} 
         className={({ isActive }) => 
           `flex items-center p-2 rounded-md mb-1 transition-colors duration-200
-          ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-primary/5 text-foreground/80'} 
+          ${isActive ? 'bg-accent text-primary' : 'hover:bg-accent/50 text-foreground/80'} 
           ${expanded ? 'justify-start' : 'justify-center'} nav-item ${isActive ? 'active' : ''}`
         }
       >
-        <Icon className="h-5 w-5" />
-        {expanded && <span className="ml-3 text-sm">{label}</span>}
+        <Icon className="h-4 w-4" />
+        {expanded && <span className="ml-2 text-sm">{label}</span>}
       </NavLink>
     </li>
   );
@@ -63,19 +63,19 @@ const NavGroupItem = ({
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center w-full p-2 rounded-md transition-colors duration-200
-          hover:bg-primary/5 text-foreground/80
+          hover:bg-accent/50 text-foreground/80
           ${expanded ? 'justify-start' : 'justify-center'}`}
       >
-        <Icon className="h-5 w-5" />
+        <Icon className="h-4 w-4" />
         {expanded && (
           <>
-            <span className="ml-3 text-sm flex-grow text-left">{label}</span>
-            <ChevronRight className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+            <span className="ml-2 text-sm flex-grow text-left">{label}</span>
+            <ChevronRight className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
           </>
         )}
       </button>
       {(isOpen || !expanded) && (
-        <ul className={`${expanded ? 'ml-7' : 'mt-1'} space-y-1`}>
+        <ul className={`${expanded ? 'ml-6' : 'mt-1'} space-y-1`}>
           {children}
         </ul>
       )}
@@ -89,11 +89,11 @@ const Sidebar = () => {
   return (
     <div 
       className={`fixed top-0 left-0 h-screen bg-sidebar border-r border-border
-      ${sidebarExpanded ? 'w-60' : 'w-16'} flex flex-col z-10 transition-all duration-300`}
+      ${sidebarExpanded ? 'w-60' : 'w-16'} flex flex-col z-10 transition-all duration-200`}
     >
-      <div className="p-4 flex items-center border-b border-border">
+      <div className="p-3 flex items-center border-b border-border">
         {sidebarExpanded && (
-          <h2 className="text-lg font-semibold mr-auto">Carbon Impact</h2>
+          <h2 className="text-base font-medium mr-auto">Carbon Impact</h2>
         )}
         <Button 
           variant="ghost" 
@@ -101,7 +101,7 @@ const Sidebar = () => {
           className={`${sidebarExpanded ? '' : 'mx-auto'} p-1`} 
           onClick={toggleSidebar}
         >
-          {sidebarExpanded ? <ChevronLeft /> : <ChevronRight />}
+          {sidebarExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </Button>
       </div>
 
@@ -123,7 +123,7 @@ const Sidebar = () => {
         </ul>
       </nav>
       
-      <div className="border-t border-border p-4">
+      <div className="border-t border-border p-3">
         {sidebarExpanded ? (
           <div className="text-xs text-muted-foreground">
             <p>Carbon Impact Flow</p>
@@ -131,7 +131,7 @@ const Sidebar = () => {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="h-2 w-2 bg-eco-purple rounded-full"></div>
+            <div className="h-2 w-2 bg-primary/50 rounded-full"></div>
           </div>
         )}
       </div>

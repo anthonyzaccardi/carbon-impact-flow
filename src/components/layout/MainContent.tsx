@@ -16,7 +16,7 @@ const MainContent = ({ children }: MainContentProps) => {
   // Add page transition effect when location changes
   useEffect(() => {
     setIsChanging(true);
-    const timer = setTimeout(() => setIsChanging(false), 300);
+    const timer = setTimeout(() => setIsChanging(false), 200);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -24,15 +24,15 @@ const MainContent = ({ children }: MainContentProps) => {
     <main className="flex-1 relative">
       <div 
         className={cn(
-          "w-full min-h-screen pt-6 pb-12 px-4 md:px-6 transition-all duration-300",
+          "w-full min-h-screen pt-4 pb-8 px-3 md:px-4 transition-all duration-200",
           sidebarExpanded ? 'md:pl-64' : 'md:pl-20',
           isChanging ? 'opacity-0' : 'opacity-100'
         )}
       >
         <div 
           className={cn(
-            "max-w-7xl mx-auto transition-all duration-500",
-            isChanging ? 'translate-y-4 opacity-0' : 'translate-y-0 opacity-100'
+            "max-w-6xl mx-auto transition-all duration-300",
+            isChanging ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'
           )}
         >
           {children}
