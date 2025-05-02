@@ -163,7 +163,7 @@ const InitiativesPage = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard 
-          title="Total Initiatives" 
+          title="Total initiatives" 
           value={totalInitiatives}
           chart={<MiniDonutChart 
             data={initiativeStatusData} 
@@ -171,7 +171,7 @@ const InitiativesPage = () => {
           />}
         />
         <StatCard 
-          title="Active Initiatives" 
+          title="Active initiatives" 
           value={activeInitiatives}
           chart={<MiniBarChart 
             data={initiatives.filter(i => i.status === 'in_progress').slice(0, 5).map((i, idx) => ({
@@ -184,7 +184,7 @@ const InitiativesPage = () => {
           />}
         />
         <StatCard 
-          title="Total Spend" 
+          title="Total spend" 
           value={`${totalSpend.toLocaleString()} USD`}
           chart={<MiniBarChart 
             data={initiatives.slice(0, 6).map((i, idx) => ({
@@ -198,7 +198,7 @@ const InitiativesPage = () => {
           />}
         />
         <StatCard 
-          title="Total Impact" 
+          title="Total impact" 
           value={`${totalImpact.toFixed(2)} tCO₂e`}
           description="Calculated reduction"
           chart={<MiniBarChart 
