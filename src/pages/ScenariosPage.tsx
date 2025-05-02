@@ -104,15 +104,15 @@ const ScenariosPage = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard 
-          title="Total Scenarios" 
+          title="Total scenarios" 
           value={scenarios.length}
         />
         <StatCard 
-          title="Scenario Targets" 
+          title="Scenario targets" 
           value={targets.filter(t => t.scenarioId).length}
         />
         <StatCard 
-          title="Total Reduction" 
+          title="Total reduction" 
           value={`${targets.filter(t => t.scenarioId).reduce(
             (sum, t) => sum + (t.baselineValue - t.targetValue), 0
           ).toLocaleString()} tCO2e`}
