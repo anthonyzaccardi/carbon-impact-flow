@@ -105,7 +105,7 @@ const FactorsPage = () => {
       description="Manage conversion factors for emission calculations"
       breadcrumbItems={[
         { label: "Dashboard", href: "/" },
-        { label: "Emission Factors" }
+        { label: "Factors" }
       ]}
     >
       <div className="flex justify-between items-center">
