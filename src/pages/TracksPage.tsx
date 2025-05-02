@@ -134,8 +134,7 @@ const TracksPage = () => {
       onRowClick={handleRowClick}
     />
   </PageLayout>
-);
-
+  );
 };
 
 export default TracksPage;
