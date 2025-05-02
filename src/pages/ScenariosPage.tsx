@@ -70,7 +70,7 @@ const ScenariosPage = () => {
       cell: (item) => getScenarioStats(item.id).uniqueTracks,
     },
     {
-      header: "Total Reduction",
+      header: "Total reduction",
       accessorKey: "reduction",
       cell: (item) => `${getScenarioStats(item.id).totalReduction.toLocaleString()} tCO2e`,
     },
