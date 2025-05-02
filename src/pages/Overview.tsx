@@ -57,7 +57,7 @@ const Overview = () => {
       <BreadcrumbNav items={[{ label: "Overview", icon: <TrendingUp className="h-4 w-4" /> }]} />
       
       <div className="mb-8">
-        <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">Dashboard</h1>
+        <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">Overview</h1>
         <p className="text-muted-foreground max-w-3xl">
           Track your environmental impact metrics and progress toward reduction goals across all emission sources.
         </p>
