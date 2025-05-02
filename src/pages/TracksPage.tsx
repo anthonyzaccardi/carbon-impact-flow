@@ -98,7 +98,7 @@ const TracksPage = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard 
-          title="Total Tracks" 
+          title="Total tracks" 
           value={totalTracks}
           chart={<MiniBarChart 
             data={trackEmissionsData} 
@@ -107,7 +107,7 @@ const TracksPage = () => {
           />}
         />
         <StatCard 
-          title="Total Emissions" 
+          title="Total emissions" 
           value={`${totalEmissions.toLocaleString()} tCO2e`}
           chart={<MiniDonutChart 
             data={trackDistributionData.slice(0, 4)} 
@@ -115,7 +115,7 @@ const TracksPage = () => {
           />}
         />
         <StatCard 
-          title="Avg. per Track" 
+          title="Avg. per track" 
           value={`${averageEmissions.toLocaleString()} tCO2e`}
           chart={<ProgressIndicator 
             current={averageEmissions} 
