@@ -89,69 +89,68 @@ const ScenariosPage = () => {
   ];
 
   return (
-  <PageLayout
-    title="Scenarios"
-    description="Create and manage planning scenarios"
-    breadcrumbItems={[
-      { label: "Dashboard", href: "/" },
-      { label: "Scenarios" }
-    ]}
-  >
-    <div className="flex justify-end mb-6">
-      <Button onClick={handleCreateNew} className="bg-primary hover:bg-primary/90">
-        <Plus className="mr-2 h-4 w-4" />
-        Add scenario
-      </Button>
-    </div>
-
-    {/* Stats Overview */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-      <StatCard 
-        title="Total scenarios" 
-        value={scenarios.length}
-      />
-      <StatCard 
-        title="Scenario targets" 
-        value={targets.filter(t => t.scenarioId).length}
-      />
-      <StatCard 
-        title="Total reduction" 
-        value={`${targets.filter(t => t.scenarioId).reduce(
-          (sum, t) => sum + (t.baselineValue - t.targetValue), 0
-        ).toLocaleString()} tCO2e`}
-      />
-    </div>
-
-    {/* Featured Scenarios */}
-    <FeaturedScenarios
-      scenarios={scenarios}
-      tracks={tracks}
-      targets={targets}
-      onScenarioClick={handleRowClick}
-    />
-
-    {/* Filters */}
-    <div className="flex flex-col md:flex-row gap-4 my-6">
-      <div className="relative flex-1">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search scenarios..."
-          className="pl-8"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+    <PageLayout
+      title="Scenarios"
+      description="Create and manage planning scenarios"
+      breadcrumbItems={[
+        { label: "Dashboard", href: "/" },
+        { label: "Scenarios" }
+      ]}
+    >
+      <div className="flex justify-end mb-6">
+        <Button onClick={handleCreateNew} className="bg-primary hover:bg-primary/90">
+          <Plus className="mr-2 h-4 w-4" />
+          Add scenario
+        </Button>
+      </div>
+  
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <StatCard 
+          title="Total scenarios" 
+          value={scenarios.length}
+        />
+        <StatCard 
+          title="Scenario targets" 
+          value={targets.filter(t => t.scenarioId).length}
+        />
+        <StatCard 
+          title="Total reduction" 
+          value={`${targets.filter(t => t.scenarioId).reduce(
+            (sum, t) => sum + (t.baselineValue - t.targetValue), 0
+          ).toLocaleString()} tCO2e`}
         />
       </div>
-    </div>
-
-    {/* Scenarios Table */}
-    <DataTable 
-      data={filteredScenarios} 
-      columns={columns} 
-      onRowClick={handleRowClick}
-    />
-  </PageLayout>
-);
-
+  
+      {/* Featured Scenarios */}
+      <FeaturedScenarios
+        scenarios={scenarios}
+        tracks={tracks}
+        targets={targets}
+        onScenarioClick={handleRowClick}
+      />
+  
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4 my-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search scenarios..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+  
+      {/* Scenarios Table */}
+      <DataTable 
+        data={filteredScenarios} 
+        columns={columns} 
+        onRowClick={handleRowClick}
+      />
+    </PageLayout>
+  );
 };
 
 export default ScenariosPage;
