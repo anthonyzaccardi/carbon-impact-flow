@@ -101,7 +101,7 @@ const FactorsPage = () => {
 
   return (
     <PageLayout 
-      title="Emission Factors" 
+      title="Factors" 
       description="Manage conversion factors for emission calculations"
       breadcrumbItems={[
         { label: "Dashboard", href: "/" },
