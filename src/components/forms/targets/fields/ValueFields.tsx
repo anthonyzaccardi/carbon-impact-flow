@@ -14,9 +14,10 @@ import { TargetFormData } from "../schema";
 interface ValueFieldsProps {
   form: UseFormReturn<TargetFormData>;
   isViewMode: boolean;
+  isFromCatalog?: boolean;
 }
 
-export const ValueFields = ({ form, isViewMode }: ValueFieldsProps) => {
+export const ValueFields = ({ form, isViewMode, isFromCatalog = false }: ValueFieldsProps) => {
   return (
     <>
       <div>
@@ -27,9 +28,19 @@ export const ValueFields = ({ form, isViewMode }: ValueFieldsProps) => {
             <FormItem>
               <FormLabel>Baseline Value</FormLabel>
               <FormControl>
-                <Input type="number" {...field} disabled={isViewMode} />
+                <Input 
+                  type="number" 
+                  {...field} 
+                  disabled={isViewMode || isFromCatalog} 
+                  className={isFromCatalog ? "bg-muted" : ""}
+                />
               </FormControl>
               <FormMessage />
+              {isFromCatalog && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Using track's total emissions as baseline
+                </p>
+              )}
             </FormItem>
           )}
         />

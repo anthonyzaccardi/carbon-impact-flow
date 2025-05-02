@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { ResponsiveContainer, BarChart, Bar, Tooltip, XAxis, Cell } from 'recharts';
+import React, { useState } from 'react';
+import { ResponsiveContainer, BarChart, Bar, Tooltip, XAxis, Cell, YAxis } from 'recharts';
 import { cn } from '@/lib/utils';
 
 interface MiniBarChartProps {
@@ -11,6 +11,7 @@ interface MiniBarChartProps {
   activeIndex?: number;
   className?: string;
   variant?: 'default' | 'gradient';
+  interactive?: boolean;
 }
 
 const MiniBarChart = ({ 
@@ -18,15 +19,24 @@ const MiniBarChart = ({
   color = "#10B981", 
   height = 40,
   showAxis = false,
-  activeIndex,
+  activeIndex: externalActiveIndex,
   className,
-  variant = 'default'
+  variant = 'default',
+  interactive = true
 }: MiniBarChartProps) => {
   const gradientId = `barGradient-${Math.random().toString(36).substring(2, 9)}`;
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  
+  // Use external activeIndex if provided, otherwise use hoverIndex
+  const activeIndex = externalActiveIndex !== undefined ? externalActiveIndex : hoverIndex;
   
   return (
     <ResponsiveContainer width="100%" height={height} className={className}>
-      <BarChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: showAxis ? 15 : 5 }}>
+      <BarChart 
+        data={data} 
+        margin={{ top: 5, right: 5, left: 0, bottom: showAxis ? 15 : 5 }}
+        onMouseLeave={() => interactive && setHoverIndex(null)}
+      >
         {variant === 'gradient' && (
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -37,26 +47,31 @@ const MiniBarChart = ({
         )}
         
         {showAxis && (
-          <XAxis 
-            dataKey="name" 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fontSize: 10, fill: '#888' }}
-            height={10}
-          />
+          <>
+            <XAxis 
+              dataKey="name" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: '#888' }}
+              height={10}
+            />
+            <YAxis hide />
+          </>
         )}
         
         <Bar 
           dataKey="value"
           fill={variant === 'gradient' ? `url(#${gradientId})` : color}
           radius={[2, 2, 0, 0]}
-          animationDuration={1000}
+          animationDuration={800}
           animationEasing="ease-out"
+          onMouseEnter={(data, index) => interactive && setHoverIndex(index)}
         >
           {data.map((entry, index) => (
             <Cell 
               key={`cell-${index}`}
-              fillOpacity={activeIndex !== undefined ? (index === activeIndex ? 1 : 0.4) : 1} 
+              fillOpacity={interactive && activeIndex !== null ? (index === activeIndex ? 1 : 0.4) : 1} 
+              className={interactive ? "cursor-pointer transition-all duration-200" : ""}
             />
           ))}
         </Bar>

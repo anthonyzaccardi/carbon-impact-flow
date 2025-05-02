@@ -16,6 +16,7 @@ import { useState } from "react";
 import MiniSparkline from "@/components/charts/MiniSparkline";
 import MiniBarChart from "@/components/charts/MiniBarChart";
 import MiniDonutChart from "@/components/charts/MiniDonutChart";
+import PageLayout from "@/components/layout/PageLayout";
 
 const MeasurementsPage = () => {
   const { measurements, tracks, factors, suppliers, openSidePanel } = useAppContext();
@@ -121,13 +122,17 @@ const MeasurementsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageLayout 
+      title="Measurements" 
+      description="Record activity data and view calculated emissions"
+      breadcrumbItems={[
+        { label: "Dashboard", href: "/" },
+        { label: "Measurements" }
+      ]}
+    >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Measurements</h1>
-          <p className="text-muted-foreground">
-            Record activity data and view calculated emissions
-          </p>
+          <h2 className="text-xl font-medium">Overview</h2>
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
@@ -209,7 +214,7 @@ const MeasurementsPage = () => {
         columns={columns} 
         onRowClick={handleRowClick}
       />
-    </div>
+    </PageLayout>
   );
 };
 

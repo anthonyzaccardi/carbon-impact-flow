@@ -1,3 +1,4 @@
+
 import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
@@ -12,6 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import PageLayout from "@/components/layout/PageLayout";
+import MiniBarChart from "@/components/charts/MiniBarChart";
+import MiniDonutChart from "@/components/charts/MiniDonutChart";
 
 const FactorsPage = () => {
   const { factors, tracks, measurements, openSidePanel } = useAppContext();
@@ -38,6 +42,17 @@ const FactorsPage = () => {
   const getMeasurementsCount = (factorId: string) => {
     return measurements.filter(m => m.factorId === factorId).length;
   };
+  
+  // Sample data for interactive charts
+  const factorsByTrack = tracks.slice(0, 5).map(track => ({
+    name: track.name,
+    value: factors.filter(f => f.trackId === track.id).length
+  }));
+  
+  const factorsByCategory = [...new Set(factors.map(f => f.category))].slice(0, 4).map(category => ({
+    name: category,
+    value: factors.filter(f => f.category === category).length
+  }));
   
   // Table columns
   const columns = [
@@ -85,13 +100,17 @@ const FactorsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageLayout 
+      title="Emission Factors" 
+      description="Manage conversion factors for emission calculations"
+      breadcrumbItems={[
+        { label: "Dashboard", href: "/" },
+        { label: "Emission Factors" }
+      ]}
+    >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Emission Factors</h1>
-          <p className="text-muted-foreground">
-            Manage conversion factors for emission calculations
-          </p>
+          <h2 className="text-xl font-medium">Overview</h2>
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
@@ -104,14 +123,34 @@ const FactorsPage = () => {
         <StatCard 
           title="Total Factors" 
           value={totalFactors}
+          chart={<MiniBarChart 
+            data={factorsByTrack} 
+            showAxis 
+            height={70}
+            color="#8B5CF6"
+            variant="gradient"
+          />}
         />
         <StatCard 
           title="Categories" 
           value={categories}
+          chart={<MiniDonutChart 
+            data={factorsByCategory}
+            height={70}
+            showLegend
+          />}
         />
         <StatCard 
           title="Total Measurements" 
           value={measurements.length}
+          chart={<MiniBarChart 
+            data={Array.from({ length: 6 }, (_, i) => ({
+              name: `Type ${i + 1}`,
+              value: Math.floor(Math.random() * 20) + 5
+            }))} 
+            color="#10B981"
+            height={70}
+          />}
         />
       </div>
       
@@ -150,7 +189,7 @@ const FactorsPage = () => {
         columns={columns} 
         onRowClick={handleRowClick}
       />
-    </div>
+    </PageLayout>
   );
 };
 

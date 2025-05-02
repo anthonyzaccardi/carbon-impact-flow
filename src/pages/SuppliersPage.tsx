@@ -1,3 +1,4 @@
+
 import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
@@ -5,6 +6,7 @@ import StatCard from "@/components/ui/stat-card";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import PageLayout from "@/components/layout/PageLayout";
 
 const SuppliersPage = () => {
   const { suppliers, targets, openSidePanel } = useAppContext();
@@ -69,13 +71,17 @@ const SuppliersPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageLayout 
+      title="Suppliers" 
+      description="Manage organizations in your supply chain"
+      breadcrumbItems={[
+        { label: "Dashboard", href: "/" },
+        { label: "Suppliers" }
+      ]}
+    >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Suppliers</h1>
-          <p className="text-muted-foreground">
-            Manage organizations in your supply chain
-          </p>
+          <h2 className="text-xl font-medium">Overview</h2>
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
@@ -118,7 +124,7 @@ const SuppliersPage = () => {
         columns={columns} 
         onRowClick={handleRowClick}
       />
-    </div>
+    </PageLayout>
   );
 };
 

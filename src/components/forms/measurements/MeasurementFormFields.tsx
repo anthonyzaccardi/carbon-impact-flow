@@ -226,7 +226,7 @@ const MeasurementFormFields = ({
             <FormItem>
               <FormLabel>Unit</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isViewMode} />
+                <Input {...field} disabled={true} readOnly value="tCO₂e" className="bg-muted" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -260,4 +260,3 @@ const MeasurementFormFields = ({
 };
 
 export default MeasurementFormFields;
-

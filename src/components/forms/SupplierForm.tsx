@@ -77,25 +77,26 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       currency: data.currency
     };
 
+    let supplierId = "";
+    
     if (mode === "create") {
       // Create the supplier first, then update targets with the new supplier ID
-      const newSupplierId = createSupplier(formattedData);
+      supplierId = createSupplier(formattedData);
       
       // Attach any pending targets to the newly created supplier
       pendingTargetIds.forEach(targetId => {
         const target = targets.find(t => t.id === targetId);
         if (target) {
-          updateTarget(targetId, { ...target, supplierId: newSupplierId });
+          updateTarget(targetId, { ...target, supplierId: supplierId });
         }
       });
-      
-      return newSupplierId;
     } else if (mode === "edit" && initialData) {
       updateSupplier(initialData.id, formattedData);
-      return initialData.id;
+      supplierId = initialData.id;
     }
     
-    return ""; // Return empty string as default to fix TypeScript error
+    onClose();
+    return supplierId;
   }
 
   return (

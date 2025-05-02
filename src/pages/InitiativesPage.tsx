@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAppContext } from '@/contexts/useAppContext';
 import { Initiative } from '@/types';
@@ -9,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import StatCard from '@/components/ui/stat-card';
+import PageLayout from '@/components/layout/PageLayout';
+import MiniBarChart from '@/components/charts/MiniBarChart';
+import MiniDonutChart from '@/components/charts/MiniDonutChart';
 
 const InitiativesPage = () => {
   const { initiatives, targets, openSidePanel, extractPercentage } = useAppContext();
@@ -23,6 +25,19 @@ const InitiativesPage = () => {
   const activeInitiatives = initiatives.filter(i => i.status === 'in_progress').length;
   const totalSpend = initiatives.reduce((sum, i) => sum + i.spend, 0);
   const totalImpact = initiatives.reduce((sum, i) => sum + i.absolute, 0);
+
+  // Chart data for initiatives
+  const initiativeStatusData = [
+    { name: "Not Started", value: initiatives.filter(i => i.status === 'not_started').length },
+    { name: "In Progress", value: initiatives.filter(i => i.status === 'in_progress').length },
+    { name: "Committed", value: initiatives.filter(i => i.status === 'committed').length },
+    { name: "Completed", value: initiatives.filter(i => i.status === 'completed').length }
+  ];
+  
+  const initiativeImpactData = Array.from({ length: 5 }, (_, i) => ({
+    name: `Q${i+1}`,
+    value: initiatives.slice(i*2, (i+1)*2).reduce((sum, init) => sum + init.absolute, 0)
+  }));
 
   const calculateInitiativeAbsoluteValue = (initiative: Initiative): number => {
     const initiativeTargets = targets.filter(t => initiative.targetIds.includes(t.id));
@@ -129,13 +144,17 @@ const InitiativesPage = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <PageLayout
+      title="Initiatives"
+      description="Manage climate action initiatives and interventions"
+      breadcrumbItems={[
+        { label: "Dashboard", href: "/" },
+        { label: "Initiatives" }
+      ]}
+    >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Initiatives</h1>
-          <p className="text-muted-foreground">
-            Manage climate action initiatives and interventions
-          </p>
+          <h2 className="text-xl font-medium">Overview</h2>
         </div>
         <Button onClick={handleCreateInitiative}>
           <Plus className="mr-2 h-4 w-4" />
@@ -147,19 +166,49 @@ const InitiativesPage = () => {
         <StatCard 
           title="Total Initiatives" 
           value={totalInitiatives}
+          chart={<MiniDonutChart 
+            data={initiativeStatusData} 
+            height={70} 
+          />}
         />
         <StatCard 
           title="Active Initiatives" 
           value={activeInitiatives}
+          chart={<MiniBarChart 
+            data={initiatives.filter(i => i.status === 'in_progress').slice(0, 5).map((i, idx) => ({
+              name: `Init ${idx+1}`,
+              value: i.absolute
+            }))} 
+            height={70}
+            color="#10B981"
+            variant="gradient"  
+          />}
         />
         <StatCard 
           title="Total Spend" 
           value={`${totalSpend.toLocaleString()} USD`}
+          chart={<MiniBarChart 
+            data={initiatives.slice(0, 6).map((i, idx) => ({
+              name: `${idx+1}`,
+              value: i.spend
+            }))}
+            height={70}
+            color="#1EAEDB"
+            showAxis
+            variant="gradient"
+          />}
         />
         <StatCard 
           title="Total Impact" 
           value={`${totalImpact.toFixed(2)} tCO₂e`}
           description="Calculated reduction"
+          chart={<MiniBarChart 
+            data={initiativeImpactData}
+            height={70}
+            showAxis
+            color="#8B5CF6"
+            variant="gradient"
+          />}
         />
       </div>
       
@@ -178,7 +227,7 @@ const InitiativesPage = () => {
         columns={columns}
         onRowClick={handleViewInitiative}
       />
-    </div>
+    </PageLayout>
   );
 };
 

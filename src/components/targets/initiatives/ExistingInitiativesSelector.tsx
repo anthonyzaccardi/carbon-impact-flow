@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Initiative } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface ExistingInitiativesSelectorProps {
   targetId: string;
@@ -16,9 +18,16 @@ export const ExistingInitiativesSelector = ({
 }: ExistingInitiativesSelectorProps) => {
   const { initiatives, addTargetsToInitiative } = useAppContext();
   const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Filter initiatives that are not already attached to this target
   const availableInitiatives = initiatives.filter(i => !i.targetIds.includes(targetId));
+  
+  // Apply search filter
+  const filteredInitiatives = availableInitiatives.filter(i => 
+    i.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    i.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleInitiativeClick = (initiativeId: string) => {
     setSelectedInitiatives(prev => 
@@ -37,13 +46,23 @@ export const ExistingInitiativesSelector = ({
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4">
-        {availableInitiatives.length === 0 ? (
+      <div className="relative mb-4">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search initiatives..."
+          className="pl-8"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      
+      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+        {filteredInitiatives.length === 0 ? (
           <p className="text-muted-foreground text-center p-4">
-            No unattached initiatives available
+            {searchTerm ? "No initiatives match your search" : "No unattached initiatives available"}
           </p>
         ) : (
-          availableInitiatives.map((initiative) => (
+          filteredInitiatives.map((initiative) => (
             <div
               key={initiative.id}
               onClick={() => handleInitiativeClick(initiative.id)}
@@ -56,10 +75,12 @@ export const ExistingInitiativesSelector = ({
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-medium">{initiative.name}</h3>
-                  <p className="text-sm text-muted-foreground">{initiative.description}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{initiative.description}</p>
                 </div>
                 <Badge variant="outline">
-                  {initiative.status.replace('_', ' ')}
+                  {initiative.status === "not_started" ? "Not Started" :
+                   initiative.status === "in_progress" ? "In Progress" :
+                   initiative.status === "committed" ? "Committed" : "Completed"}
                 </Badge>
               </div>
               <div className="mt-2 text-sm text-muted-foreground">
@@ -72,7 +93,7 @@ export const ExistingInitiativesSelector = ({
         )}
       </div>
       
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 pt-2 border-t">
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
