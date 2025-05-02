@@ -91,7 +91,7 @@ const TracksPage = () => {
         </div>
         <Button onClick={handleCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Track
+          Add track
         </Button>
       </div>
       
