@@ -41,7 +41,7 @@ export const TargetsSummary = ({ targets = [] }: TargetsSummaryProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <StatCard 
-        title="Total Targets" 
+        title="Total targets" 
         value={totalTargets}
         chart={<MiniBarChart 
           data={reductionByTargetData.length ? reductionByTargetData : emptyData} 

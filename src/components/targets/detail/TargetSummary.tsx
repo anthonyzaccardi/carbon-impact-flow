@@ -30,7 +30,7 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Target Reduction</p>
+                <p className="text-sm text-muted-foreground">Target reduction</p>
                 <p className="text-lg font-medium">{target.targetPercentage}%</p>
               </div>
               <div>
@@ -38,11 +38,11 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
                 <p className="text-lg font-medium">{target.baselineValue.toLocaleString()} tCO2e</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Target Value</p>
+                <p className="text-sm text-muted-foreground">Target value</p>
                 <p className="text-lg font-medium">{target.targetValue.toLocaleString()} tCO2e</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Target Date</p>
+                <p className="text-sm text-muted-foreground">Target date</p>
                 <p className="text-lg font-medium">{new Date(target.targetDate).toLocaleDateString()}</p>
               </div>
               <div>
@@ -62,7 +62,7 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
       
       <Card>
         <CardHeader>
-          <CardTitle>Initiatives Impact</CardTitle>
+          <CardTitle>Initiatives impact</CardTitle>
           <CardDescription>
             Current initiatives coverage
           </CardDescription>
@@ -97,7 +97,7 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
             </div>
             
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Total Investment</p>
+              <p className="text-sm text-muted-foreground mb-1">Total investment</p>
               <p className="text-2xl font-medium">
                 ${totalSpend.toLocaleString()}
               </p>
