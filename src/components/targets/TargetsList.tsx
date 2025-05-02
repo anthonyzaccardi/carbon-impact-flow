@@ -44,7 +44,7 @@ export const TargetsList = ({ targets, tracks, onRowClick, onRemoveTarget }: Tar
       cell: (target: Target) => `${target.targetPercentage}% reduction`,
     },
     {
-      header: "Target Date",
+      header: "Target date",
       accessorKey: "targetDate",
       cell: (target: Target) => new Date(target.targetDate).toLocaleDateString(),
     },

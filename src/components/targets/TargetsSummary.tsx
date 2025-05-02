@@ -50,7 +50,7 @@ export const TargetsSummary = ({ targets = [] }: TargetsSummaryProps) => {
         />}
       />
       <StatCard 
-        title="Total Baseline" 
+        title="Total baseline" 
         value={`${totalBaseline.toLocaleString()} tCO2e`}
         chart={<MiniSparkline 
           data={targets.length ? targets.slice(0, 6).map((t, idx) => ({
@@ -62,7 +62,7 @@ export const TargetsSummary = ({ targets = [] }: TargetsSummaryProps) => {
         />}
       />
       <StatCard 
-        title="Total Reduction" 
+        title="Total reduction" 
         value={`${totalReduction.toLocaleString()} tCO2e`}
         chart={<ProgressIndicator 
           current={totalReduction} 
@@ -71,7 +71,7 @@ export const TargetsSummary = ({ targets = [] }: TargetsSummaryProps) => {
         />}
       />
       <StatCard 
-        title="Average Reduction" 
+        title="Average reduction" 
         value={`${averageReduction.toFixed(1)}%`}
         chart={<MiniDonutChart 
           data={targetDistributionData.length ? targetDistributionData : emptyData} 
