@@ -84,7 +84,7 @@ const TracksPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold mb-2">Emission Tracks</h1>
+          <h1 className="text-2xl font-semibold mb-2">Tracks</h1>
           <p className="text-muted-foreground">
             Manage emission categories and their statistics
           </p>
