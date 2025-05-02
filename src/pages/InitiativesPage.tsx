@@ -158,7 +158,7 @@ const InitiativesPage = () => {
         </div>
         <Button onClick={handleCreateInitiative}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Initiative
+          Add initiative
         </Button>
       </div>
       
