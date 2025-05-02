@@ -35,7 +35,7 @@ const TargetsPage = () => {
       description="Set and track emission reduction goals"
       breadcrumbItems={[
         { label: "Home", href: "/" },
-        { label: "Targets", icon: <TrendingDown className="h-4 w-4" /> }
+        { label: "Targets" }
       ]}
     >
       <div className="flex justify-between items-center mb-6">
