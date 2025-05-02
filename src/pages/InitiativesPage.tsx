@@ -30,7 +30,6 @@ const InitiativesPage = () => {
   const initiativeStatusData = [
     { name: "Not Started", value: initiatives.filter(i => i.status === 'not_started').length },
     { name: "In Progress", value: initiatives.filter(i => i.status === 'in_progress').length },
-    { name: "Committed", value: initiatives.filter(i => i.status === 'committed').length },
     { name: "Completed", value: initiatives.filter(i => i.status === 'completed').length }
   ];
   
