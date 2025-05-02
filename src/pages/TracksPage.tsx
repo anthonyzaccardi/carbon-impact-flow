@@ -64,7 +64,7 @@ const TracksPage = () => {
       },
     },
     {
-      header: "Total Emissions",
+      header: "Total emissions",
       accessorKey: "totalEmissions",
       cell: (item) => `${item.totalEmissions.toLocaleString()} tCO₂e`,
     }
