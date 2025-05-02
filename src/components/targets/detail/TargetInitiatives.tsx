@@ -107,7 +107,7 @@ export const TargetInitiatives = ({
           <DropdownMenuTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Add Initiative
+              Add initiative
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
