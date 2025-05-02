@@ -65,7 +65,7 @@ const Overview = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          title="Total Tracks" 
+          title="Total tracks" 
           value={tracks.length} 
           description="Active emission tracking categories" 
           icon={<Activity className="h-5 w-5" />}
@@ -74,7 +74,7 @@ const Overview = () => {
         />
 
         <StatCard 
-          title="Active Measurements" 
+          title="Active measurements" 
           value={measurements.length} 
           description="Total recorded measurements" 
           icon={<Calendar className="h-5 w-5" />}
@@ -83,7 +83,7 @@ const Overview = () => {
         />
 
         <StatCard 
-          title="Set Targets" 
+          title="Set targets" 
           value={targets.length} 
           description="Emission reduction targets" 
           icon={<ArrowUp className="h-5 w-5" />}
@@ -96,7 +96,7 @@ const Overview = () => {
         />
 
         <StatCard 
-          title="Ongoing Initiatives" 
+          title="Ongoing initiatives" 
           value={initiatives.length} 
           description="Active reduction programs" 
           icon={<Users className="h-5 w-5" />}
@@ -114,7 +114,7 @@ const Overview = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <StatCard 
-          title="Total Emissions" 
+          title="Total emissions" 
           value={`${totalEmissions.toLocaleString(undefined, {
             maximumFractionDigits: 2
           })} tCO₂e`} 
