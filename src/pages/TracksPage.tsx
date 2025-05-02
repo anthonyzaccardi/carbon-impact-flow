@@ -82,58 +82,58 @@ const TracksPage = () => {
   };
 
   return (
-  <PageLayout
-    title="Tracks"
-    description="Manage emission categories and their statistics"
-    breadcrumbItems={[
-      { label: "Dashboard", href: "/" },
-      { label: "Tracks" }
-    ]}
-  >
-    <div className="flex justify-end mb-6">
-      <Button onClick={handleCreateNew}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add track
-      </Button>
-    </div>
-
-    {/* Stats Overview */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <StatCard 
-        title="Total tracks" 
-        value={totalTracks}
-        chart={<MiniBarChart 
-          data={trackEmissionsData} 
-          height={60} 
-          color="#9b87f5" 
-        />}
+    <PageLayout
+      title="Tracks"
+      description="Manage emission categories and their statistics"
+      breadcrumbItems={[
+        { label: "Dashboard", href: "/" },
+        { label: "Tracks" }
+      ]}
+    >
+      <div className="flex justify-end mb-6">
+        <Button onClick={handleCreateNew}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add track
+        </Button>
+      </div>
+  
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <StatCard 
+          title="Total tracks" 
+          value={totalTracks}
+          chart={<MiniBarChart 
+            data={trackEmissionsData} 
+            height={60} 
+            color="#9b87f5" 
+          />}
+        />
+        <StatCard 
+          title="Total emissions" 
+          value={`${totalEmissions.toLocaleString()} tCO2e`}
+          chart={<MiniDonutChart 
+            data={trackDistributionData.slice(0, 4)} 
+            height={80} 
+          />}
+        />
+        <StatCard 
+          title="Avg. per track" 
+          value={`${averageEmissions.toLocaleString()} tCO2e`}
+          chart={<ProgressIndicator 
+            current={averageEmissions} 
+            target={totalEmissions} 
+            color="#8B5CF6" 
+          />}
+        />
+      </div>
+  
+      {/* Tracks Table */}
+      <DataTable 
+        data={tracks} 
+        columns={columns} 
+        onRowClick={handleRowClick}
       />
-      <StatCard 
-        title="Total emissions" 
-        value={`${totalEmissions.toLocaleString()} tCO2e`}
-        chart={<MiniDonutChart 
-          data={trackDistributionData.slice(0, 4)} 
-          height={80} 
-        />}
-      />
-      <StatCard 
-        title="Avg. per track" 
-        value={`${averageEmissions.toLocaleString()} tCO2e`}
-        chart={<ProgressIndicator 
-          current={averageEmissions} 
-          target={totalEmissions} 
-          color="#8B5CF6" 
-        />}
-      />
-    </div>
-
-    {/* Tracks Table */}
-    <DataTable 
-      data={tracks} 
-      columns={columns} 
-      onRowClick={handleRowClick}
-    />
-  </PageLayout>
+    </PageLayout>
   );
 };
 
