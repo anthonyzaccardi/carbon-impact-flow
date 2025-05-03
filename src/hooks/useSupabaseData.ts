@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchAllData } from '@/services/supabase/dataService';
 import { toast } from 'sonner';
 import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier } from '@/types';
@@ -13,9 +13,12 @@ export function useSupabaseData(
   setScenarios: (scenarios: Scenario[]) => void,
   setSuppliers: (suppliers: Supplier[]) => void,
 ) {
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const loadAllData = async () => {
       try {
+        setLoading(true);
         const {
           tracks,
           factors,
@@ -37,9 +40,13 @@ export function useSupabaseData(
       } catch (error) {
         console.error("Failed to load application data:", error);
         toast.error("Failed to load application data");
+      } finally {
+        setLoading(false);
       }
     };
 
     loadAllData();
   }, [setTracks, setFactors, setMeasurements, setTargets, setInitiatives, setScenarios, setSuppliers]);
+
+  return { loading };
 }

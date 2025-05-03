@@ -88,33 +88,45 @@ export type Database = {
           absolute: number
           budget: number | null
           created_at: string
+          currency: string | null
           description: string | null
+          end_date: string | null
           id: string
           name: string
           plan: string | null
+          start_date: string | null
           status: string
+          trajectory: string | null
           updated_at: string
         }
         Insert: {
           absolute?: number
           budget?: number | null
           created_at?: string
+          currency?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
           name: string
           plan?: string | null
+          start_date?: string | null
           status: string
+          trajectory?: string | null
           updated_at?: string
         }
         Update: {
           absolute?: number
           budget?: number | null
           created_at?: string
+          currency?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
           name?: string
           plan?: string | null
+          start_date?: string | null
           status?: string
+          trajectory?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -247,9 +259,11 @@ export type Database = {
         Row: {
           baseline_value: number
           created_at: string
+          description: string | null
           id: string
           name: string
           scenario_id: string | null
+          status: string | null
           supplier_id: string | null
           target_date: string
           target_percentage: number
@@ -260,9 +274,11 @@ export type Database = {
         Insert: {
           baseline_value: number
           created_at?: string
+          description?: string | null
           id?: string
           name: string
           scenario_id?: string | null
+          status?: string | null
           supplier_id?: string | null
           target_date: string
           target_percentage: number
@@ -273,9 +289,11 @@ export type Database = {
         Update: {
           baseline_value?: number
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
           scenario_id?: string | null
+          status?: string | null
           supplier_id?: string | null
           target_date?: string
           target_percentage?: number

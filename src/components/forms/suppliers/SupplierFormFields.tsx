@@ -3,8 +3,10 @@ import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UseFormReturn } from "react-hook-form";
 
 interface SupplierFormFieldsProps {
+  form: UseFormReturn<any>;
   isViewMode: boolean;
 }
 
@@ -12,15 +14,12 @@ const industries = ["Agriculture", "Construction", "Education", "Energy", "Finan
 const currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY"];
 
 export const SupplierFormFields = ({
+  form,
   isViewMode
 }: SupplierFormFieldsProps) => {
-  const {
-    control
-  } = useFormContext();
-  
   return (
     <>
-      <FormField control={control} name="name" render={({
+      <FormField control={form.control} name="name" render={({
       field
     }) => <FormItem>
             <FormLabel>Company name</FormLabel>
@@ -31,7 +30,7 @@ export const SupplierFormFields = ({
           </FormItem>} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={control} name="industry" render={({
+        <FormField control={form.control} name="industry" render={({
         field
       }) => <FormItem>
               <FormLabel>Industry</FormLabel>
@@ -50,7 +49,7 @@ export const SupplierFormFields = ({
               <FormMessage />
             </FormItem>} />
 
-        <FormField control={control} name="currency" render={({
+        <FormField control={form.control} name="currency" render={({
         field
       }) => <FormItem>
               <FormLabel>Currency</FormLabel>
@@ -71,7 +70,7 @@ export const SupplierFormFields = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={control} name="contactPerson" render={({
+        <FormField control={form.control} name="contactPerson" render={({
         field
       }) => <FormItem>
               <FormLabel>Contact person</FormLabel>
@@ -83,7 +82,7 @@ export const SupplierFormFields = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={control} name="email" render={({
+        <FormField control={form.control} name="email" render={({
         field
       }) => <FormItem>
               <FormLabel>Email</FormLabel>
@@ -93,7 +92,7 @@ export const SupplierFormFields = ({
               <FormMessage />
             </FormItem>} />
 
-        <FormField control={control} name="phone" render={({
+        <FormField control={form.control} name="phone" render={({
         field
       }) => <FormItem>
               <FormLabel>Phone</FormLabel>

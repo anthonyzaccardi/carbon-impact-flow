@@ -1,63 +1,46 @@
 
 import { Target } from "@/types";
-import { LinkedTargetsList } from "./linked-targets/LinkedTargetsList";
-import { TargetSelectionTable } from "./linked-targets/TargetSelectionTable";
-import { useLinkedTargets } from "./linked-targets/useLinkedTargets";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface LinkedTargetsProps {
+export interface LinkedTargetsProps {
+  supplierId: string;
   targets: Target[];
-  supplierId?: string;
-  isViewMode: boolean;
-  pendingTargetIds?: string[];
-  setPendingTargetIds?: (ids: string[]) => void;
+  isViewMode?: boolean;
 }
 
-export const LinkedTargets = ({ 
-  targets, 
-  supplierId, 
-  isViewMode,
-  pendingTargetIds = [],
-  setPendingTargetIds = () => {}
+export const LinkedTargets = ({
+  supplierId,
+  targets,
+  isViewMode = true
 }: LinkedTargetsProps) => {
-  const {
-    displayTargets,
-    availableTargets,
-    selectedTargetIds,
-    handleSelect,
-    handleSaveSelection,
-    handleDetachTarget,
-    isPending,
-    isLinkedOrPending,
-    getTrackName,
-    formatDate
-  } = useLinkedTargets({
-    supplierId,
-    pendingTargetIds,
-    setPendingTargetIds
-  });
+  if (targets.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Linked Targets</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">No targets linked to this supplier</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      <LinkedTargetsList
-        targets={displayTargets}
-        supplierId={supplierId}
-        isViewMode={isViewMode}
-        pendingTargetIds={pendingTargetIds}
-        onDetachTarget={handleDetachTarget}
-        isPending={isPending}
-      />
-
-      {!isViewMode && availableTargets.length > 0 && (
-        <TargetSelectionTable
-          availableTargets={availableTargets}
-          selectedTargetIds={selectedTargetIds}
-          isLinkedOrPending={isLinkedOrPending}
-          onSelect={handleSelect}
-          onSaveSelection={handleSaveSelection}
-          getTrackName={getTrackName}
-          formatDate={formatDate}
-        />
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Linked Targets</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2">
+          {targets.map(target => (
+            <li key={target.id} className="p-2 bg-accent/30 rounded-md">
+              <div className="font-medium">{target.name}</div>
+              <div className="text-sm text-muted-foreground">{target.targetPercentage}% reduction by {new Date(target.targetDate).toLocaleDateString()}</div>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 };

@@ -91,7 +91,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         {isViewMode && initialData && (
           <LinkedTargets 
             supplierId={initialData.id}
-            targets={relatedTargets} 
+            targets={relatedTargets}
+            isViewMode={true} 
           />
         )}
 

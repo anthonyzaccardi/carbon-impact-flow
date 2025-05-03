@@ -1,69 +1,78 @@
+
 import { supabase } from "@/integrations/supabase/client";
-import { Initiative, InitiativeStatus, PlanType } from "@/types";
+import { Initiative } from "@/types";
 import { toast } from "sonner";
 
 export async function fetchInitiatives(): Promise<Initiative[]> {
-  const { data, error } = await supabase
+  // First, get all initiatives
+  const { data: initiatives, error: initiativesError } = await supabase
     .from('initiatives')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching initiatives:', error);
+  if (initiativesError) {
+    console.error('Error fetching initiatives:', initiativesError);
     toast.error('Failed to load initiatives');
     return [];
   }
 
-  // Get target associations for all initiatives
+  // Then, get all initiative-target associations
   const { data: initiativeTargets, error: targetsError } = await supabase
     .from('initiative_targets')
     .select('*');
 
   if (targetsError) {
     console.error('Error fetching initiative targets:', targetsError);
+    toast.error('Failed to load initiative target relationships');
+    return [];
   }
 
-  // Create a map of initiative ID to target IDs
-  const initiativeTargetsMap: Record<string, string[]> = {};
-  if (initiativeTargets) {
-    initiativeTargets.forEach(it => {
-      if (!initiativeTargetsMap[it.initiative_id]) {
-        initiativeTargetsMap[it.initiative_id] = [];
-      }
-      initiativeTargetsMap[it.initiative_id].push(it.target_id);
-    });
-  }
+  // Map the data to the frontend model
+  return initiatives ? initiatives.map(i => {
+    // Find all target IDs associated with this initiative
+    const targetIds = initiativeTargets
+      ? initiativeTargets
+          .filter(it => it.initiative_id === i.id)
+          .map(it => it.target_id)
+      : [];
 
-  return data ? data.map(i => ({
-    id: i.id,
-    name: i.name,
-    description: i.description || '',
-    startDate: new Date().toISOString(), // Default value as it's missing in the DB
-    endDate: new Date().toISOString(),   // Default value as it's missing in the DB
-    status: i.status as InitiativeStatus,
-    spend: i.budget || 0,
-    trajectory: 'linear', // Default value as it's missing in the DB
-    plan: (i.plan || '-5%') as PlanType,
-    absolute: i.absolute,
-    currency: 'USD', // Default value as it's missing in the DB
-    targetIds: initiativeTargetsMap[i.id] || [],
-    createdAt: i.created_at,
-    updatedAt: i.updated_at
-  })) : [];
+    return {
+      id: i.id,
+      name: i.name,
+      description: i.description || '',
+      startDate: i.start_date || new Date().toISOString(),
+      endDate: i.end_date || new Date().toISOString(),
+      status: i.status,
+      spend: i.budget || 0,
+      trajectory: i.trajectory || 'linear',
+      plan: i.plan || '-5%',
+      absolute: i.absolute,
+      targetIds: targetIds,
+      currency: i.currency || 'USD',
+      createdAt: i.created_at,
+      updatedAt: i.updated_at
+    };
+  }) : [];
 }
 
-export async function createInitiative(initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt'>): Promise<Initiative | null> {
+export async function createInitiative(
+  initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'absolute'> & { targetIds: string[] }
+): Promise<Initiative | null> {
+  // Format the initiative data for the database
   const newInitiative = {
     name: initiative.name,
     description: initiative.description,
     status: initiative.status,
     plan: initiative.plan,
     budget: initiative.spend,
-    absolute: initiative.absolute,
-    // These fields are missing in our DB schema, but required by our types
-    // We'll need to modify the schema later if needed
+    absolute: 0, // This will be calculated based on targets
+    start_date: initiative.startDate,
+    end_date: initiative.endDate,
+    trajectory: initiative.trajectory,
+    currency: initiative.currency
   };
 
+  // Insert the initiative
   const { data, error } = await supabase
     .from('initiatives')
     .insert([newInitiative])
@@ -76,8 +85,8 @@ export async function createInitiative(initiative: Omit<Initiative, 'id' | 'crea
     return null;
   }
 
-  // Associate targets if provided
-  if (initiative.targetIds && initiative.targetIds.length > 0) {
+  // Associate targets if there are any
+  if (initiative.targetIds.length > 0) {
     const initiativeTargets = initiative.targetIds.map(targetId => ({
       initiative_id: data.id,
       target_id: targetId
@@ -89,39 +98,50 @@ export async function createInitiative(initiative: Omit<Initiative, 'id' | 'crea
 
     if (targetsError) {
       console.error('Error associating targets with initiative:', targetsError);
-      toast.error('Created initiative but failed to associate targets');
+      toast.error(`Failed to associate targets with initiative: ${targetsError.message}`);
+      // We don't return null here because the initiative was created successfully,
+      // we just couldn't associate all targets
     }
   }
 
+  // Return the created initiative with the associated target IDs
   return {
     id: data.id,
     name: data.name,
     description: data.description || '',
-    startDate: new Date().toISOString(), // Default value as it's missing in the DB
-    endDate: new Date().toISOString(),   // Default value as it's missing in the DB
-    status: data.status as InitiativeStatus,
+    startDate: data.start_date || new Date().toISOString(),
+    endDate: data.end_date || new Date().toISOString(),
+    status: data.status,
     spend: data.budget || 0,
-    trajectory: 'linear', // Default value as it's missing in the DB
-    plan: (data.plan || '-5%') as PlanType,
+    trajectory: data.trajectory || 'linear',
+    plan: data.plan || '-5%',
     absolute: data.absolute,
-    currency: 'USD', // Default value as it's missing in the DB
-    targetIds: initiative.targetIds || [],
+    targetIds: initiative.targetIds,
+    currency: data.currency || 'USD',
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };
 }
 
-export async function updateInitiative(id: string, initiative: Partial<Initiative>): Promise<Initiative | null> {
-  const updates = {
-    ...(initiative.name && { name: initiative.name }),
-    ...(initiative.description !== undefined && { description: initiative.description }),
-    ...(initiative.status && { status: initiative.status }),
-    ...(initiative.plan && { plan: initiative.plan }),
-    ...(initiative.spend !== undefined && { budget: initiative.spend }),
-    ...(initiative.absolute !== undefined && { absolute: initiative.absolute })
-    // The missing fields will need schema modifications
-  };
+export async function updateInitiative(
+  id: string, 
+  initiative: Partial<Initiative>
+): Promise<Initiative | null> {
+  // Prepare the updates for the database
+  const updates: any = {};
+  
+  if (initiative.name !== undefined) updates.name = initiative.name;
+  if (initiative.description !== undefined) updates.description = initiative.description;
+  if (initiative.status !== undefined) updates.status = initiative.status;
+  if (initiative.plan !== undefined) updates.plan = initiative.plan;
+  if (initiative.spend !== undefined) updates.budget = initiative.spend;
+  if (initiative.absolute !== undefined) updates.absolute = initiative.absolute;
+  if (initiative.startDate !== undefined) updates.start_date = initiative.startDate;
+  if (initiative.endDate !== undefined) updates.end_date = initiative.endDate;
+  if (initiative.trajectory !== undefined) updates.trajectory = initiative.trajectory;
+  if (initiative.currency !== undefined) updates.currency = initiative.currency;
 
+  // Update the initiative
   const { data, error } = await supabase
     .from('initiatives')
     .update(updates)
@@ -135,20 +155,19 @@ export async function updateInitiative(id: string, initiative: Partial<Initiativ
     return null;
   }
 
-  // If targetIds are being updated, update the junction table
-  if (initiative.targetIds) {
-    // First delete all existing associations
+  // If targetIds are provided, update the initiative-target associations
+  if (initiative.targetIds !== undefined) {
+    // First, remove all existing associations
     const { error: deleteError } = await supabase
       .from('initiative_targets')
       .delete()
       .eq('initiative_id', id);
 
     if (deleteError) {
-      console.error('Error removing existing target associations:', deleteError);
-    }
-
-    // Then add the new ones
-    if (initiative.targetIds.length > 0) {
+      console.error('Error removing initiative target associations:', deleteError);
+      toast.error(`Failed to update initiative targets: ${deleteError.message}`);
+    } else if (initiative.targetIds.length > 0) {
+      // Then, add the new associations
       const initiativeTargets = initiative.targetIds.map(targetId => ({
         initiative_id: id,
         target_id: targetId
@@ -159,48 +178,42 @@ export async function updateInitiative(id: string, initiative: Partial<Initiativ
         .insert(initiativeTargets);
 
       if (insertError) {
-        console.error('Error adding new target associations:', insertError);
-        toast.error('Updated initiative but failed to update target associations');
+        console.error('Error adding initiative target associations:', insertError);
+        toast.error(`Failed to update initiative targets: ${insertError.message}`);
       }
     }
   }
 
-  // Need to fetch the current target associations
+  // Get the current target IDs for this initiative
   const { data: initiativeTargets } = await supabase
     .from('initiative_targets')
     .select('target_id')
     .eq('initiative_id', id);
 
+  const targetIds = initiativeTargets ? initiativeTargets.map(it => it.target_id) : [];
+
+  // Return the updated initiative
   return {
     id: data.id,
     name: data.name,
     description: data.description || '',
-    startDate: new Date().toISOString(), // Default value as it's missing in the DB
-    endDate: new Date().toISOString(),   // Default value as it's missing in the DB
-    status: data.status as InitiativeStatus,
+    startDate: data.start_date || new Date().toISOString(),
+    endDate: data.end_date || new Date().toISOString(),
+    status: data.status,
     spend: data.budget || 0,
-    trajectory: 'linear', // Default value as it's missing in the DB
-    plan: (data.plan || '-5%') as PlanType,
+    trajectory: data.trajectory || 'linear',
+    plan: data.plan || '-5%',
     absolute: data.absolute,
-    currency: 'USD', // Default value as it's missing in the DB
-    targetIds: initiativeTargets ? initiativeTargets.map(it => it.target_id) : [],
+    targetIds: targetIds,
+    currency: data.currency || 'USD',
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };
 }
 
 export async function deleteInitiative(id: string): Promise<boolean> {
-  // Delete from junction table first (cascade should handle this, but being explicit)
-  const { error: junctionError } = await supabase
-    .from('initiative_targets')
-    .delete()
-    .eq('initiative_id', id);
-
-  if (junctionError) {
-    console.error('Error deleting initiative associations:', junctionError);
-  }
-
-  // Delete the initiative
+  // The initiative_targets associations will be automatically removed
+  // due to the ON DELETE CASCADE constraint
   const { error } = await supabase
     .from('initiatives')
     .delete()
@@ -215,7 +228,11 @@ export async function deleteInitiative(id: string): Promise<boolean> {
   return true;
 }
 
-export async function addTargetsToInitiative(initiativeId: string, targetIds: string[]): Promise<boolean> {
+export async function addTargetsToInitiative(
+  initiativeId: string, 
+  targetIds: string[]
+): Promise<boolean> {
+  // Create association records
   const initiativeTargets = targetIds.map(targetId => ({
     initiative_id: initiativeId,
     target_id: targetId
@@ -227,14 +244,17 @@ export async function addTargetsToInitiative(initiativeId: string, targetIds: st
 
   if (error) {
     console.error('Error adding targets to initiative:', error);
-    toast.error(`Failed to associate targets: ${error.message}`);
+    toast.error(`Failed to add targets to initiative: ${error.message}`);
     return false;
   }
 
   return true;
 }
 
-export async function removeTargetFromInitiative(initiativeId: string, targetId: string): Promise<boolean> {
+export async function removeTargetFromInitiative(
+  initiativeId: string,
+  targetId: string
+): Promise<boolean> {
   const { error } = await supabase
     .from('initiative_targets')
     .delete()
@@ -243,7 +263,7 @@ export async function removeTargetFromInitiative(initiativeId: string, targetId:
 
   if (error) {
     console.error('Error removing target from initiative:', error);
-    toast.error(`Failed to remove target association: ${error.message}`);
+    toast.error(`Failed to remove target from initiative: ${error.message}`);
     return false;
   }
 

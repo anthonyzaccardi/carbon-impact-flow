@@ -14,24 +14,24 @@ export const useInitiativeCrud = (
   targets: Target[],
   extractPercentage: (plan: string) => number
 ) => {
-  const createInitiative = (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'absolute' | 'targetIds'> & { targetIds?: string[] }) => {
-    createInitiativeOperation(initiatives, setInitiatives, targets, extractPercentage, initiative);
+  const createInitiative = async (initiative: Omit<Initiative, 'id' | 'createdAt' | 'updatedAt' | 'absolute' | 'targetIds'> & { targetIds?: string[] }) => {
+    return createInitiativeOperation(initiatives, setInitiatives, targets, extractPercentage, initiative);
   };
 
-  const updateInitiative = (id: string, initiative: Partial<Initiative>) => {
-    updateInitiativeOperation(initiatives, setInitiatives, targets, extractPercentage, id, initiative);
+  const updateInitiative = async (id: string, initiative: Partial<Initiative>) => {
+    return updateInitiativeOperation(initiatives, setInitiatives, targets, extractPercentage, id, initiative);
   };
 
-  const deleteInitiative = (id: string) => {
-    deleteInitiativeOperation(initiatives, setInitiatives, id);
+  const deleteInitiative = async (id: string) => {
+    return deleteInitiativeOperation(initiatives, setInitiatives, id);
   };
 
-  const addTargetsToInitiative = (initiativeId: string, targetIds: string[]) => {
-    addTargetsToInitiativeOperation(initiatives, setInitiatives, initiativeId, targetIds);
+  const addTargetsToInitiative = async (initiativeId: string, targetIds: string[]) => {
+    return addTargetsToInitiativeOperation(initiatives, setInitiatives, initiativeId, targetIds);
   };
 
-  const removeTargetFromInitiative = (initiativeId: string, targetId: string) => {
-    removeTargetFromInitiativeOperation(initiatives, setInitiatives, initiativeId, targetId);
+  const removeTargetFromInitiative = async (initiativeId: string, targetId: string) => {
+    return removeTargetFromInitiativeOperation(initiatives, setInitiatives, initiativeId, targetId);
   };
 
   return {
