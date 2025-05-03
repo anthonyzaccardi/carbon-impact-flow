@@ -2,15 +2,16 @@
 import { useEffect } from 'react';
 import { fetchAllData } from '@/services/supabase/dataService';
 import { toast } from 'sonner';
+import { Track, Factor, Measurement, Target, Initiative, Scenario, Supplier } from '@/types';
 
 export function useSupabaseData(
-  setTracks: (tracks: any[]) => void,
-  setFactors: (factors: any[]) => void,
-  setMeasurements: (measurements: any[]) => void,
-  setTargets: (targets: any[]) => void,
-  setInitiatives: (initiatives: any[]) => void,
-  setScenarios: (scenarios: any[]) => void,
-  setSuppliers: (suppliers: any[]) => void,
+  setTracks: (tracks: Track[]) => void,
+  setFactors: (factors: Factor[]) => void,
+  setMeasurements: (measurements: Measurement[]) => void,
+  setTargets: (targets: Target[]) => void,
+  setInitiatives: (initiatives: Initiative[]) => void,
+  setScenarios: (scenarios: Scenario[]) => void,
+  setSuppliers: (suppliers: Supplier[]) => void,
 ) {
   useEffect(() => {
     const loadAllData = async () => {

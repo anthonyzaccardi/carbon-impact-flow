@@ -14,33 +14,16 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const TracksPage = () => {
-  const { tracks, openSidePanel, getTrackStats, setTracks } = useAppContext();
+  const { tracks, openSidePanel, getTrackStats } = useAppContext();
   const [loading, setLoading] = useState(true);
   
-  // Fetch tracks from Supabase
+  // Fetch tracks from Supabase handled via useSupabaseData hook now
   useEffect(() => {
-    const fetchTracks = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('tracks')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
-        
-        if (data) {
-          setTracks(data);
-        }
-      } catch (error) {
-        console.error('Error fetching tracks:', error);
-        toast.error('Failed to load tracks');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchTracks();
-  }, [setTracks]);
+    // Set loading to false once initial data is loaded
+    if (tracks.length > 0) {
+      setLoading(false);
+    }
+  }, [tracks]);
   
   // Metrics
   const totalTracks = tracks.length;
@@ -162,7 +145,7 @@ const TracksPage = () => {
         data={tracks} 
         columns={columns} 
         onRowClick={handleRowClick}
-        isLoading={loading}
+        /* Remove isLoading prop as it's not in the component props */
       />
     </PageLayout>
   );

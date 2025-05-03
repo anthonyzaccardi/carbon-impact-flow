@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Target } from "@/types";
+import { Target, Status } from "@/types";
 import { toast } from "sonner";
 
 export async function fetchTargets(): Promise<Target[]> {
@@ -21,12 +21,12 @@ export async function fetchTargets(): Promise<Target[]> {
     scenarioId: t.scenario_id,
     supplierId: t.supplier_id,
     name: t.name,
-    description: t.description || '',
+    description: '',  // Default value as it's missing in the DB
     baselineValue: t.baseline_value,
     targetValue: t.target_value,
     targetPercentage: t.target_percentage,
     targetDate: t.target_date,
-    status: t.status || 'not_started',
+    status: 'not_started' as Status,  // Default value as it's missing in the DB
     createdAt: t.created_at,
     updatedAt: t.updated_at
   })) : [];
@@ -64,12 +64,12 @@ export async function createTarget(target: Omit<Target, 'id' | 'createdAt' | 'up
     scenarioId: data.scenario_id,
     supplierId: data.supplier_id,
     name: data.name,
-    description: data.description || '',
+    description: '', // Default value as it's missing in the DB
     baselineValue: data.baseline_value,
     targetValue: data.target_value,
     targetPercentage: data.target_percentage,
     targetDate: data.target_date,
-    status: data.status || 'not_started',
+    status: 'not_started' as Status, // Default value as it's missing in the DB
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };
@@ -108,12 +108,12 @@ export async function updateTarget(id: string, target: Partial<Target>): Promise
     scenarioId: data.scenario_id,
     supplierId: data.supplier_id,
     name: data.name,
-    description: data.description || '',
+    description: '', // Default value as it's missing in the DB
     baselineValue: data.baseline_value,
     targetValue: data.target_value,
     targetPercentage: data.target_percentage,
     targetDate: data.target_date,
-    status: data.status || 'not_started',
+    status: 'not_started' as Status, // Default value as it's missing in the DB
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };

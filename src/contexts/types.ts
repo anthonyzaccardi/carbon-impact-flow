@@ -15,6 +15,15 @@ export interface AppContextType {
   sidePanel: SidePanel;
   sidebarExpanded: boolean;
   
+  // Data setter functions for Supabase integration
+  setTracks: (tracks: Track[]) => void;
+  setFactors: (factors: Factor[]) => void;
+  setMeasurements: (measurements: Measurement[]) => void;
+  setTargets: (targets: Target[]) => void;
+  setInitiatives: (initiatives: Initiative[]) => void;
+  setScenarios: (scenarios: Scenario[]) => void;
+  setSuppliers: (suppliers: Supplier[]) => void;
+  
   // Actions
   openSidePanel: (type: 'create' | 'edit' | 'view', entityType: SidePanel['entityType'], data?: any) => void;
   closeSidePanel: () => void;

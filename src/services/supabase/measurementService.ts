@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Measurement } from "@/types";
+import { Measurement, MeasurementStatus } from "@/types";
 import { toast } from "sonner";
 
 export async function fetchMeasurements(): Promise<Measurement[]> {
@@ -24,7 +24,7 @@ export async function fetchMeasurements(): Promise<Measurement[]> {
     quantity: m.quantity,
     unit: m.unit,
     calculatedValue: m.calculated_value,
-    status: m.status,
+    status: m.status as MeasurementStatus, // Type assertion to ensure compatibility
     notes: m.notes,
     createdAt: m.created_at,
     updatedAt: m.updated_at
@@ -65,7 +65,7 @@ export async function createMeasurement(measurement: Omit<Measurement, 'id' | 'c
     quantity: data.quantity,
     unit: data.unit,
     calculatedValue: data.calculated_value,
-    status: data.status,
+    status: data.status as MeasurementStatus, // Type assertion to ensure compatibility
     notes: data.notes,
     createdAt: data.created_at,
     updatedAt: data.updated_at
@@ -76,7 +76,7 @@ export async function updateMeasurement(id: string, measurement: Partial<Measure
   const updates = {
     ...(measurement.trackId && { track_id: measurement.trackId }),
     ...(measurement.factorId && { factor_id: measurement.factorId }),
-    ...(measurement.supplierId && { supplier_id: measurement.supplierId }),
+    ...(measurement.supplierId !== undefined && { supplier_id: measurement.supplierId }),
     ...(measurement.date && { date: measurement.date }),
     ...(measurement.quantity !== undefined && { quantity: measurement.quantity }),
     ...(measurement.unit && { unit: measurement.unit }),
@@ -107,7 +107,7 @@ export async function updateMeasurement(id: string, measurement: Partial<Measure
     quantity: data.quantity,
     unit: data.unit,
     calculatedValue: data.calculated_value,
-    status: data.status,
+    status: data.status as MeasurementStatus, // Type assertion to ensure compatibility
     notes: data.notes,
     createdAt: data.created_at,
     updatedAt: data.updated_at

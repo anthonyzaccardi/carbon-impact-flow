@@ -1,7 +1,4 @@
 
-// The specific error is in this file - showing createSupplier returning void rather than a string.
-// I need to update the component to correctly handle the Supabase integration.
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,7 +58,6 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   const onSubmit = async (data: SupplierFormValues) => {
     try {
       if (mode === "create") {
-        // Fix: Make sure createSupplier returns a string (ID) or we handle void properly
         await createSupplier({
           name: data.name,
           industry: data.industry,
@@ -87,10 +83,16 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <SupplierFormFields form={form} isViewMode={isViewMode} />
+        <SupplierFormFields 
+          form={form} 
+          isViewMode={isViewMode} 
+        />
 
         {isViewMode && initialData && (
-          <LinkedTargets supplier={initialData} targets={relatedTargets} />
+          <LinkedTargets 
+            supplierId={initialData.id}
+            targets={relatedTargets} 
+          />
         )}
 
         <div className="flex justify-end space-x-2">

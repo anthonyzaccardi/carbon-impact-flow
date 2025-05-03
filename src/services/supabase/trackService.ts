@@ -15,7 +15,14 @@ export async function fetchTracks(): Promise<Track[]> {
     return [];
   }
 
-  return data || [];
+  return data ? data.map(track => ({
+    id: track.id,
+    name: track.name,
+    emoji: track.emoji,
+    totalEmissions: track.total_emissions,
+    createdAt: track.created_at,
+    updatedAt: track.updated_at
+  })) : [];
 }
 
 export async function createTrack(track: Omit<Track, 'id' | 'createdAt' | 'updatedAt' | 'totalEmissions'>): Promise<Track | null> {

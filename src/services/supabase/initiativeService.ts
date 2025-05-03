@@ -1,6 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Initiative } from "@/types";
+import { Initiative, InitiativeStatus, PlanType } from "@/types";
 import { toast } from "sonner";
 
 export async function fetchInitiatives(): Promise<Initiative[]> {
@@ -39,14 +38,14 @@ export async function fetchInitiatives(): Promise<Initiative[]> {
     id: i.id,
     name: i.name,
     description: i.description || '',
-    startDate: i.start_date || new Date().toISOString(),
-    endDate: i.end_date || new Date().toISOString(),
-    status: i.status,
+    startDate: new Date().toISOString(), // Default value as it's missing in the DB
+    endDate: new Date().toISOString(),   // Default value as it's missing in the DB
+    status: i.status as InitiativeStatus,
     spend: i.budget || 0,
-    trajectory: i.trajectory || 'linear',
-    plan: i.plan || '-5%',
+    trajectory: 'linear', // Default value as it's missing in the DB
+    plan: (i.plan || '-5%') as PlanType,
     absolute: i.absolute,
-    currency: i.currency || 'USD',
+    currency: 'USD', // Default value as it's missing in the DB
     targetIds: initiativeTargetsMap[i.id] || [],
     createdAt: i.created_at,
     updatedAt: i.updated_at
@@ -61,10 +60,8 @@ export async function createInitiative(initiative: Omit<Initiative, 'id' | 'crea
     plan: initiative.plan,
     budget: initiative.spend,
     absolute: initiative.absolute,
-    start_date: initiative.startDate,
-    end_date: initiative.endDate,
-    trajectory: initiative.trajectory,
-    currency: initiative.currency
+    // These fields are missing in our DB schema, but required by our types
+    // We'll need to modify the schema later if needed
   };
 
   const { data, error } = await supabase
@@ -100,14 +97,14 @@ export async function createInitiative(initiative: Omit<Initiative, 'id' | 'crea
     id: data.id,
     name: data.name,
     description: data.description || '',
-    startDate: data.start_date || new Date().toISOString(),
-    endDate: data.end_date || new Date().toISOString(),
-    status: data.status,
+    startDate: new Date().toISOString(), // Default value as it's missing in the DB
+    endDate: new Date().toISOString(),   // Default value as it's missing in the DB
+    status: data.status as InitiativeStatus,
     spend: data.budget || 0,
-    trajectory: data.trajectory || 'linear',
-    plan: data.plan || '-5%',
+    trajectory: 'linear', // Default value as it's missing in the DB
+    plan: (data.plan || '-5%') as PlanType,
     absolute: data.absolute,
-    currency: data.currency || 'USD',
+    currency: 'USD', // Default value as it's missing in the DB
     targetIds: initiative.targetIds || [],
     createdAt: data.created_at,
     updatedAt: data.updated_at
@@ -121,11 +118,8 @@ export async function updateInitiative(id: string, initiative: Partial<Initiativ
     ...(initiative.status && { status: initiative.status }),
     ...(initiative.plan && { plan: initiative.plan }),
     ...(initiative.spend !== undefined && { budget: initiative.spend }),
-    ...(initiative.absolute !== undefined && { absolute: initiative.absolute }),
-    ...(initiative.startDate && { start_date: initiative.startDate }),
-    ...(initiative.endDate && { end_date: initiative.endDate }),
-    ...(initiative.trajectory && { trajectory: initiative.trajectory }),
-    ...(initiative.currency && { currency: initiative.currency })
+    ...(initiative.absolute !== undefined && { absolute: initiative.absolute })
+    // The missing fields will need schema modifications
   };
 
   const { data, error } = await supabase
@@ -181,14 +175,14 @@ export async function updateInitiative(id: string, initiative: Partial<Initiativ
     id: data.id,
     name: data.name,
     description: data.description || '',
-    startDate: data.start_date || new Date().toISOString(),
-    endDate: data.end_date || new Date().toISOString(),
-    status: data.status,
+    startDate: new Date().toISOString(), // Default value as it's missing in the DB
+    endDate: new Date().toISOString(),   // Default value as it's missing in the DB
+    status: data.status as InitiativeStatus,
     spend: data.budget || 0,
-    trajectory: data.trajectory || 'linear',
-    plan: data.plan || '-5%',
+    trajectory: 'linear', // Default value as it's missing in the DB
+    plan: (data.plan || '-5%') as PlanType,
     absolute: data.absolute,
-    currency: data.currency || 'USD',
+    currency: 'USD', // Default value as it's missing in the DB
     targetIds: initiativeTargets ? initiativeTargets.map(it => it.target_id) : [],
     createdAt: data.created_at,
     updatedAt: data.updated_at
