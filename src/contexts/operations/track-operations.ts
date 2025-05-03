@@ -2,36 +2,59 @@
 import { toast } from 'sonner';
 import { Track, Factor, Measurement, Target } from '@/types';
 import { generateId, getCurrentTimestamp } from '../utils';
+import { 
+  createTrack as createTrackInSupabase,
+  updateTrack as updateTrackInSupabase,
+  deleteTrack as deleteTrackInSupabase
+} from '@/services/supabase/trackService';
 
-export const createTrackOperation = (
+export const createTrackOperation = async (
   tracks: Track[],
   setTracks: (tracks: Track[]) => void,
   track: Omit<Track, 'id' | 'createdAt' | 'updatedAt' | 'totalEmissions'>
 ) => {
-  const newTrack: Track = {
-    ...track,
-    totalEmissions: 0,
-    id: generateId('track'),
-    createdAt: getCurrentTimestamp(),
-    updatedAt: getCurrentTimestamp()
-  };
-  setTracks([...tracks, newTrack]);
-  toast.success(`Created track: ${track.name}`);
+  try {
+    // Create the track in Supabase
+    const newTrack = await createTrackInSupabase(track);
+    
+    if (newTrack) {
+      // Update local state
+      setTracks([...tracks, newTrack]);
+      toast.success(`Created track: ${track.name}`);
+      return newTrack.id;
+    }
+    return "";
+  } catch (error) {
+    console.error('Error in createTrackOperation:', error);
+    toast.error('Failed to create track');
+    return "";
+  }
 };
 
-export const updateTrackOperation = (
+export const updateTrackOperation = async (
   tracks: Track[],
   setTracks: (tracks: Track[]) => void,
   id: string,
-  track: Partial<Track>
+  trackUpdates: Partial<Track>
 ) => {
-  setTracks(tracks.map(t => 
-    t.id === id ? { ...t, ...track, updatedAt: getCurrentTimestamp() } : t
-  ));
-  toast.success(`Updated track: ${track.name || id}`);
+  try {
+    // Update the track in Supabase
+    const updatedTrack = await updateTrackInSupabase(id, trackUpdates);
+    
+    if (updatedTrack) {
+      // Update local state
+      setTracks(tracks.map(t => 
+        t.id === id ? { ...t, ...trackUpdates, updatedAt: getCurrentTimestamp() } : t
+      ));
+      toast.success(`Updated track: ${trackUpdates.name || id}`);
+    }
+  } catch (error) {
+    console.error('Error in updateTrackOperation:', error);
+    toast.error('Failed to update track');
+  }
 };
 
-export const deleteTrackOperation = (
+export const deleteTrackOperation = async (
   tracks: Track[],
   factors: Factor[],
   measurements: Measurement[],
@@ -39,6 +62,7 @@ export const deleteTrackOperation = (
   setTracks: (tracks: Track[]) => void,
   id: string
 ) => {
+  // Check if track has related records before delete
   const hasFactors = factors.some(f => f.trackId === id);
   const hasMeasurements = measurements.some(m => m.trackId === id);
   const hasTargets = targets.some(t => t.trackId === id);
@@ -48,6 +72,17 @@ export const deleteTrackOperation = (
     return;
   }
   
-  setTracks(tracks.filter(t => t.id !== id));
-  toast.success(`Deleted track: ${id}`);
+  try {
+    // Delete from Supabase
+    const success = await deleteTrackInSupabase(id);
+    
+    if (success) {
+      // Update local state
+      setTracks(tracks.filter(t => t.id !== id));
+      toast.success(`Deleted track`);
+    }
+  } catch (error) {
+    console.error('Error in deleteTrackOperation:', error);
+    toast.error('Failed to delete track');
+  }
 };

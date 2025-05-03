@@ -1,4 +1,5 @@
 
+import { useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
@@ -8,9 +9,38 @@ import MiniBarChart from "@/components/charts/MiniBarChart";
 import MiniDonutChart from "@/components/charts/MiniDonutChart";
 import ProgressIndicator from "@/components/charts/ProgressIndicator";
 import PageLayout from "@/components/layout/PageLayout";
+import { Track } from "@/types";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const TracksPage = () => {
-  const { tracks, openSidePanel, getTrackStats } = useAppContext();
+  const { tracks, openSidePanel, getTrackStats, setTracks } = useAppContext();
+  const [loading, setLoading] = useState(true);
+  
+  // Fetch tracks from Supabase
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tracks')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+        
+        if (data) {
+          setTracks(data);
+        }
+      } catch (error) {
+        console.error('Error fetching tracks:', error);
+        toast.error('Failed to load tracks');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTracks();
+  }, [setTracks]);
   
   // Metrics
   const totalTracks = tracks.length;
@@ -72,7 +102,7 @@ const TracksPage = () => {
   ];
 
   // Handle row click
-  const handleRowClick = (track) => {
+  const handleRowClick = (track: Track) => {
     openSidePanel('view', 'track', track);
   };
   
@@ -101,7 +131,7 @@ const TracksPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard 
           title="Total tracks" 
-          value={totalTracks}
+          value={loading ? "Loading..." : totalTracks}
           chart={<MiniBarChart 
             data={trackEmissionsData} 
             height={60} 
@@ -110,7 +140,7 @@ const TracksPage = () => {
         />
         <StatCard 
           title="Total emissions" 
-          value={`${totalEmissions.toLocaleString()} tCO2e`}
+          value={loading ? "Loading..." : `${totalEmissions.toLocaleString()} tCO2e`}
           chart={<MiniDonutChart 
             data={trackDistributionData.slice(0, 4)} 
             height={80} 
@@ -118,7 +148,7 @@ const TracksPage = () => {
         />
         <StatCard 
           title="Avg. per track" 
-          value={`${averageEmissions.toLocaleString()} tCO2e`}
+          value={loading ? "Loading..." : `${averageEmissions.toLocaleString()} tCO2e`}
           chart={<ProgressIndicator 
             current={averageEmissions} 
             target={totalEmissions} 
@@ -132,6 +162,7 @@ const TracksPage = () => {
         data={tracks} 
         columns={columns} 
         onRowClick={handleRowClick}
+        isLoading={loading}
       />
     </PageLayout>
   );

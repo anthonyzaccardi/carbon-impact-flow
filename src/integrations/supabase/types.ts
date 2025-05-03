@@ -9,7 +9,331 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      factors: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          name: string
+          track_id: string
+          unit: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          name: string
+          track_id: string
+          unit: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          track_id?: string
+          unit?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factors_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      initiative_targets: {
+        Row: {
+          created_at: string
+          initiative_id: string
+          target_id: string
+        }
+        Insert: {
+          created_at?: string
+          initiative_id: string
+          target_id: string
+        }
+        Update: {
+          created_at?: string
+          initiative_id?: string
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "initiative_targets_initiative_id_fkey"
+            columns: ["initiative_id"]
+            isOneToOne: false
+            referencedRelation: "initiatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "initiative_targets_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      initiatives: {
+        Row: {
+          absolute: number
+          budget: number | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          plan: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          absolute?: number
+          budget?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          plan?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          absolute?: number
+          budget?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          plan?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      measurements: {
+        Row: {
+          calculated_value: number
+          created_at: string
+          date: string
+          factor_id: string
+          id: string
+          notes: string | null
+          quantity: number
+          status: string
+          supplier_id: string | null
+          track_id: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          calculated_value: number
+          created_at?: string
+          date: string
+          factor_id: string
+          id?: string
+          notes?: string | null
+          quantity: number
+          status: string
+          supplier_id?: string | null
+          track_id: string
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          calculated_value?: number
+          created_at?: string
+          date?: string
+          factor_id?: string
+          id?: string
+          notes?: string | null
+          quantity?: number
+          status?: string
+          supplier_id?: string | null
+          track_id?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "measurements_factor_id_fkey"
+            columns: ["factor_id"]
+            isOneToOne: false
+            referencedRelation: "factors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "measurements_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "measurements_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scenarios: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          contact_person: string
+          created_at: string
+          currency: string
+          email: string
+          id: string
+          industry: string
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          contact_person: string
+          created_at?: string
+          currency: string
+          email: string
+          id?: string
+          industry: string
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          contact_person?: string
+          created_at?: string
+          currency?: string
+          email?: string
+          id?: string
+          industry?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      targets: {
+        Row: {
+          baseline_value: number
+          created_at: string
+          id: string
+          name: string
+          scenario_id: string | null
+          supplier_id: string | null
+          target_date: string
+          target_percentage: number
+          target_value: number
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          baseline_value: number
+          created_at?: string
+          id?: string
+          name: string
+          scenario_id?: string | null
+          supplier_id?: string | null
+          target_date: string
+          target_percentage: number
+          target_value: number
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          baseline_value?: number
+          created_at?: string
+          id?: string
+          name?: string
+          scenario_id?: string | null
+          supplier_id?: string | null
+          target_date?: string
+          target_percentage?: number
+          target_value?: number
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "targets_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "scenarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "targets_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "targets_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tracks: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          name: string
+          total_emissions: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          name: string
+          total_emissions?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          name?: string
+          total_emissions?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

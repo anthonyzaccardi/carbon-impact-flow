@@ -1,5 +1,5 @@
 
-import { createContext, ReactNode } from 'react';
+import { createContext, ReactNode, useEffect } from 'react';
 import { AppContextType } from './types';
 import { useEntityState } from './hooks/useEntityState';
 import { useUIState } from './hooks/useUIState';
@@ -12,6 +12,7 @@ import { useTargetCrud } from './hooks/useTargetCrud';
 import { useInitiativeCrud } from './hooks/useInitiativeCrud';
 import { useScenarioCrud } from './hooks/useScenarioCrud';
 import { useSupplierCrud } from './hooks/useSupplierCrud';
+import { useSupabaseData } from '@/hooks/useSupabaseData';
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -33,6 +34,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setSuppliers
   } = useEntityState();
 
+  // Use Supabase data hook to fetch all data on app init
+  useSupabaseData(
+    setTracks,
+    setFactors,
+    setMeasurements,
+    setTargets,
+    setInitiatives,
+    setScenarios,
+    setSuppliers
+  );
+
   const {
     sidePanel,
     sidebarExpanded,
@@ -49,7 +61,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     getTrackStats
   } = useUtilityFunctions(tracks, factors, measurements, targets, initiatives);
 
-  // Use the new effects hook
+  // Use the effects hook
   useEffects(tracks, setTracks, targets, setTargets, calculateTrackMeasurementsValue);
 
   const trackCrud = useTrackCrud(tracks, setTracks, factors, measurements, targets);
