@@ -27,28 +27,27 @@ export const TargetHeader = ({
 }: TargetHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-col">
-  <Button 
-    variant="ghost" 
-    size="sm" 
-    className="mb-2 self-start" 
-    onClick={onBack}
-  >
-    <ChevronLeft className="h-4 w-4 mr-1" />
-    {scenario ? `Back to ${scenario.name}` : 'Back to Targets'}
-  </Button>
-  <div>
-    <h1 className="text-2xl font-semibold">
-      Target: {target.name}
-    </h1>
-    {scenario && (
-      <p className="text-muted-foreground">
-        Scenario: {scenario.name}
-      </p>
-    )}
-  </div>
-</div>
-
+      <div className="flex items-center">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="mr-2" 
+          onClick={onBack}
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          {scenario ? `Back to ${scenario.name}` : 'Back to Targets'}
+        </Button>
+        <div>
+          <h1 className="text-2xl font-semibold">
+            Target: {target.name}
+          </h1>
+          {scenario && (
+            <p className="text-muted-foreground">
+              Scenario: {scenario.name}
+            </p>
+          )}
+        </div>
+      </div>
       
       <div className="flex gap-2">
         <Button variant="outline" onClick={onEditTarget}>
