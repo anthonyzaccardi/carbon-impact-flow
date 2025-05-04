@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppContext } from "@/contexts/useAppContext";
 import { Target, Status, TargetPercentage } from "@/types";
 import { targetFormSchema, type TargetFormData } from "./schema";
+import { useEffect } from "react";
 
 interface UseTargetFormProps {
   mode: "create" | "edit" | "view";
@@ -12,7 +13,7 @@ interface UseTargetFormProps {
 }
 
 export const useTargetForm = ({ mode, initialData, onClose }: UseTargetFormProps) => {
-  const { createTarget, updateTarget } = useAppContext();
+  const { createTarget, updateTarget, tracks } = useAppContext();
 
   const formattedData = initialData
     ? {
@@ -34,10 +35,29 @@ export const useTargetForm = ({ mode, initialData, onClose }: UseTargetFormProps
     },
   });
 
+  // Update baseline value when track changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'trackId' && value.trackId) {
+        const selectedTrack = tracks.find(t => t.id === value.trackId);
+        if (selectedTrack) {
+          form.setValue('baselineValue', selectedTrack.totalEmissions);
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, tracks]);
+
   const onSubmit = (data: TargetFormData) => {
+    // Calculate target value based on baseline and percentage
+    const targetPercentageNum = parseInt(data.targetPercentage);
+    const targetValue = data.baselineValue * (1 + targetPercentageNum / 100);
+
     const targetData = {
       ...data,
       targetPercentage: parseInt(data.targetPercentage),
+      targetValue: targetValue, // Add calculated target value
       name: data.name,
       trackId: data.trackId,
       description: data.description,

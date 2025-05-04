@@ -1,8 +1,13 @@
 import { toast } from 'sonner';
 import { Target, Initiative } from '@/types';
 import { generateId, getCurrentTimestamp } from '../utils';
+import { 
+  createTarget as createTargetInSupabase,
+  updateTarget as updateTargetInSupabase, 
+  deleteTarget as deleteTargetInSupabase
+} from '@/services/supabase/targetService';
 
-export const createTargetOperation = (
+export const createTargetOperation = async (
   targets: Target[],
   setTargets: (targets: Target[]) => void,
   target: Omit<Target, 'id' | 'createdAt' | 'updatedAt' | 'targetValue'>
@@ -18,19 +23,28 @@ export const createTargetOperation = (
     return;
   }
 
-  const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
-  const newTarget: Target = {
-    ...target,
-    targetValue,
-    id: generateId('target'),
-    createdAt: getCurrentTimestamp(),
-    updatedAt: getCurrentTimestamp()
-  };
-  setTargets([...targets, newTarget]);
-  toast.success(`Created target: ${target.name}`);
+  try {
+    // Calculate target value
+    const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+    
+    // Create target in Supabase
+    const newTarget = await createTargetInSupabase({
+      ...target,
+      targetValue
+    });
+    
+    if (newTarget) {
+      // Update local state
+      setTargets([...targets, newTarget]);
+      toast.success(`Created target: ${target.name}`);
+    }
+  } catch (error) {
+    console.error('Error in createTargetOperation:', error);
+    toast.error('Failed to create target');
+  }
 };
 
-export const updateTargetOperation = (
+export const updateTargetOperation = async (
   targets: Target[],
   setTargets: (targets: Target[]) => void,
   id: string,
@@ -52,40 +66,46 @@ export const updateTargetOperation = (
   // Ensure targetDate remains as a string or we keep the existing one
   const targetDate = target.targetDate || undefined;
 
-  setTargets(targets.map(t => {
-    if (t.id === id) {
-      const targetValue = target.baselineValue !== undefined && target.targetPercentage !== undefined
-        ? target.baselineValue * (1 - (target.targetPercentage / 100))
-        : target.targetValue !== undefined 
-          ? target.targetValue 
-          : t.targetValue;
-      
-      return { 
-        ...t, 
-        ...target,
-        targetDate: targetDate || t.targetDate,
-        targetValue,
-        updatedAt: getCurrentTimestamp() 
-      };
+  try {
+    // Update target in Supabase
+    const updatedTarget = await updateTargetInSupabase(id, target);
+    
+    if (updatedTarget) {
+      // Update local state
+      setTargets(targets.map(t => t.id === id ? updatedTarget : t));
+      toast.success(`Updated target: ${target.name || id}`);
     }
-    return t;
-  }));
-  toast.success(`Updated target: ${target.name || id}`);
+  } catch (error) {
+    console.error('Error in updateTargetOperation:', error);
+    toast.error('Failed to update target');
+  }
 };
 
-export const deleteTargetOperation = (
+export const deleteTargetOperation = async (
   targets: Target[],
   setTargets: (targets: Target[]) => void,
   initiatives: Initiative[],
   setInitiatives: (initiatives: Initiative[]) => void,
   id: string
 ) => {
-  const updatedInitiatives = initiatives.map(initiative => ({
-    ...initiative,
-    targetIds: initiative.targetIds.filter(targetId => targetId !== id)
-  }));
-  setInitiatives(updatedInitiatives);
-  
-  setTargets(targets.filter(t => t.id !== id));
-  toast.success(`Deleted target: ${id}`);
+  try {
+    // Delete from Supabase
+    const success = await deleteTargetInSupabase(id);
+    
+    if (success) {
+      // Update local state for initiatives (remove target references)
+      const updatedInitiatives = initiatives.map(initiative => ({
+        ...initiative,
+        targetIds: initiative.targetIds.filter(targetId => targetId !== id)
+      }));
+      setInitiatives(updatedInitiatives);
+      
+      // Update local state for targets
+      setTargets(targets.filter(t => t.id !== id));
+      toast.success(`Deleted target: ${id}`);
+    }
+  } catch (error) {
+    console.error('Error in deleteTargetOperation:', error);
+    toast.error('Failed to delete target');
+  }
 };

@@ -21,18 +21,21 @@ export async function fetchTargets(): Promise<Target[]> {
     scenarioId: t.scenario_id,
     supplierId: t.supplier_id,
     name: t.name,
-    description: '',  // Default value as it's missing in the DB
+    description: t.description || '',
     baselineValue: t.baseline_value,
     targetValue: t.target_value,
     targetPercentage: t.target_percentage,
     targetDate: t.target_date,
-    status: 'not_started' as Status,  // Default value as it's missing in the DB
+    status: t.status as Status || 'not_started',
     createdAt: t.created_at,
     updatedAt: t.updated_at
   })) : [];
 }
 
 export async function createTarget(target: Omit<Target, 'id' | 'createdAt' | 'updatedAt'>): Promise<Target | null> {
+  // Calculate target value based on baseline and percentage
+  const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+  
   const newTarget = {
     track_id: target.trackId,
     scenario_id: target.scenarioId,
@@ -40,7 +43,7 @@ export async function createTarget(target: Omit<Target, 'id' | 'createdAt' | 'up
     name: target.name,
     description: target.description || '',
     baseline_value: target.baselineValue,
-    target_value: target.targetValue,
+    target_value: targetValue, // Use calculated target value
     target_percentage: target.targetPercentage,
     target_date: target.targetDate,
     status: target.status || 'not_started'
@@ -64,18 +67,24 @@ export async function createTarget(target: Omit<Target, 'id' | 'createdAt' | 'up
     scenarioId: data.scenario_id,
     supplierId: data.supplier_id,
     name: data.name,
-    description: '', // Default value as it's missing in the DB
+    description: data.description || '',
     baselineValue: data.baseline_value,
     targetValue: data.target_value,
     targetPercentage: data.target_percentage,
     targetDate: data.target_date,
-    status: 'not_started' as Status, // Default value as it's missing in the DB
+    status: data.status as Status || 'not_started',
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };
 }
 
 export async function updateTarget(id: string, target: Partial<Target>): Promise<Target | null> {
+  // Calculate target value if both baseline and percentage are provided
+  let targetValue = target.targetValue;
+  if (target.baselineValue !== undefined && target.targetPercentage !== undefined) {
+    targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+  }
+
   const updates = {
     ...(target.trackId && { track_id: target.trackId }),
     ...(target.scenarioId !== undefined && { scenario_id: target.scenarioId }),
@@ -83,7 +92,7 @@ export async function updateTarget(id: string, target: Partial<Target>): Promise
     ...(target.name && { name: target.name }),
     ...(target.description !== undefined && { description: target.description }),
     ...(target.baselineValue !== undefined && { baseline_value: target.baselineValue }),
-    ...(target.targetValue !== undefined && { target_value: target.targetValue }),
+    ...(targetValue !== undefined && { target_value: targetValue }),
     ...(target.targetPercentage !== undefined && { target_percentage: target.targetPercentage }),
     ...(target.targetDate && { target_date: target.targetDate }),
     ...(target.status && { status: target.status })
@@ -108,12 +117,12 @@ export async function updateTarget(id: string, target: Partial<Target>): Promise
     scenarioId: data.scenario_id,
     supplierId: data.supplier_id,
     name: data.name,
-    description: '', // Default value as it's missing in the DB
+    description: data.description || '',
     baselineValue: data.baseline_value,
     targetValue: data.target_value,
     targetPercentage: data.target_percentage,
     targetDate: data.target_date,
-    status: 'not_started' as Status, // Default value as it's missing in the DB
+    status: data.status as Status || 'not_started',
     createdAt: data.created_at,
     updatedAt: data.updated_at
   };
