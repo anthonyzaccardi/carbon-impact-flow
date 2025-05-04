@@ -1,10 +1,13 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Initiative, Target, InitiativeStatus, TrajectoryType, PlanType } from "@/types";
+import { Initiative } from "@/types";
 import { InitiativeFormData, initiativeFormSchema } from "./schema";
 import { useAppContext } from "@/contexts/useAppContext";
+import { useTargetSelection } from "./hooks/useTargetSelection";
+import { getInitiativeFormDefaultValues } from "./utils/formUtils";
+import { formatDateForApi } from "./utils/dateUtils";
 import { format, isValid } from "date-fns";
 
 interface UseInitiativeFormProps {
@@ -14,36 +17,10 @@ interface UseInitiativeFormProps {
 }
 
 export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeFormProps) => {
-  const { createInitiative, updateInitiative, targets, calculateTrackMeasurementsValue, extractPercentage } = useAppContext();
-  const [selectedTargets, setSelectedTargets] = useState<Target[]>([]);
-  const [calculatedAbsolute, setCalculatedAbsolute] = useState(0);
-
+  const { createInitiative, updateInitiative } = useAppContext();
+  
   // Define defaultValues with proper type casting and date validation
-  const defaultValues: InitiativeFormData = initialData
-    ? {
-        name: initialData.name,
-        description: initialData.description || "",
-        startDate: getValidDate(initialData.startDate),
-        endDate: getValidDate(initialData.endDate),
-        status: initialData.status as InitiativeStatus,
-        spend: initialData.spend,
-        trajectory: initialData.trajectory as TrajectoryType,
-        plan: initialData.plan as PlanType,
-        currency: initialData.currency,
-        targetIds: initialData.targetIds || [],
-      }
-    : {
-        name: "",
-        description: "",
-        startDate: new Date(),
-        endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
-        status: "not_started",
-        spend: 0,
-        trajectory: "linear",
-        plan: "-6%",
-        currency: "USD",
-        targetIds: [],
-      };
+  const defaultValues = getInitiativeFormDefaultValues(initialData);
 
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeFormSchema),
@@ -53,49 +30,20 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
   const watchTargetIds = form.watch("targetIds");
   const watchPlan = form.watch("plan");
 
-  // Helper function to ensure dates are valid
-  function getValidDate(dateString: string): Date {
-    try {
-      const date = new Date(dateString);
-      return isValid(date) ? date : new Date();
-    } catch (error) {
-      console.error("Invalid date:", dateString);
-      return new Date();
-    }
-  }
-
-  useEffect(() => {
-    if (watchTargetIds && watchTargetIds.length > 0) {
-      const targetsData = targets.filter(t => watchTargetIds.includes(t.id));
-      setSelectedTargets(targetsData);
-
-      let absoluteValue = 0;
-      
-      if (targetsData.length > 0) {
-        absoluteValue = targetsData.reduce((sum, target) => {
-          if (target.trackId) {
-            const trackMeasurementsValue = calculateTrackMeasurementsValue(target.trackId);
-            return sum + (trackMeasurementsValue * Math.abs(extractPercentage(watchPlan)));
-          }
-          return sum;
-        }, 0);
-        
-        if (targetsData.length > 1) {
-          absoluteValue /= targetsData.length;
-        }
-      }
-      
-      setCalculatedAbsolute(absoluteValue);
-    } else {
-      setSelectedTargets([]);
-      setCalculatedAbsolute(0);
-    }
-  }, [watchTargetIds, watchPlan, targets, calculateTrackMeasurementsValue, extractPercentage]);
+  const { selectedTargets, calculatedAbsolute } = useTargetSelection({
+    targetIds: watchTargetIds || [], 
+    plan: watchPlan
+  });
 
   const onSubmit = (data: InitiativeFormData) => {
     // Ensure we have valid dates before formatting
-    const startDate = isValid(data.startDate) ? format(data.startDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
-    const endDate = isValid(data.endDate) ? format(data.endDate, "yyyy-MM-dd") : format(new Date(new Date().setMonth(new Date().getMonth() + 6)), "yyyy-MM-dd");
+    const startDate = isValid(data.startDate) 
+      ? format(data.startDate, "yyyy-MM-dd") 
+      : format(new Date(), "yyyy-MM-dd");
+      
+    const endDate = isValid(data.endDate) 
+      ? format(data.endDate, "yyyy-MM-dd") 
+      : format(new Date(new Date().setMonth(new Date().getMonth() + 6)), "yyyy-MM-dd");
 
     const formattedData = {
       ...data,
