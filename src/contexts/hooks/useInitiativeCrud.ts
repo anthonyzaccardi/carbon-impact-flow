@@ -6,7 +6,7 @@ import {
   deleteInitiativeOperation,
   addTargetsToInitiativeOperation,
   removeTargetFromInitiativeOperation
-} from '../operations';
+} from '../operations/initiative';
 
 export const useInitiativeCrud = (
   initiatives: Initiative[],
