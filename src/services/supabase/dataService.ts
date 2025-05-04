@@ -3,7 +3,7 @@ import { fetchTracks } from './trackService';
 import { fetchFactors } from './factorService';
 import { fetchMeasurements } from './measurementService';
 import { fetchTargets } from './targetService';
-import { fetchInitiatives } from './initiativeService';
+import { fetchInitiatives } from './initiative';
 import { fetchScenarios } from './scenarioService';
 import { fetchSuppliers } from './supplierService';
 
