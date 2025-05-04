@@ -25,7 +25,7 @@ export const createTargetOperation = async (
 
   try {
     // Calculate target value
-    const targetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+    const targetValue = target.baselineValue * (1 + (target.targetPercentage / 100));
     
     // Create target in Supabase
     const newTarget = await createTargetInSupabase({
