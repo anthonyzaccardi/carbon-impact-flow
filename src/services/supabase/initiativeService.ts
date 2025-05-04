@@ -1,7 +1,29 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Initiative } from "@/types";
+import { Initiative, InitiativeStatus, TrajectoryType, PlanType } from "@/types";
 import { toast } from "sonner";
+
+// Helper functions to ensure type safety
+const validateInitiativeStatus = (status: string): InitiativeStatus => {
+  const validStatuses: InitiativeStatus[] = ['not_started', 'in_progress', 'completed', 'committed'];
+  return validStatuses.includes(status as InitiativeStatus) 
+    ? (status as InitiativeStatus) 
+    : 'not_started';
+};
+
+const validateTrajectoryType = (trajectory: string | null): TrajectoryType => {
+  const validTrajectories: TrajectoryType[] = ['every_year', 'linear'];
+  return trajectory && validTrajectories.includes(trajectory as TrajectoryType) 
+    ? (trajectory as TrajectoryType) 
+    : 'linear';
+};
+
+const validatePlanType = (plan: string | null): PlanType => {
+  const validPlans: PlanType[] = ['-2%', '-4%', '-6%', '-8%', '-10%', '-15%', '-5%'];
+  return plan && validPlans.includes(plan as PlanType) 
+    ? (plan as PlanType) 
+    : '-5%';
+};
 
 export async function fetchInitiatives(): Promise<Initiative[]> {
   // First, get all initiatives
@@ -42,10 +64,10 @@ export async function fetchInitiatives(): Promise<Initiative[]> {
       description: i.description || '',
       startDate: i.start_date || new Date().toISOString(),
       endDate: i.end_date || new Date().toISOString(),
-      status: i.status,
+      status: validateInitiativeStatus(i.status),
       spend: i.budget || 0,
-      trajectory: i.trajectory || 'linear',
-      plan: i.plan || '-5%',
+      trajectory: validateTrajectoryType(i.trajectory),
+      plan: validatePlanType(i.plan),
       absolute: i.absolute,
       targetIds: targetIds,
       currency: i.currency || 'USD',
@@ -111,10 +133,10 @@ export async function createInitiative(
     description: data.description || '',
     startDate: data.start_date || new Date().toISOString(),
     endDate: data.end_date || new Date().toISOString(),
-    status: data.status,
+    status: validateInitiativeStatus(data.status),
     spend: data.budget || 0,
-    trajectory: data.trajectory || 'linear',
-    plan: data.plan || '-5%',
+    trajectory: validateTrajectoryType(data.trajectory),
+    plan: validatePlanType(data.plan),
     absolute: data.absolute,
     targetIds: initiative.targetIds,
     currency: data.currency || 'USD',
@@ -199,10 +221,10 @@ export async function updateInitiative(
     description: data.description || '',
     startDate: data.start_date || new Date().toISOString(),
     endDate: data.end_date || new Date().toISOString(),
-    status: data.status,
+    status: validateInitiativeStatus(data.status),
     spend: data.budget || 0,
-    trajectory: data.trajectory || 'linear',
-    plan: data.plan || '-5%',
+    trajectory: validateTrajectoryType(data.trajectory),
+    plan: validatePlanType(data.plan),
     absolute: data.absolute,
     targetIds: targetIds,
     currency: data.currency || 'USD',
