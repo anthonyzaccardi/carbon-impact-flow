@@ -52,7 +52,7 @@ export const useTargetForm = ({ mode, initialData, onClose }: UseTargetFormProps
   const onSubmit = (data: TargetFormData) => {
     // Calculate target value based on baseline and percentage
     const targetPercentageNum = parseInt(data.targetPercentage);
-    const targetValue = target.baselineValue * (1 - Math.abs(target.targetPercentage) / 100);
+    const targetValue = data.baselineValue * (1 + targetPercentageNum / 100);
 
     const targetData = {
       ...data,
