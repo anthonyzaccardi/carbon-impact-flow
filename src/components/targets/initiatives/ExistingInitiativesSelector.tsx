@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/contexts/useAppContext';
 import { Initiative } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { SortableTable } from '@/components/ui/sortable-table';
+import { SortableTable, SortableColumn } from '@/components/ui/sortable-table';
 
 interface ExistingInitiativesSelectorProps {
   targetId: string;
@@ -51,7 +51,7 @@ export const ExistingInitiativesSelector: React.FC<ExistingInitiativesSelectorPr
     }
   };
 
-  const columns = [
+  const columns: SortableColumn<Initiative>[] = [
     {
       header: '',
       cell: (initiative: Initiative) => (
@@ -65,7 +65,7 @@ export const ExistingInitiativesSelector: React.FC<ExistingInitiativesSelectorPr
     },
     {
       header: 'Name',
-      accessorKey: 'name' as keyof Initiative
+      accessorKey: 'name'
     },
     {
       header: 'Status',
@@ -83,16 +83,16 @@ export const ExistingInitiativesSelector: React.FC<ExistingInitiativesSelectorPr
           {initiative.status.replace('_', ' ')}
         </Badge>
       ),
-      accessorKey: 'status' as keyof Initiative
+      accessorKey: 'status'
     },
     {
       header: 'Plan',
-      accessorKey: 'plan' as keyof Initiative
+      accessorKey: 'plan'
     },
     {
       header: 'Spend',
       cell: (initiative: Initiative) => `${initiative.spend.toLocaleString()} ${initiative.currency}`,
-      accessorKey: 'spend' as keyof Initiative
+      accessorKey: 'spend'
     }
   ];
 

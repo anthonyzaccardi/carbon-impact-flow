@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/useAppContext";
 import { ScenarioTargetAttachmentManager } from "@/components/targets/scenario/ScenarioTargetAttachmentManager";
-import { SortableTable } from "@/components/ui/sortable-table";
+import { SortableTable, SortableColumn } from "@/components/ui/sortable-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,10 +56,10 @@ export const TargetsList: React.FC<TargetsListProps> = ({
   };
 
   // Update the type for columns to be compatible with ExtendedTarget
-  const columns = [
+  const columns: SortableColumn<ExtendedTarget>[] = [
     {
       header: "Name",
-      accessorKey: "name" as keyof ExtendedTarget,
+      accessorKey: "name",
     },
     {
       header: "Track",
@@ -74,21 +74,21 @@ export const TargetsList: React.FC<TargetsListProps> = ({
           "Unknown Track"
         );
       },
-      accessorKey: "trackId" as keyof ExtendedTarget,
+      accessorKey: "trackId",
     },
     {
       header: "Baseline",
       cell: (target: ExtendedTarget) => (
         <span>{target.baselineValue.toLocaleString()} tCO₂e</span>
       ),
-      accessorKey: "baselineValue" as keyof ExtendedTarget,
+      accessorKey: "baselineValue",
     },
     {
       header: "Target",
       cell: (target: ExtendedTarget) => (
         <span>{target.correctedTargetValue.toLocaleString()} tCO₂e</span>
       ),
-      accessorKey: "correctedTargetValue" as keyof ExtendedTarget,
+      accessorKey: "correctedTargetValue",
     },
     {
       header: "Reduction",
@@ -97,14 +97,14 @@ export const TargetsList: React.FC<TargetsListProps> = ({
           {target.targetPercentage}%
         </Badge>
       ),
-      accessorKey: "targetPercentage" as keyof ExtendedTarget,
+      accessorKey: "targetPercentage",
     },
     {
       header: "Target Date",
       cell: (target: ExtendedTarget) => (
         <span>{new Date(target.targetDate).toLocaleDateString()}</span>
       ),
-      accessorKey: "targetDate" as keyof ExtendedTarget,
+      accessorKey: "targetDate",
     },
     {
       header: "Scenario",
@@ -115,7 +115,7 @@ export const TargetsList: React.FC<TargetsListProps> = ({
         }
         return "None";
       },
-      accessorKey: "scenarioId" as keyof ExtendedTarget,
+      accessorKey: "scenarioId",
     },
     {
       header: "Status",
@@ -132,7 +132,7 @@ export const TargetsList: React.FC<TargetsListProps> = ({
           {target.status.replace("_", " ")}
         </Badge>
       ),
-      accessorKey: "status" as keyof ExtendedTarget,
+      accessorKey: "status",
     },
     {
       header: "",
@@ -172,7 +172,7 @@ export const TargetsList: React.FC<TargetsListProps> = ({
           </DropdownMenu>
         );
       },
-      accessorKey: "id" as keyof ExtendedTarget,
+      accessorKey: "id",
     }
   ];
 

@@ -1,10 +1,9 @@
 
 import { toast } from 'sonner';
 import { Initiative } from '@/types';
-import { getCurrentTimestamp } from '../../utils';
 import { 
-  addTargetsToInitiative as addTargetsInSupabase,
-  removeTargetFromInitiative as removeTargetInSupabase 
+  addTargetsToInitiative as addTargetsToInitiativeInSupabase,
+  removeTargetFromInitiative as removeTargetFromInitiativeInSupabase
 } from '@/services/supabase/initiativeService';
 
 export const addTargetsToInitiativeOperation = async (
@@ -14,21 +13,29 @@ export const addTargetsToInitiativeOperation = async (
   targetIds: string[]
 ) => {
   try {
-    const success = await addTargetsInSupabase(initiativeId, targetIds);
+    // Update in Supabase
+    const success = await addTargetsToInitiativeInSupabase(initiativeId, targetIds);
     
     if (success) {
-      setInitiatives(initiatives.map(i => {
-        if (i.id === initiativeId) {
-          const newTargetIds = [...new Set([...i.targetIds, ...targetIds])];
-          return { ...i, targetIds: newTargetIds, updatedAt: getCurrentTimestamp() };
+      // Update local state
+      const updatedInitiatives = initiatives.map(initiative => {
+        if (initiative.id === initiativeId) {
+          // Add the target IDs if they don't already exist
+          const updatedTargetIds = [...new Set([...initiative.targetIds, ...targetIds])];
+          return {
+            ...initiative,
+            targetIds: updatedTargetIds
+          };
         }
-        return i;
-      }));
-      toast.success('Added targets to initiative');
+        return initiative;
+      });
+      
+      setInitiatives(updatedInitiatives);
+      toast.success(`Attached ${targetIds.length} target${targetIds.length === 1 ? '' : 's'} to initiative`);
     }
   } catch (error) {
-    console.error('Error adding targets to initiative:', error);
-    toast.error('Failed to add targets to initiative');
+    console.error('Error in addTargetsToInitiativeOperation:', error);
+    toast.error('Failed to attach targets to initiative');
   }
 };
 
@@ -39,23 +46,26 @@ export const removeTargetFromInitiativeOperation = async (
   targetId: string
 ) => {
   try {
-    const success = await removeTargetInSupabase(initiativeId, targetId);
+    // Update in Supabase
+    const success = await removeTargetFromInitiativeInSupabase(initiativeId, targetId);
     
     if (success) {
-      setInitiatives(initiatives.map(i => {
-        if (i.id === initiativeId) {
+      // Update local state
+      const updatedInitiatives = initiatives.map(initiative => {
+        if (initiative.id === initiativeId) {
           return {
-            ...i,
-            targetIds: i.targetIds.filter(id => id !== targetId),
-            updatedAt: getCurrentTimestamp()
+            ...initiative,
+            targetIds: initiative.targetIds.filter(id => id !== targetId)
           };
         }
-        return i;
-      }));
-      toast.success('Removed target from initiative');
+        return initiative;
+      });
+      
+      setInitiatives(updatedInitiatives);
+      toast.success('Target removed from initiative');
     }
   } catch (error) {
-    console.error('Error removing target from initiative:', error);
+    console.error('Error in removeTargetFromInitiativeOperation:', error);
     toast.error('Failed to remove target from initiative');
   }
 };
