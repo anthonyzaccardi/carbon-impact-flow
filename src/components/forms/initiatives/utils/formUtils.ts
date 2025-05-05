@@ -20,12 +20,11 @@ export const prepareInitialValues = (
     name: '',
     description: '',
     status: 'not_started',
-    plan: '-5%', // Fixed the empty string to a valid value
+    plan: '-5%',
     targetIds: [],
     startDate: new Date(),
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
     spend: 0,
-    budget: 0,
     currency: 'USD',
     trajectory: 'linear'
   };
@@ -51,7 +50,6 @@ export const getInitiativeFormDefaultValues = (initialData?: Initiative): Initia
     startDate: new Date(),
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
     spend: 0,
-    budget: 0,
     currency: 'USD',
     trajectory: 'linear'
   };

@@ -32,8 +32,14 @@ export const FeaturedScenarios = ({
           key={scenario.id} 
           scenario={scenario}
           onClick={() => onScenarioClick(scenario)}
-          trackGroups={[]} // Added missing required props
-          stats={{ totalTargets: 0, totalReduction: 0 }} // Added missing required props
+          trackGroups={[]} 
+          stats={{ 
+            totalTargets: 0, 
+            totalReduction: 0,
+            uniqueTracks: 0,
+            startYear: null,
+            endYear: null
+          }}
         />
       )}
       slidesToShow={3}

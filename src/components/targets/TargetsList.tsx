@@ -19,6 +19,10 @@ interface TargetsListProps {
   onRowClick: (target: Target) => void;
 }
 
+interface ExtendedTarget extends Target {
+  correctedTargetValue: number;
+}
+
 export const TargetsList: React.FC<TargetsListProps> = ({
   targets,
   tracks,
@@ -34,7 +38,7 @@ export const TargetsList: React.FC<TargetsListProps> = ({
     return {
       ...target,
       correctedTargetValue
-    };
+    } as ExtendedTarget;
   });
 
   const handleAttachToScenario = (scenarioId: string) => {
@@ -53,11 +57,11 @@ export const TargetsList: React.FC<TargetsListProps> = ({
   const columns = [
     {
       header: "Name",
-      accessorKey: "name" as keyof Target,
+      accessorKey: "name" as keyof ExtendedTarget,
     },
     {
       header: "Track",
-      cell: (target: Target & { correctedTargetValue: number }) => {
+      cell: (target: ExtendedTarget) => {
         const track = tracks.find((t) => t.id === target.trackId);
         return track ? (
           <div className="flex items-center gap-2">
@@ -68,52 +72,52 @@ export const TargetsList: React.FC<TargetsListProps> = ({
           "Unknown Track"
         );
       },
-      accessorKey: "trackId" as keyof Target,
+      accessorKey: "trackId" as keyof ExtendedTarget,
     },
     {
       header: "Baseline",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: ExtendedTarget) => (
         <span>{target.baselineValue.toLocaleString()} tCO₂e</span>
       ),
-      accessorKey: "baselineValue" as keyof Target,
+      accessorKey: "baselineValue" as keyof ExtendedTarget,
     },
     {
       header: "Target",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: ExtendedTarget) => (
         <span>{target.correctedTargetValue.toLocaleString()} tCO₂e</span>
       ),
-      accessorKey: "correctedTargetValue",
+      accessorKey: "correctedTargetValue" as keyof ExtendedTarget,
     },
     {
       header: "Reduction",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: ExtendedTarget) => (
         <Badge variant="outline">
           {target.targetPercentage}%
         </Badge>
       ),
-      accessorKey: "targetPercentage" as keyof Target,
+      accessorKey: "targetPercentage" as keyof ExtendedTarget,
     },
     {
       header: "Target Date",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: ExtendedTarget) => (
         <span>{new Date(target.targetDate).toLocaleDateString()}</span>
       ),
-      accessorKey: "targetDate" as keyof Target,
+      accessorKey: "targetDate" as keyof ExtendedTarget,
     },
     {
       header: "Scenario",
-      cell: (target: Target & { correctedTargetValue: number }) => {
+      cell: (target: ExtendedTarget) => {
         if (target.scenarioId) {
           const scenario = scenarios.find(s => s.id === target.scenarioId);
           return scenario ? scenario.name : "Unknown Scenario";
         }
         return "None";
       },
-      accessorKey: "scenarioId" as keyof Target,
+      accessorKey: "scenarioId" as keyof ExtendedTarget,
     },
     {
       header: "Status",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: ExtendedTarget) => (
         <Badge
           className={
             target.status === "completed"
@@ -126,12 +130,12 @@ export const TargetsList: React.FC<TargetsListProps> = ({
           {target.status.replace("_", " ")}
         </Badge>
       ),
-      accessorKey: "status" as keyof Target,
+      accessorKey: "status" as keyof ExtendedTarget,
     },
     {
       header: "",
       sortable: false,
-      cell: (target: Target & { correctedTargetValue: number }) => {
+      cell: (target: ExtendedTarget) => {
         if (target.scenarioId) return null;
         
         return (
@@ -165,7 +169,8 @@ export const TargetsList: React.FC<TargetsListProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         );
-      }
+      },
+      accessorKey: "id" as keyof ExtendedTarget,
     }
   ];
 
