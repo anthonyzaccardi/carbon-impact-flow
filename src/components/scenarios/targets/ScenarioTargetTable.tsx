@@ -2,13 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { Target, Track } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { SortableTable } from "@/components/ui/sortable-table";
+import { SortableTable, SortableColumn } from "@/components/ui/sortable-table";
 
 interface ScenarioTargetTableProps {
   targets: Target[];
   tracks: Track[];
   onRowClick: (target: Target) => void;
   onRemoveTarget: (targetId: string) => void;
+}
+
+// Define ExtendedTarget to include the correctedTargetValue property
+interface ExtendedTarget extends Target {
+  correctedTargetValue: number;
 }
 
 export const ScenarioTargetTable = ({
@@ -24,17 +29,17 @@ export const ScenarioTargetTable = ({
     return {
       ...target,
       correctedTargetValue
-    };
+    } as ExtendedTarget;
   });
 
-  const columns = [
+  const columns: SortableColumn<ExtendedTarget>[] = [
     {
       header: "Name",
-      accessorKey: "name" as keyof Target
+      accessorKey: "name"
     },
     {
       header: "Track",
-      cell: (target: Target) => {
+      cell: (target: ExtendedTarget) => {
         const trackId = target.trackId;
         const track = tracks.find(t => t.id === trackId);
         return track ? (
@@ -44,29 +49,29 @@ export const ScenarioTargetTable = ({
           </div>
         ) : "Unknown";
       },
-      accessorKey: "trackId" as keyof Target
+      accessorKey: "trackId"
     },
     {
       header: "Baseline",
-      cell: (target: Target) => `${target.baselineValue.toLocaleString()} tCO₂e`,
-      accessorKey: "baselineValue" as keyof Target
+      cell: (target: ExtendedTarget) => `${target.baselineValue.toLocaleString()} tCO₂e`,
+      accessorKey: "baselineValue"
     },
     {
       header: "Target",
-      cell: (target: Target & { correctedTargetValue?: number }) => 
-        `${(target.correctedTargetValue || 0).toLocaleString()} tCO₂e`,
-      accessorKey: "targetValue" as keyof Target
+      cell: (target: ExtendedTarget) => 
+        `${target.correctedTargetValue.toLocaleString()} tCO₂e`,
+      accessorKey: "correctedTargetValue"
     },
     {
       header: "Reduction",
-      cell: (target: Target) => (
+      cell: (target: ExtendedTarget) => (
         <Badge variant="outline">{target.targetPercentage}%</Badge>
       ),
-      accessorKey: "targetPercentage" as keyof Target
+      accessorKey: "targetPercentage"
     },
     {
       header: "Status",
-      cell: (target: Target) => (
+      cell: (target: ExtendedTarget) => (
         <Badge 
           className={
             target.status === 'completed' 
@@ -79,11 +84,11 @@ export const ScenarioTargetTable = ({
           {target.status ? target.status.replace('_', ' ') : 'not started'}
         </Badge>
       ),
-      accessorKey: "status" as keyof Target
+      accessorKey: "status"
     },
     {
       header: "",
-      cell: (target: Target) => (
+      cell: (target: ExtendedTarget) => (
         <Button 
           variant="ghost" 
           size="sm"
@@ -96,7 +101,7 @@ export const ScenarioTargetTable = ({
           Remove
         </Button>
       ),
-      accessorKey: "id" as keyof Target,
+      accessorKey: "id",
       sortable: false
     }
   ];

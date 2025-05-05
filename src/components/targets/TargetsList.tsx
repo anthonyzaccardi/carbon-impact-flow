@@ -19,6 +19,7 @@ interface TargetsListProps {
   onRowClick: (target: Target) => void;
 }
 
+// Define ExtendedTarget interface that extends Target with the additional property
 interface ExtendedTarget extends Target {
   correctedTargetValue: number;
 }
@@ -54,6 +55,7 @@ export const TargetsList: React.FC<TargetsListProps> = ({
     });
   };
 
+  // Update the type for columns to be compatible with ExtendedTarget
   const columns = [
     {
       header: "Name",

@@ -6,7 +6,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 
 type SortDirection = "asc" | "desc" | null;
 
-interface SortableColumn<T> {
+export interface SortableColumn<T> {
   header: string;
   accessorKey?: keyof T;
   cell?: (item: T) => React.ReactNode;
