@@ -30,7 +30,7 @@ export const TargetsList: React.FC<TargetsListProps> = ({
   onRowClick,
 }) => {
   const { scenarios, openSidePanel } = useAppContext();
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
+  const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
 
   // Calculate the correct target values
   const targetsWithCorrectValues = targets.map(target => {
@@ -42,13 +42,13 @@ export const TargetsList: React.FC<TargetsListProps> = ({
     } as ExtendedTarget;
   });
 
-  const handleAttachToScenario = (scenarioId: string) => {
-    setSelectedScenarioId(scenarioId);
+  const handleManageScenario = (targetId: string) => {
+    setSelectedTargetId(targetId);
     openSidePanel('view', 'custom', {
-      title: "Attach Targets to Scenario",
+      title: "Manage Scenario Association",
       content: (
         <ScenarioTargetAttachmentManager
-          scenarioId={scenarioId}
+          targetId={targetId}
           onClose={() => openSidePanel('view', 'custom', { isOpen: false })}
         />
       ),
@@ -111,9 +111,35 @@ export const TargetsList: React.FC<TargetsListProps> = ({
       cell: (target: ExtendedTarget) => {
         if (target.scenarioId) {
           const scenario = scenarios.find(s => s.id === target.scenarioId);
-          return scenario ? scenario.name : "Unknown Scenario";
+          return (
+            <div className="flex items-center gap-2">
+              <span>{scenario ? scenario.name : "Unknown Scenario"}</span>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="ml-auto"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleManageScenario(target.id);
+                }}
+              >
+                Manage
+              </Button>
+            </div>
+          );
         }
-        return "None";
+        return (
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleManageScenario(target.id);
+            }}
+          >
+            Manage
+          </Button>
+        );
       },
       accessorKey: "scenarioId",
     },
@@ -133,46 +159,6 @@ export const TargetsList: React.FC<TargetsListProps> = ({
         </Badge>
       ),
       accessorKey: "status",
-    },
-    {
-      header: "",
-      sortable: false,
-      cell: (target: ExtendedTarget) => {
-        if (target.scenarioId) return null;
-        
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="ml-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Attach to Scenario
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {scenarios.length > 0 ? (
-                scenarios.map(scenario => (
-                  <DropdownMenuItem 
-                    key={scenario.id} 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAttachToScenario(scenario.id);
-                    }}
-                  >
-                    {scenario.name}
-                  </DropdownMenuItem>
-                ))
-              ) : (
-                <DropdownMenuItem disabled>No scenarios available</DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-      accessorKey: "id",
     }
   ];
 

@@ -1,70 +1,59 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/useAppContext';
-import { Target } from '@/types';
+import { Target, Scenario } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { SortableTable } from '@/components/ui/sortable-table';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 
 interface ScenarioTargetAttachmentManagerProps {
-  scenarioId: string;
+  targetId: string;
   onClose: () => void;
 }
 
 export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentManagerProps> = ({
-  scenarioId,
+  targetId,
   onClose,
 }) => {
-  const { targets, tracks, updateTarget } = useAppContext();
+  const { scenarios, targets, updateTarget } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTargets, setSelectedTargets] = useState<string[]>([]);
-
-  // Filter out targets already linked to this scenario
-  const availableTargets = targets.filter(
-    target => !target.scenarioId
-  );
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
+  
+  const target = targets.find(t => t.id === targetId);
+  
+  // Initialize the selected scenario if the target is already attached to one
+  useEffect(() => {
+    if (target?.scenarioId) {
+      setSelectedScenarioId(target.scenarioId);
+    }
+  }, [target]);
 
   // Apply search filter
-  const filteredTargets = availableTargets.filter(
-    target => target.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredScenarios = scenarios.filter(
+    scenario => scenario.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleTargetSelection = (targetId: string) => {
-    setSelectedTargets(prev => 
-      prev.includes(targetId) 
-        ? prev.filter(id => id !== targetId) 
-        : [...prev, targetId]
-    );
+  const handleSelectScenario = (scenarioId: string) => {
+    setSelectedScenarioId(scenarioId === selectedScenarioId ? null : scenarioId);
   };
 
-  const handleAttachTargets = () => {
-    if (selectedTargets.length > 0) {
-      selectedTargets.forEach(targetId => {
-        const target = targets.find(t => t.id === targetId);
-        if (target) {
-          updateTarget(targetId, { ...target, scenarioId });
-        }
-      });
+  const handleSave = () => {
+    if (target) {
+      updateTarget(targetId, { ...target, scenarioId: selectedScenarioId || undefined });
       onClose();
     }
-  };
-
-  const getTrackName = (trackId: string) => {
-    const track = tracks.find(t => t.id === trackId);
-    return track ? `${track.emoji} ${track.name}` : 'Unknown Track';
   };
 
   const columns = [
     {
       header: '',
-      cell: (target: Target) => (
+      cell: (scenario: Scenario) => (
         <Checkbox 
-          checked={selectedTargets.includes(target.id)}
-          onCheckedChange={() => handleTargetSelection(target.id)}
+          checked={selectedScenarioId === scenario.id}
+          onCheckedChange={() => handleSelectScenario(scenario.id)}
           className="pointer-events-none" // Prevent event conflict with row click
         />
       ),
@@ -72,54 +61,48 @@ export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentM
     },
     {
       header: 'Name',
-      accessorKey: 'name' as keyof Target
+      accessorKey: 'name' as keyof Scenario
     },
     {
-      header: 'Track',
-      cell: (target: Target) => getTrackName(target.trackId),
-      accessorKey: 'trackId' as keyof Target
+      header: 'Total Targets',
+      cell: (scenario: Scenario) => {
+        const scenarioTargets = targets.filter(t => t.scenarioId === scenario.id);
+        return scenarioTargets.length;
+      },
+      accessorKey: 'id' as keyof Scenario
     },
     {
-      header: 'Reduction',
-      cell: (target: Target) => (
-        <Badge variant="outline">
-          {target.targetPercentage}%
-        </Badge>
-      ),
-      accessorKey: 'targetPercentage' as keyof Target
-    },
-    {
-      header: 'Target Date',
-      cell: (target: Target) => new Date(target.targetDate).toLocaleDateString(),
-      accessorKey: 'targetDate' as keyof Target
+      header: 'Created',
+      cell: (scenario: Scenario) => new Date(scenario.createdAt).toLocaleDateString(),
+      accessorKey: 'createdAt' as keyof Scenario
     }
   ];
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Attach Targets to Scenario</h2>
-      <p className="text-sm text-muted-foreground">Select targets to attach to this scenario</p>
+      <h2 className="text-lg font-semibold">Manage Scenario</h2>
+      <p className="text-sm text-muted-foreground">Select a scenario to associate with this target or leave empty to detach from all scenarios.</p>
       
       <div className="relative mb-4">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search targets..."
+          placeholder="Search scenarios..."
           className="pl-8"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
-      {filteredTargets.length === 0 ? (
+      {filteredScenarios.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
-          {searchQuery ? "No targets match your search" : "No targets available to attach"}
+          {searchQuery ? "No scenarios match your search" : "No scenarios available"}
         </div>
       ) : (
         <div className="max-h-[60vh] overflow-y-auto">
           <SortableTable
-            data={filteredTargets}
+            data={filteredScenarios}
             columns={columns}
-            onRowClick={(target) => handleTargetSelection(target.id)}
+            onRowClick={(scenario) => handleSelectScenario(scenario.id)}
           />
         </div>
       )}
@@ -128,11 +111,8 @@ export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentM
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button 
-          onClick={handleAttachTargets}
-          disabled={selectedTargets.length === 0}
-        >
-          Add Selected ({selectedTargets.length})
+        <Button onClick={handleSave}>
+          Save
         </Button>
       </div>
     </div>
