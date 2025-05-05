@@ -114,9 +114,10 @@ const Sidebar = () => {
           
           {/* Act group with sub-navigation */}
           <NavGroupItem icon={PlayCircle} label="Act" expanded={sidebarExpanded}>
+            <NavItem to="/scenarios" icon={Settings} label="Scenarios" expanded={sidebarExpanded} />
             <NavItem to="/targets" icon={Target} label="Targets" expanded={sidebarExpanded} />
             <NavItem to="/initiatives" icon={Lightbulb} label="Initiatives" expanded={sidebarExpanded} />
-            <NavItem to="/scenarios" icon={Settings} label="Scenarios" expanded={sidebarExpanded} />
+            
           </NavGroupItem>
           
           <NavItem to="/suppliers" icon={Users} label="Suppliers" expanded={sidebarExpanded} />
