@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { FeaturedScenarios } from "@/components/scenarios/FeaturedScenarios";
 import PageLayout from "@/components/layout/PageLayout";
 
-
 const ScenariosPage = () => {
   const { scenarios, targets, tracks, openSidePanel } = useAppContext();
   const navigate = useNavigate();
@@ -125,8 +124,6 @@ const ScenariosPage = () => {
       {/* Featured Scenarios */}
       <FeaturedScenarios
         scenarios={scenarios}
-        tracks={tracks}
-        targets={targets}
         onScenarioClick={handleRowClick}
       />
   

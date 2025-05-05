@@ -6,7 +6,7 @@ import { Initiative } from "@/types";
 import { InitiativeFormData, initiativeFormSchema } from "./schema";
 import { useAppContext } from "@/contexts/useAppContext";
 import { useTargetSelection } from "./hooks/useTargetSelection";
-import { getInitiativeFormDefaultValues } from "./utils/formUtils";
+import { prepareInitialValues } from "./utils/formUtils";
 import { formatDateForApi } from "./utils/dateUtils";
 import { format, isValid } from "date-fns";
 
@@ -20,7 +20,7 @@ export const useInitiativeForm = ({ mode, initialData, onClose }: UseInitiativeF
   const { createInitiative, updateInitiative } = useAppContext();
   
   // Define defaultValues with proper type casting and date validation
-  const defaultValues = getInitiativeFormDefaultValues(initialData);
+  const defaultValues = prepareInitialValues(initialData);
 
   const form = useForm<InitiativeFormData>({
     resolver: zodResolver(initiativeFormSchema),

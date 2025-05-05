@@ -34,8 +34,9 @@ export const ScenarioTargetTable = ({
     },
     {
       header: "Track",
-      cell: (target: Target & { correctedTargetValue: number }) => {
-        const track = tracks.find(t => t.id === target.trackId);
+      cell: (target: Target) => {
+        const trackId = target.trackId;
+        const track = tracks.find(t => t.id === trackId);
         return track ? (
           <div className="flex items-center gap-2">
             <span>{track.emoji}</span>
@@ -47,24 +48,25 @@ export const ScenarioTargetTable = ({
     },
     {
       header: "Baseline",
-      cell: (target: Target & { correctedTargetValue: number }) => `${target.baselineValue.toLocaleString()} tCO₂e`,
+      cell: (target: Target) => `${target.baselineValue.toLocaleString()} tCO₂e`,
       accessorKey: "baselineValue" as keyof Target
     },
     {
       header: "Target",
-      cell: (target: Target & { correctedTargetValue: number }) => `${target.correctedTargetValue.toLocaleString()} tCO₂e`,
-      accessorKey: "correctedTargetValue"
+      cell: (target: Target & { correctedTargetValue?: number }) => 
+        `${(target.correctedTargetValue || 0).toLocaleString()} tCO₂e`,
+      accessorKey: "targetValue" as keyof Target
     },
     {
       header: "Reduction",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: Target) => (
         <Badge variant="outline">{target.targetPercentage}%</Badge>
       ),
       accessorKey: "targetPercentage" as keyof Target
     },
     {
       header: "Status",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: Target) => (
         <Badge 
           className={
             target.status === 'completed' 
@@ -74,14 +76,14 @@ export const ScenarioTargetTable = ({
                 : 'bg-gray-100 text-gray-800'
           }
         >
-          {target.status.replace('_', ' ')}
+          {target.status ? target.status.replace('_', ' ') : 'not started'}
         </Badge>
       ),
       accessorKey: "status" as keyof Target
     },
     {
       header: "",
-      cell: (target: Target & { correctedTargetValue: number }) => (
+      cell: (target: Target) => (
         <Button 
           variant="ghost" 
           size="sm"
@@ -94,6 +96,7 @@ export const ScenarioTargetTable = ({
           Remove
         </Button>
       ),
+      accessorKey: "id" as keyof Target,
       sortable: false
     }
   ];

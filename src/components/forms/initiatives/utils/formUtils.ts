@@ -12,7 +12,7 @@ export const prepareInitialValues = (
       ...initialData,
       startDate: new Date(initialData.startDate),
       endDate: new Date(initialData.endDate),
-      targets: selectedTargets || []
+      targetIds: initialData.targetIds || []
     };
   }
 
@@ -20,8 +20,34 @@ export const prepareInitialValues = (
     name: '',
     description: '',
     status: 'not_started',
-    plan: '',
-    targets: [],
+    plan: '-5%', // Fixed the empty string to a valid value
+    targetIds: [],
+    startDate: new Date(),
+    endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
+    spend: 0,
+    budget: 0,
+    currency: 'USD',
+    trajectory: 'linear'
+  };
+};
+
+// Renamed from getInitiativeFormDefaultValues to match what's being imported
+export const getInitiativeFormDefaultValues = (initialData?: Initiative): InitiativeFormData => {
+  if (initialData) {
+    return {
+      ...initialData,
+      startDate: new Date(initialData.startDate),
+      endDate: new Date(initialData.endDate),
+      targetIds: initialData.targetIds || []
+    };
+  }
+
+  return {
+    name: '',
+    description: '',
+    status: 'not_started',
+    plan: '-5%',
+    targetIds: [],
     startDate: new Date(),
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
     spend: 0,
