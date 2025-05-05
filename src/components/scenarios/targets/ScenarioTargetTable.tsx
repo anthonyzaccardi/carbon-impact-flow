@@ -1,8 +1,8 @@
 
-import { Target, Track } from "@/types";
-import DataTable from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
-import { format, isValid, parseISO } from "date-fns";
+import { Target, Track } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import { SortableTable } from "@/components/ui/sortable-table";
 
 interface ScenarioTargetTableProps {
   targets: Target[];
@@ -11,67 +11,81 @@ interface ScenarioTargetTableProps {
   onRemoveTarget: (targetId: string) => void;
 }
 
-export const ScenarioTargetTable = ({ 
-  targets, 
-  tracks, 
+export const ScenarioTargetTable = ({
+  targets,
+  tracks,
   onRowClick,
-  onRemoveTarget 
+  onRemoveTarget,
 }: ScenarioTargetTableProps) => {
-  const formatDate = (dateString: string) => {
-    try {
-      const date = parseISO(dateString);
-      return isValid(date) ? format(date, 'PP') : 'Invalid date';
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return 'Invalid date';
-    }
-  };
+  // Calculate the correct target values
+  const targetsWithCorrectValues = targets.map(target => {
+    // Calculate the correct target value: baseline * (1 - percentage/100)
+    const correctedTargetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+    return {
+      ...target,
+      correctedTargetValue
+    };
+  });
 
   const columns = [
     {
       header: "Name",
-      accessorKey: "name",
+      accessorKey: "name" as keyof Target
     },
     {
       header: "Track",
-      accessorKey: "trackId",
-      cell: (target: Target) => {
+      cell: (target: Target & { correctedTargetValue: number }) => {
         const track = tracks.find(t => t.id === target.trackId);
         return track ? (
-          <div className="flex items-center">
-            <span className="mr-1">{track.emoji}</span>
+          <div className="flex items-center gap-2">
+            <span>{track.emoji}</span>
             <span>{track.name}</span>
           </div>
-        ) : target.trackId;
-      }
-    },
-    {
-      header: "Target",
-      accessorKey: "targetPercentage",
-      cell: (target: Target) => `${target.targetPercentage}% reduction`,
+        ) : "Unknown";
+      },
+      accessorKey: "trackId" as keyof Target
     },
     {
       header: "Baseline",
-      accessorKey: "baselineValue",
-      cell: (target: Target) => `${target.baselineValue.toLocaleString()} tCO2e`,
+      cell: (target: Target & { correctedTargetValue: number }) => `${target.baselineValue.toLocaleString()} tCO₂e`,
+      accessorKey: "baselineValue" as keyof Target
     },
     {
-      header: "Target Value",
-      accessorKey: "targetValue",
-      cell: (target: Target) => `${target.targetValue.toLocaleString()} tCO2e`,
+      header: "Target",
+      cell: (target: Target & { correctedTargetValue: number }) => `${target.correctedTargetValue.toLocaleString()} tCO₂e`,
+      accessorKey: "correctedTargetValue"
     },
     {
-      header: "Target Date",
-      accessorKey: "targetDate",
-      cell: (target: Target) => formatDate(target.targetDate),
+      header: "Reduction",
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <Badge variant="outline">{target.targetPercentage}%</Badge>
+      ),
+      accessorKey: "targetPercentage" as keyof Target
     },
     {
-      header: "Actions",
-      accessorKey: "actions",
-      cell: (target: Target) => (
+      header: "Status",
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <Badge 
+          className={
+            target.status === 'completed' 
+              ? 'bg-green-100 text-green-800' 
+              : target.status === 'in_progress'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-gray-100 text-gray-800'
+          }
+        >
+          {target.status.replace('_', ' ')}
+        </Badge>
+      ),
+      accessorKey: "status" as keyof Target
+    },
+    {
+      header: "",
+      cell: (target: Target & { correctedTargetValue: number }) => (
         <Button 
           variant="ghost" 
-          size="sm" 
+          size="sm"
+          className="ml-auto" 
           onClick={(e) => {
             e.stopPropagation();
             onRemoveTarget(target.id);
@@ -79,13 +93,14 @@ export const ScenarioTargetTable = ({
         >
           Remove
         </Button>
-      )
+      ),
+      sortable: false
     }
   ];
 
   return (
-    <DataTable
-      data={targets}
+    <SortableTable
+      data={targetsWithCorrectValues}
       columns={columns}
       onRowClick={onRowClick}
     />

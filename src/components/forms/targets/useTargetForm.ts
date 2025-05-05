@@ -50,14 +50,14 @@ export const useTargetForm = ({ mode, initialData, onClose }: UseTargetFormProps
   }, [form, tracks]);
 
   const onSubmit = (data: TargetFormData) => {
-    // Calculate target value based on baseline and percentage
+    // Calculate target value based on baseline and percentage (correct formula)
     const targetPercentageNum = parseInt(data.targetPercentage);
-    const targetValue = data.baselineValue * (1 + targetPercentageNum / 100);
+    const targetValue = data.baselineValue * (1 - targetPercentageNum / 100);
 
     const targetData = {
       ...data,
       targetPercentage: parseInt(data.targetPercentage),
-      targetValue: targetValue, // Add calculated target value
+      targetValue: targetValue, // Corrected target value calculation
       name: data.name,
       trackId: data.trackId,
       description: data.description,

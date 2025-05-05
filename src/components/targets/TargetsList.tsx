@@ -1,91 +1,181 @@
 
-import { Target, Track } from "@/types";
-import DataTable from "@/components/ui/data-table";
-import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Target, Track } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useAppContext } from "@/contexts/useAppContext";
+import { ScenarioTargetAttachmentManager } from "@/components/targets/scenario/ScenarioTargetAttachmentManager";
+import { SortableTable } from "@/components/ui/sortable-table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TargetsListProps {
   targets: Target[];
   tracks: Track[];
   onRowClick: (target: Target) => void;
-  onRemoveTarget?: (targetId: string) => void;
 }
 
-export const TargetsList = ({ targets, tracks, onRowClick, onRemoveTarget }: TargetsListProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
+export const TargetsList: React.FC<TargetsListProps> = ({
+  targets,
+  tracks,
+  onRowClick,
+}) => {
+  const { scenarios, openSidePanel } = useAppContext();
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
 
-  const filteredTargets = targets.filter(target => 
-    target.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Calculate the correct target values
+  const targetsWithCorrectValues = targets.map(target => {
+    // Calculate the correct target value: baseline * (1 - percentage/100)
+    const correctedTargetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+    return {
+      ...target,
+      correctedTargetValue
+    };
+  });
+
+  const handleAttachToScenario = (scenarioId: string) => {
+    setSelectedScenarioId(scenarioId);
+    openSidePanel('view', 'custom', {
+      title: "Attach Targets to Scenario",
+      content: (
+        <ScenarioTargetAttachmentManager
+          scenarioId={scenarioId}
+          onClose={() => openSidePanel('view', 'custom', { isOpen: false })}
+        />
+      ),
+    });
+  };
 
   const columns = [
     {
       header: "Name",
-      accessorKey: "name",
+      accessorKey: "name" as keyof Target,
     },
     {
       header: "Track",
-      accessorKey: "trackId",
-      cell: (target: Target) => {
-        const track = tracks.find(t => t.id === target.trackId);
+      cell: (target: Target & { correctedTargetValue: number }) => {
+        const track = tracks.find((t) => t.id === target.trackId);
         return track ? (
-          <div className="flex items-center">
-            <span className="mr-1">{track.emoji}</span>
+          <div className="flex items-center gap-2">
+            <span>{track.emoji}</span>
             <span>{track.name}</span>
           </div>
-        ) : target.trackId;
-      }
+        ) : (
+          "Unknown Track"
+        );
+      },
+      accessorKey: "trackId" as keyof Target,
+    },
+    {
+      header: "Baseline",
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <span>{target.baselineValue.toLocaleString()} tCO₂e</span>
+      ),
+      accessorKey: "baselineValue" as keyof Target,
     },
     {
       header: "Target",
-      accessorKey: "targetPercentage",
-      cell: (target: Target) => `${target.targetPercentage}% reduction`,
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <span>{target.correctedTargetValue.toLocaleString()} tCO₂e</span>
+      ),
+      accessorKey: "correctedTargetValue",
     },
     {
-      header: "Target date",
-      accessorKey: "targetDate",
-      cell: (target: Target) => new Date(target.targetDate).toLocaleDateString(),
+      header: "Reduction",
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <Badge variant="outline">
+          {target.targetPercentage}%
+        </Badge>
+      ),
+      accessorKey: "targetPercentage" as keyof Target,
+    },
+    {
+      header: "Target Date",
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <span>{new Date(target.targetDate).toLocaleDateString()}</span>
+      ),
+      accessorKey: "targetDate" as keyof Target,
+    },
+    {
+      header: "Scenario",
+      cell: (target: Target & { correctedTargetValue: number }) => {
+        if (target.scenarioId) {
+          const scenario = scenarios.find(s => s.id === target.scenarioId);
+          return scenario ? scenario.name : "Unknown Scenario";
+        }
+        return "None";
+      },
+      accessorKey: "scenarioId" as keyof Target,
     },
     {
       header: "Status",
-      accessorKey: "status",
-    },
-    ...(onRemoveTarget ? [{
-      header: "Actions",
-      accessorKey: "actions",
-      cell: (target: Target) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemoveTarget(target.id);
-          }}
+      cell: (target: Target & { correctedTargetValue: number }) => (
+        <Badge
+          className={
+            target.status === "completed"
+              ? "bg-green-100 text-green-800"
+              : target.status === "in_progress"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-gray-100 text-gray-800"
+          }
         >
-          Remove
-        </Button>
-      )
-    }] : [])
+          {target.status.replace("_", " ")}
+        </Badge>
+      ),
+      accessorKey: "status" as keyof Target,
+    },
+    {
+      header: "",
+      sortable: false,
+      cell: (target: Target & { correctedTargetValue: number }) => {
+        if (target.scenarioId) return null;
+        
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="ml-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Attach to Scenario
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {scenarios.length > 0 ? (
+                scenarios.map(scenario => (
+                  <DropdownMenuItem 
+                    key={scenario.id} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAttachToScenario(scenario.id);
+                    }}
+                  >
+                    {scenario.name}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem disabled>No scenarios available</DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      }
+    }
   ];
 
   return (
-    <>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search targets..."
-          className="pl-10"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <DataTable
-        data={filteredTargets}
+    <div className="space-y-4">
+      <SortableTable
+        data={targetsWithCorrectValues}
         columns={columns}
         onRowClick={onRowClick}
       />
-    </>
+    </div>
   );
 };

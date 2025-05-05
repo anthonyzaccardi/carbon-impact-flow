@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/useAppContext';
@@ -6,6 +7,7 @@ import { ExistingInitiativesSelector } from '@/components/targets/initiatives/Ex
 import { TargetHeader } from '@/components/targets/detail/TargetHeader';
 import { TargetSummary } from '@/components/targets/detail/TargetSummary';
 import { TargetInitiatives } from '@/components/targets/detail/TargetInitiatives';
+import { InitiativesImpactChart } from '@/components/targets/detail/InitiativesImpactChart';
 import { useInitiativeMetrics } from '@/hooks/useInitiativeMetrics';
 import { Target, Initiative, Scenario } from '@/types';
 
@@ -111,6 +113,13 @@ const TargetDetailPage = () => {
         totalImpact={totalImpact}
         totalSpend={totalSpend}
       />
+
+      {targetInitiatives.length > 0 && (
+        <InitiativesImpactChart 
+          initiatives={targetInitiatives} 
+          target={targetData}
+        />
+      )}
       
       <TargetInitiatives
         initiatives={targetInitiatives}

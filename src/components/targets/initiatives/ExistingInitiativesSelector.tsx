@@ -1,51 +1,108 @@
 
+import { useState, useMemo } from 'react';
 import { useAppContext } from '@/contexts/useAppContext';
-import { useState } from 'react';
 import { Initiative } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { SortableTable } from '@/components/ui/sortable-table';
 
 interface ExistingInitiativesSelectorProps {
   targetId: string;
   onClose: () => void;
 }
 
-export const ExistingInitiativesSelector = ({
+export const ExistingInitiativesSelector: React.FC<ExistingInitiativesSelectorProps> = ({
   targetId,
-  onClose
-}: ExistingInitiativesSelectorProps) => {
+  onClose,
+}) => {
   const { initiatives, addTargetsToInitiative } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedInitiatives, setSelectedInitiatives] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter initiatives that are not already attached to this target
-  const availableInitiatives = initiatives.filter(i => !i.targetIds.includes(targetId));
-  
-  // Apply search filter
-  const filteredInitiatives = availableInitiatives.filter(i => 
-    i.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    i.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter out initiatives that are already associated with this target
+  const availableInitiatives = useMemo(() => {
+    return initiatives.filter(initiative => !initiative.targetIds.includes(targetId));
+  }, [initiatives, targetId]);
 
-  const handleInitiativeClick = (initiativeId: string) => {
-    setSelectedInitiatives(prev => 
-      prev.includes(initiativeId) 
+  const filteredInitiatives = useMemo(() => {
+    return availableInitiatives.filter(initiative =>
+      initiative.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [availableInitiatives, searchTerm]);
+
+  const toggleInitiative = (initiativeId: string) => {
+    setSelectedInitiatives(prev =>
+      prev.includes(initiativeId)
         ? prev.filter(id => id !== initiativeId)
         : [...prev, initiativeId]
     );
   };
 
   const handleAttach = () => {
-    selectedInitiatives.forEach(initiativeId => {
-      addTargetsToInitiative(initiativeId, [targetId]);
-    });
-    onClose();
+    if (selectedInitiatives.length) {
+      // Attach each selected initiative to the target
+      selectedInitiatives.forEach(initiativeId => {
+        addTargetsToInitiative(initiativeId, [targetId]);
+      });
+      onClose();
+    }
   };
+
+  const columns = [
+    {
+      header: '',
+      cell: (initiative: Initiative) => (
+        <Checkbox
+          checked={selectedInitiatives.includes(initiative.id)}
+          onCheckedChange={() => toggleInitiative(initiative.id)}
+          className="pointer-events-none" // Prevent event conflict with row click
+        />
+      ),
+      sortable: false
+    },
+    {
+      header: 'Name',
+      accessorKey: 'name' as keyof Initiative
+    },
+    {
+      header: 'Status',
+      cell: (initiative: Initiative) => (
+        <Badge 
+          variant="outline"
+          className={
+            initiative.status === 'completed' 
+              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+              : initiative.status === 'in_progress'
+                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+          }
+        >
+          {initiative.status.replace('_', ' ')}
+        </Badge>
+      ),
+      accessorKey: 'status' as keyof Initiative
+    },
+    {
+      header: 'Plan',
+      accessorKey: 'plan' as keyof Initiative
+    },
+    {
+      header: 'Spend',
+      cell: (initiative: Initiative) => `${initiative.spend.toLocaleString()} ${initiative.currency}`,
+      accessorKey: 'spend' as keyof Initiative
+    }
+  ];
 
   return (
     <div className="space-y-4">
+      <h3 className="text-lg font-medium">Attach Existing Initiatives</h3>
+      <p className="text-sm text-muted-foreground">
+        Select initiatives to attach to this target.
+      </p>
+      
       <div className="relative mb-4">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
@@ -55,53 +112,30 @@ export const ExistingInitiativesSelector = ({
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+
+      {filteredInitiatives.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          {searchTerm ? "No initiatives match your search" : "No initiatives available to attach"}
+        </div>
+      ) : (
+        <div className="max-h-[60vh] overflow-y-auto">
+          <SortableTable
+            data={filteredInitiatives}
+            columns={columns}
+            onRowClick={(initiative) => toggleInitiative(initiative.id)}
+          />
+        </div>
+      )}
       
-      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-        {filteredInitiatives.length === 0 ? (
-          <p className="text-muted-foreground text-center p-4">
-            {searchTerm ? "No initiatives match your search" : "No unattached initiatives available"}
-          </p>
-        ) : (
-          filteredInitiatives.map((initiative) => (
-            <div
-              key={initiative.id}
-              onClick={() => handleInitiativeClick(initiative.id)}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                selectedInitiatives.includes(initiative.id)
-                  ? 'border-primary bg-primary/5'
-                  : 'hover:bg-muted/50'
-              }`}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{initiative.name}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{initiative.description}</p>
-                </div>
-                <Badge variant="outline">
-                  {initiative.status === "not_started" ? "Not Started" :
-                   initiative.status === "in_progress" ? "In Progress" :
-                   initiative.status === "committed" ? "Committed" : "Completed"}
-                </Badge>
-              </div>
-              <div className="mt-2 text-sm text-muted-foreground">
-                <span>Plan: {initiative.plan}</span>
-                <span className="mx-2">•</span>
-                <span>Impact: {initiative.absolute.toLocaleString()} tCO₂e</span>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-      
-      <div className="flex justify-end gap-2 pt-2 border-t">
+      <div className="flex justify-end gap-2 pt-4 border-t">
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button
+        <Button 
           onClick={handleAttach}
           disabled={selectedInitiatives.length === 0}
         >
-          Add Selected ({selectedInitiatives.length})
+          Attach Selected ({selectedInitiatives.length})
         </Button>
       </div>
     </div>

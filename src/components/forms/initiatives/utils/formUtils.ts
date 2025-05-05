@@ -1,45 +1,60 @@
 
-import { Initiative } from "@/types";
-import { InitiativeFormData } from "../schema";
-import { getValidDate } from "./dateUtils";
+import { Initiative, Target } from '@/types';
+import { InitiativeFormData } from '../schema';
+import { format } from 'date-fns';
 
-export function getInitiativeFormDefaultValues(
-  initialData?: Initiative
-): InitiativeFormData {
-  return initialData
-    ? {
-        name: initialData.name,
-        description: initialData.description || "",
-        startDate: getValidDate(initialData.startDate),
-        endDate: getValidDate(initialData.endDate),
-        status: initialData.status,
-        spend: initialData.spend,
-        trajectory: initialData.trajectory,
-        plan: initialData.plan,
-        currency: initialData.currency,
-        targetIds: initialData.targetIds || [],
-      }
-    : {
-        name: "",
-        description: "",
-        startDate: new Date(),
-        endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
-        status: "not_started",
-        spend: 0,
-        trajectory: "linear",
-        plan: "-6%",
-        currency: "USD",
-        targetIds: [],
-      };
-}
+export const prepareInitialValues = (
+  initialData?: Initiative,
+  selectedTargets?: Target[]
+): InitiativeFormData => {
+  if (initialData) {
+    return {
+      ...initialData,
+      startDate: new Date(initialData.startDate),
+      endDate: new Date(initialData.endDate),
+      targets: selectedTargets || []
+    };
+  }
 
-export function prepareInitiativeDataForSubmission(data: InitiativeFormData) {
-  // Ensure we have valid dates before formatting
-  const formattedData = {
-    ...data,
-    startDate: format(data.startDate, "yyyy-MM-dd"),
-    endDate: format(data.endDate, "yyyy-MM-dd"),
+  return {
+    name: '',
+    description: '',
+    status: 'not_started',
+    plan: '',
+    targets: [],
+    startDate: new Date(),
+    endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
+    spend: 0,
+    budget: 0,
+    currency: 'USD',
+    trajectory: 'linear'
   };
+};
 
-  return formattedData;
-}
+export const prepareSubmitData = (
+  data: InitiativeFormData,
+  extractPercentage: (plan: string) => number,
+  selectedTargets: Target[]
+) => {
+  return {
+    ...data,
+    startDate: format(data.startDate, 'yyyy-MM-dd'),
+    endDate: format(data.endDate, 'yyyy-MM-dd'),
+    absolute: calculateAbsoluteValue(data, extractPercentage, selectedTargets),
+    targets: undefined, // Remove targets from the submitted data
+    targetIds: selectedTargets.map(target => target.id)
+  };
+};
+
+export const calculateAbsoluteValue = (
+  data: InitiativeFormData,
+  extractPercentage: (plan: string) => number,
+  selectedTargets: Target[]
+): number => {
+  if (!selectedTargets.length || !data.plan) return 0;
+  
+  const percentage = extractPercentage(data.plan);
+  return selectedTargets.reduce((sum, target) => {
+    return sum + (target.baselineValue * percentage);
+  }, 0);
+};

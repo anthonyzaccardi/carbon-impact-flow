@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { SortableTable } from '@/components/ui/sortable-table';
 import { cn } from '@/lib/utils';
 
 interface InitiativeTargetSidePanelProps {
@@ -56,6 +56,38 @@ export const InitiativeTargetSidePanel: React.FC<InitiativeTargetSidePanelProps>
     return track ? `${track.emoji} ${track.name}` : 'Unknown Track';
   };
 
+  const columns = [
+    {
+      header: '',
+      cell: (target: Target) => (
+        <Checkbox 
+          checked={selectedTargets.includes(target.id)}
+          onCheckedChange={() => handleTargetSelection(target.id)}
+          className="pointer-events-none" // Prevent event conflict with row click
+        />
+      ),
+      sortable: false
+    },
+    {
+      header: 'Name',
+      accessorKey: 'name' as keyof Target
+    },
+    {
+      header: 'Track',
+      cell: (target: Target) => getTrackName(target.trackId),
+      accessorKey: 'trackId' as keyof Target
+    },
+    {
+      header: 'Target',
+      cell: (target: Target) => (
+        <Badge variant="outline">
+          {target.targetPercentage}%
+        </Badge>
+      ),
+      accessorKey: 'targetPercentage' as keyof Target
+    }
+  ];
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold">Manage Targets</h2>
@@ -77,43 +109,11 @@ export const InitiativeTargetSidePanel: React.FC<InitiativeTargetSidePanelProps>
         </div>
       ) : (
         <div className="max-h-[60vh] overflow-y-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12"></TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Track</TableHead>
-                <TableHead>Target</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredTargets.map((target) => (
-                <TableRow 
-                  key={target.id}
-                  className={cn(
-                    "cursor-pointer",
-                    selectedTargets.includes(target.id) && "bg-primary/5"
-                  )}
-                  onClick={() => handleTargetSelection(target.id)}
-                >
-                  <TableCell className="p-2">
-                    <Checkbox 
-                      checked={selectedTargets.includes(target.id)}
-                      onCheckedChange={() => handleTargetSelection(target.id)}
-                      className="pointer-events-none" // Prevent event conflict with row click
-                    />
-                  </TableCell>
-                  <TableCell>{target.name}</TableCell>
-                  <TableCell>{getTrackName(target.trackId)}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {target.targetPercentage}%
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <SortableTable
+            data={filteredTargets}
+            columns={columns}
+            onRowClick={(target) => handleTargetSelection(target.id)}
+          />
         </div>
       )}
       

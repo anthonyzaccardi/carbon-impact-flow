@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Target, Track } from "@/types";
 
@@ -9,6 +10,9 @@ interface TargetSummaryProps {
 }
 
 export const TargetSummary = ({ target, track, totalImpact, totalSpend }: TargetSummaryProps) => {
+  // Calculate the corrected target value (this matches the formula used when creating the target)
+  const correctedTargetValue = target.baselineValue * (1 - (target.targetPercentage / 100));
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-2">
@@ -39,7 +43,7 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Target value</p>
-                <p className="text-lg font-medium">{target.targetValue.toLocaleString()} tCO2e</p>
+                <p className="text-lg font-medium">{correctedTargetValue.toLocaleString()} tCO2e</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Target date</p>
@@ -73,15 +77,15 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
               <div className="flex justify-between">
                 <span className="text-sm">Coverage</span>
                 <span className="text-sm font-medium">
-                  {target.targetValue > 0 
-                    ? Math.min(100, Math.round((totalImpact / target.targetValue) * 100)) 
+                  {correctedTargetValue > 0 
+                    ? Math.min(100, Math.round((totalImpact / correctedTargetValue) * 100)) 
                     : 0}%
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-primary rounded-full"
-                  style={{ width: `${Math.min(100, Math.round((totalImpact / target.targetValue) * 100))}%` }} 
+                  style={{ width: `${Math.min(100, Math.round((totalImpact / correctedTargetValue) * 100))}%` }} 
                 />
               </div>
             </div>
@@ -92,7 +96,7 @@ export const TargetSummary = ({ target, track, totalImpact, totalSpend }: Target
                 {totalImpact.toLocaleString()} tCO2e
               </p>
               <p className="text-sm text-muted-foreground">
-                of {target.targetValue.toLocaleString()} tCO2e target
+                of {correctedTargetValue.toLocaleString()} tCO2e target
               </p>
             </div>
             

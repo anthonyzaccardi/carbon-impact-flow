@@ -47,9 +47,14 @@ const Overview = () => {
     { name: 'Week 4', value: 45 },
   ];
   
+  // Fix for the reduction goals chart
   const targetProgressData = {
-    current: targets.reduce((sum, target) => sum + (target.baselineValue - target.targetValue), 0),
-    target: targets.reduce((sum, target) => sum + target.baselineValue, 0) * 0.3 // Assuming 30% reduction goal
+    current: targets.reduce((sum, target) => {
+      // Calculate the absolute reduction amount
+      const reductionAmount = target.baselineValue * Math.abs(target.targetPercentage) / 100;
+      return sum + reductionAmount;
+    }, 0),
+    target: targets.reduce((sum, target) => sum + (target.baselineValue * 0.3), 0) // Assuming 30% reduction goal
   };
 
   return (
@@ -166,7 +171,7 @@ const Overview = () => {
               <MiniDonutChart
                 data={[
                   { name: 'Achieved', value: targetProgressData.current },
-                  { name: 'Remaining', value: targetProgressData.target - targetProgressData.current }
+                  { name: 'Remaining', value: Math.max(0, targetProgressData.target - targetProgressData.current) }
                 ]}
                 colors={["#10B981", "#D1D5DB"]}
                 height={180}
@@ -174,7 +179,9 @@ const Overview = () => {
             </div>
             <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
-                {((targetProgressData.current / targetProgressData.target) * 100).toFixed(1)}% Complete
+                {targetProgressData.target > 0 
+                  ? ((targetProgressData.current / targetProgressData.target) * 100).toFixed(1) 
+                  : "0"}% Complete
               </p>
             </div>
           </CardContent>

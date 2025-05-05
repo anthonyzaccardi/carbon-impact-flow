@@ -1,20 +1,21 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/useAppContext';
 import { Target } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { SortableTable } from '@/components/ui/sortable-table';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
-interface ExistingTargetsSelectorProps {
+interface ScenarioTargetAttachmentManagerProps {
   scenarioId: string;
   onClose: () => void;
 }
 
-export const ExistingTargetsSelector: React.FC<ExistingTargetsSelectorProps> = ({
+export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentManagerProps> = ({
   scenarioId,
   onClose,
 }) => {
@@ -96,7 +97,7 @@ export const ExistingTargetsSelector: React.FC<ExistingTargetsSelectorProps> = (
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Attach Existing Targets</h2>
+      <h2 className="text-lg font-semibold">Attach Targets to Scenario</h2>
       <p className="text-sm text-muted-foreground">Select targets to attach to this scenario</p>
       
       <div className="relative mb-4">
