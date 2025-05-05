@@ -124,6 +124,8 @@ const ScenariosPage = () => {
       {/* Featured Scenarios */}
       <FeaturedScenarios
         scenarios={scenarios}
+        targets={targets}
+        tracks={tracks}
         onScenarioClick={handleRowClick}
       />
   
