@@ -237,7 +237,7 @@ const Overview = () => {
   
   // Grid cell background element
   const GridBackground = () => {
-    const cells = Array(12 * 12).fill(0);
+    const cells = Array(12 * 16).fill(0);
     
     return (
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none grid grid-cols-12 gap-3" style={{ zIndex: 0 }}>
