@@ -29,7 +29,15 @@ export function useSupabaseData(
           suppliers
         } = await fetchAllData();
 
-        console.log("Loaded scenarios from Supabase:", scenarios);
+        console.log("Loaded data from Supabase:", {
+          tracksCount: tracks.length,
+          factorsCount: factors.length,
+          measurementsCount: measurements.length,
+          targetsCount: targets.length,
+          initiativesCount: initiatives.length,
+          scenariosCount: scenarios.length,
+          suppliersCount: suppliers.length
+        });
 
         setTracks(tracks);
         setFactors(factors);

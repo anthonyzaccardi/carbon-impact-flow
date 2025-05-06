@@ -9,14 +9,18 @@ import ProgressIndicator from "@/components/charts/ProgressIndicator";
 import BreadcrumbNav from "@/components/ui/breadcrumb-nav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import GridLayout from "react-grid-layout";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronDown, GripVertical } from "lucide-react";
 import "react-grid-layout/css/styles.css";
+import "@/components/ui/grid-layout.css";
 import { cn } from "@/lib/utils";
 import { ChartContainer } from "@/components/ui/chart";
 import { Area, AreaChart, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { fetchLayout, saveLayout } from "@/services/supabase/layoutService";
+import { debounce } from "lodash";
+import { Layout } from "react-grid-layout";
 
 // Define the possible widget sizes
 type WidgetSize = "3x3" | "6x6" | "9x3" | "3x9" | "6x3" | "3x6" | "6x9" | "9x6";
@@ -30,6 +34,8 @@ interface WidgetConfig {
   h: number;
   minW?: number;
   minH?: number;
+  maxW?: number;
+  maxH?: number;
   static?: boolean;
 }
 
@@ -51,6 +57,7 @@ const Overview = () => {
   const [gridWidth, setGridWidth] = useState(0);
   const [rowHeight, setRowHeight] = useState(0);
   const [layouts, setLayouts] = useState<WidgetConfig[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Generate more comprehensive emissions data for chart
   const emissionsData = [
@@ -97,20 +104,50 @@ const Overview = () => {
     }, 0),
     target: targets.reduce((sum, target) => sum + (target.baselineValue * 0.3), 0) // Assuming 30% reduction goal
   };
-  
-  // Initialize layouts
+
+  // Load saved layout from Supabase
   useEffect(() => {
-    const initialLayouts: WidgetConfig[] = [
-      { i: "tracks", x: 0, y: 0, w: 3, h: 3 },
-      { i: "measurements", x: 3, y: 0, w: 3, h: 3 },
-      { i: "targets", x: 6, y: 0, w: 3, h: 3 },
-      { i: "initiatives", x: 9, y: 0, w: 3, h: 3 },
-      { i: "emissions", x: 0, y: 3, w: 9, h: 6 },
-      { i: "sources", x: 0, y: 9, w: 6, h: 6 },
-      { i: "goals", x: 6, y: 9, w: 6, h: 6 },
-    ];
-    
-    setLayouts(initialLayouts);
+    async function loadSavedLayout() {
+      setIsLoading(true);
+      try {
+        const savedLayout = await fetchLayout('overview');
+        
+        if (savedLayout && savedLayout.length > 0) {
+          console.log("Loaded layout from database:", savedLayout);
+          setLayouts(savedLayout);
+        } else {
+          // Use default layout if no saved layout exists
+          const defaultLayouts: WidgetConfig[] = [
+            { i: "tracks", x: 0, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+            { i: "measurements", x: 3, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+            { i: "targets", x: 6, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+            { i: "initiatives", x: 9, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+            { i: "emissions", x: 0, y: 3, w: 9, h: 6, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+            { i: "sources", x: 0, y: 9, w: 6, h: 6, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+            { i: "goals", x: 6, y: 9, w: 6, h: 6, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          ];
+          console.log("Using default layout");
+          setLayouts(defaultLayouts);
+        }
+      } catch (error) {
+        console.error("Error loading layout:", error);
+        // Fallback to default layout
+        const defaultLayouts: WidgetConfig[] = [
+          { i: "tracks", x: 0, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          { i: "measurements", x: 3, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          { i: "targets", x: 6, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          { i: "initiatives", x: 9, y: 0, w: 3, h: 3, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          { i: "emissions", x: 0, y: 3, w: 9, h: 6, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          { i: "sources", x: 0, y: 9, w: 6, h: 6, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+          { i: "goals", x: 6, y: 9, w: 6, h: 6, minW: 3, minH: 3, maxW: 9, maxH: 9 },
+        ];
+        setLayouts(defaultLayouts);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadSavedLayout();
   }, []);
   
   // Calculate grid dimensions on mount and resize
@@ -138,9 +175,18 @@ const Overview = () => {
     };
   }, []);
   
+  // Debounced save function to avoid too many DB writes
+  const debouncedSaveLayout = useCallback(
+    debounce((layout: Layout[]) => {
+      saveLayout('overview', layout);
+    }, 500),
+    []
+  );
+
   // Function to handle layout changes from drag events
   const handleLayoutChange = (newLayout: WidgetConfig[]) => {
     setLayouts(newLayout);
+    debouncedSaveLayout(newLayout);
   };
   
   // Function to resize a widget
@@ -148,12 +194,15 @@ const Overview = () => {
     const { w, h } = sizeToGridUnits(newSize);
     
     setLayouts(currentLayouts => {
-      return currentLayouts.map(item => {
+      const updatedLayouts = currentLayouts.map(item => {
         if (item.i === id) {
           return { ...item, w, h };
         }
         return item;
       });
+      
+      debouncedSaveLayout(updatedLayouts);
+      return updatedLayouts;
     });
   };
   
@@ -214,7 +263,7 @@ const Overview = () => {
       <div ref={gridContainerRef} className="relative min-h-[800px]">
         <GridBackground />
         
-        {gridWidth > 0 && rowHeight > 0 && layouts.length > 0 && (
+        {!isLoading && gridWidth > 0 && rowHeight > 0 && layouts.length > 0 && (
           <GridLayout
             className="layout"
             layout={layouts}
@@ -226,6 +275,10 @@ const Overview = () => {
             onLayoutChange={handleLayoutChange}
             draggableHandle=".drag-handle"
             useCSSTransforms={true}
+            compactType="vertical"
+            preventCollision={false}
+            isResizable={false} // Disable resize handles, we use dropdown instead
+            autoSize={true} // Auto-size container to fit content
           >
             {/* Tracks Widget */}
             <div key="tracks" className="z-10">
