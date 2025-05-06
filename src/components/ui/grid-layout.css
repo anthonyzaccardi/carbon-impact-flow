@@ -1,0 +1,45 @@
+
+/* Grid layout styles */
+
+.react-grid-layout {
+  position: relative;
+  z-index: 1;
+}
+
+.react-grid-item {
+  transition: all 200ms ease;
+  transition-property: left, top, width, height;
+}
+
+.react-grid-item.react-draggable-dragging {
+  transition: none;
+  z-index: 100;
+  cursor: move;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: rgba(16, 185, 129, 0.1);
+  border: 2px dashed #10B981;
+  opacity: 0.5;
+  border-radius: 0.5rem;
+  transition-duration: 100ms;
+  z-index: 2;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.react-grid-item .card {
+  height: 100%;
+  width: 100%;
+}
+
+.drag-handle {
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
