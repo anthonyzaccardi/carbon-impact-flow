@@ -14,6 +14,7 @@ export interface AppContextType {
   // UI state
   sidePanel: SidePanel;
   sidebarExpanded: boolean;
+  loading: boolean;
   
   // Data setter functions for Supabase integration
   setTracks: (tracks: Track[]) => void;
@@ -28,6 +29,7 @@ export interface AppContextType {
   openSidePanel: (type: 'create' | 'edit' | 'view', entityType: SidePanel['entityType'], data?: any) => void;
   closeSidePanel: () => void;
   toggleSidebar: () => void;
+  refreshScenarios: () => Promise<Scenario[]>;
   
   // CRUD operations
   createTrack: (track: Omit<Track, 'id' | 'createdAt' | 'updatedAt' | 'totalEmissions'>) => void;

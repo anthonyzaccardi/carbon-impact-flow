@@ -13,6 +13,7 @@ import { useInitiativeCrud } from './hooks/useInitiativeCrud';
 import { useScenarioCrud } from './hooks/useScenarioCrud';
 import { useSupplierCrud } from './hooks/useSupplierCrud';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
+import { fetchScenarios } from '@/services/supabase/scenarioService';
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -35,7 +36,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   } = useEntityState();
 
   // Use Supabase data hook to fetch all data on app init
-  useSupabaseData(
+  const { loading } = useSupabaseData(
     setTracks,
     setFactors,
     setMeasurements,
@@ -72,6 +73,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const scenarioCrud = useScenarioCrud(scenarios, setScenarios, targets, setTargets);
   const supplierCrud = useSupplierCrud(suppliers, setSuppliers);
 
+  // Add refreshScenarios function
+  const refreshScenarios = async () => {
+    try {
+      console.log("Refreshing scenarios...");
+      const fetchedScenarios = await fetchScenarios();
+      console.log("Fetched scenarios:", fetchedScenarios);
+      setScenarios(fetchedScenarios);
+      return fetchedScenarios;
+    } catch (error) {
+      console.error("Error refreshing scenarios:", error);
+      throw error;
+    }
+  };
+
   const value: AppContextType = {
     tracks,
     factors,
@@ -82,6 +97,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     suppliers,
     sidePanel,
     sidebarExpanded,
+    loading,
     setTracks,
     setFactors,
     setMeasurements,
@@ -92,6 +108,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     openSidePanel,
     closeSidePanel,
     toggleSidebar,
+    refreshScenarios,
     ...trackCrud,
     ...factorCrud,
     ...measurementCrud,

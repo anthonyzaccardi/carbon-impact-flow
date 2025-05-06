@@ -4,10 +4,11 @@ import { useAppContext } from '@/contexts/useAppContext';
 import { Target, Scenario } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { SortableTable } from '@/components/ui/sortable-table';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ScenarioTargetAttachmentManagerProps {
   targetId: string;
@@ -18,16 +19,39 @@ export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentM
   targetId,
   onClose,
 }) => {
-  const { scenarios, targets, updateTarget } = useAppContext();
+  const { scenarios, targets, updateTarget, refreshScenarios } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const target = targets.find(t => t.id === targetId);
   
+  // Load scenarios when the component mounts
+  useEffect(() => {
+    const loadScenarios = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        await refreshScenarios();
+        console.log("Loaded scenarios:", scenarios);
+      } catch (err) {
+        console.error("Error loading scenarios:", err);
+        setError("Failed to load scenarios. Please try again.");
+        toast.error("Failed to load scenarios");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadScenarios();
+  }, [refreshScenarios]);
+
   // Initialize the selected scenario if the target is already attached to one
   useEffect(() => {
     if (target?.scenarioId) {
       setSelectedScenarioId(target.scenarioId);
+      console.log("Target is attached to scenario:", target.scenarioId);
     }
   }, [target]);
 
@@ -40,10 +64,19 @@ export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentM
     setSelectedScenarioId(scenarioId === selectedScenarioId ? null : scenarioId);
   };
 
-  const handleSave = () => {
-    if (target) {
-      updateTarget(targetId, { ...target, scenarioId: selectedScenarioId || undefined });
+  const handleSave = async () => {
+    if (!target) return;
+    
+    setIsLoading(true);
+    try {
+      await updateTarget(targetId, { ...target, scenarioId: selectedScenarioId || undefined });
+      toast.success("Target association updated successfully");
       onClose();
+    } catch (err) {
+      console.error("Error updating target:", err);
+      toast.error("Failed to update target association");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,7 +126,19 @@ export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentM
         />
       </div>
 
-      {filteredScenarios.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2">Loading scenarios...</span>
+        </div>
+      ) : error ? (
+        <div className="text-center py-8 text-red-500">
+          {error}
+          <Button variant="outline" className="mt-2 mx-auto block" onClick={() => refreshScenarios()}>
+            Retry
+          </Button>
+        </div>
+      ) : filteredScenarios.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           {searchQuery ? "No scenarios match your search" : "No scenarios available"}
         </div>
@@ -108,10 +153,11 @@ export const ScenarioTargetAttachmentManager: React.FC<ScenarioTargetAttachmentM
       )}
       
       <div className="flex justify-end gap-2 pt-4 border-t">
-        <Button variant="outline" onClick={onClose}>
+        <Button variant="outline" onClick={onClose} disabled={isLoading}>
           Cancel
         </Button>
-        <Button onClick={handleSave}>
+        <Button onClick={handleSave} disabled={isLoading}>
+          {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
           Save
         </Button>
       </div>
