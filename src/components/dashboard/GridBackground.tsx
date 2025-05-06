@@ -2,6 +2,7 @@
 import React from 'react';
 
 const GridBackground: React.FC = () => {
+  // Create 12 columns x 12 rows grid cells
   const cells = Array(12 * 12).fill(0);
   
   return (

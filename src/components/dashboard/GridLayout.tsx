@@ -181,4 +181,3 @@ const GridContainer: React.FC<GridContainerProps> = ({ children, pageName }) => 
 };
 
 export { GridContainer };
-export type { WidgetConfig };
