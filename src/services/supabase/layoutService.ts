@@ -23,12 +23,7 @@ export async function fetchLayout(pageName: string): Promise<Layout[]> {
       return [];
     }
 
-    if (!data || !Array.isArray(data.layout)) {
-      console.log("No valid layout data found, returning empty array");
-      return [];
-    }
-
-    return data.layout;
+    return data?.layout || [];
   } catch (error) {
     console.error("Failed to fetch layout:", error);
     return [];
