@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Table } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { SortableTableProps } from './types';
@@ -42,27 +42,28 @@ export function SortableTable<T>({
     isResizing,
     resizingColumnIndex,
     handleResizeStart: baseResizeStart,
-    handleResizeMove: baseResizeMove,
-    handleResizeEnd
+    handleResizeEnd,
+    setColumnWidths: setResizeColumnWidths
   } = useColumnResize();
+
+  // Update the resize hook's column widths when our local state changes
+  useEffect(() => {
+    setResizeColumnWidths(columnWidths);
+  }, [columnWidths, setResizeColumnWidths]);
 
   // Hook wrapper functions with dependencies injected
   const handleResizeStart = useCallback((e: React.MouseEvent, index: number) => {
     baseResizeStart(e, index, columnWidths);
-  }, [columnWidths]);
-
-  const handleResizeMove = useCallback((e: MouseEvent) => {
-    baseResizeMove(e, columnWidths, setColumnWidths);
-  }, [columnWidths, setColumnWidths]);
+  }, [baseResizeStart, columnWidths]);
 
   const handleDropWrapper = useCallback((e: React.DragEvent) => {
     baseDrop(e, columns, setColumns, columnWidths, setColumnWidths);
-  }, [columns, columnWidths]);
+  }, [baseDrop, columns, columnWidths]);
 
   // Use useCallback to create stable function references
   const handleTableSort = useCallback((column: keyof T | undefined, index: number) => {
     handleSort(column, index, columns);
-  }, [columns]);
+  }, [handleSort, columns]);
 
   return (
     <div className="rounded-md border relative" ref={tableRef}>
