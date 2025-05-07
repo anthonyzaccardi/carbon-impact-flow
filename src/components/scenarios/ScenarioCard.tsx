@@ -37,7 +37,7 @@ export const ScenarioCard = ({ scenario, trackGroups, stats, onClick }: Scenario
       <CardContent>
         <div className="space-y-4">
           <div className="space-y-2">
-            <div className="text-sm font-medium">Targets:</div>
+            <div className="text-sm font-medium">Tracks:</div>
             {trackGroups.length > 0 ? (
               <ul className="space-y-2">
                 {trackGroups.map(({ track, totalReduction }) => track && (
