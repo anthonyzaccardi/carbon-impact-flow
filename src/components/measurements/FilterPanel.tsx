@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { FilterX, Search } from "lucide-react";
+import { FilterX, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -13,6 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from "@/components/ui/collapsible";
 import { Measurement, Track, Factor, Supplier } from "@/types";
 
 interface FilterPanelProps {
@@ -34,6 +39,7 @@ const FilterPanel = ({
   const [trackFilter, setTrackFilter] = useState("all");
   const [factorFilter, setFactorFilter] = useState("all");
   const [supplierFilter, setSupplierFilter] = useState("all");
+  const [isOpen, setIsOpen] = useState(true);
   
   // Quantity range filter
   const [quantityRange, setQuantityRange] = useState<[number, number]>([0, 0]);
@@ -120,25 +126,76 @@ const FilterPanel = ({
     onFilterChange
   ]);
 
+  // Generate filter summary text
+  const getFilterSummary = () => {
+    const parts = [];
+    
+    if (trackFilter !== "all") {
+      const track = tracks.find(t => t.id === trackFilter);
+      parts.push(`Track: ${track ? track.name : trackFilter}`);
+    }
+    
+    if (factorFilter !== "all") {
+      const factor = factors.find(f => f.id === factorFilter);
+      parts.push(`Factor: ${factor ? factor.name : factorFilter}`);
+    }
+    
+    if (supplierFilter !== "all") {
+      if (supplierFilter === "none") {
+        parts.push("Supplier: None");
+      } else {
+        const supplier = suppliers.find(s => s.id === supplierFilter);
+        parts.push(`Supplier: ${supplier ? supplier.name : supplierFilter}`);
+      }
+    }
+    
+    if (activeQuantityRange[0] > quantityRange[0] || activeQuantityRange[1] < quantityRange[1]) {
+      parts.push(`Quantity: ${activeQuantityRange[0]}–${activeQuantityRange[1]}`);
+    }
+    
+    if (activeCalculatedValueRange[0] > calculatedValueRange[0] || activeCalculatedValueRange[1] < calculatedValueRange[1]) {
+      parts.push(`Value: ${activeCalculatedValueRange[0]}–${activeCalculatedValueRange[1]} tCO₂e`);
+    }
+    
+    return parts.length > 0 ? parts.join(" · ") : "No filters applied";
+  };
+
   return (
     <Card className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">Filters</h3>
-        {isFilterActive && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={resetFilters}
-            className="flex items-center"
-          >
-            <FilterX className="mr-1 h-4 w-4" />
-            Reset filters
-          </Button>
-        )}
-      </div>
-      
-      <div className="space-y-4">
-        <div className="relative">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Filters</h3>
+          <div className="flex items-center space-x-2">
+            {isFilterActive && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={resetFilters}
+                className="flex items-center"
+              >
+                <FilterX className="mr-1 h-4 w-4" />
+                Reset filters
+              </Button>
+            )}
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                {isOpen ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Hide filters
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Show filters
+                  </>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+        </div>
+        
+        <div className="relative mb-4">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search measurements..."
@@ -148,163 +205,175 @@ const FilterPanel = ({
           />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label className="text-sm font-medium mb-1 block">Track</label>
-            <Select
-              value={trackFilter}
-              onValueChange={setTrackFilter}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by track" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Tracks</SelectItem>
-                {tracks.map((track) => (
-                  <SelectItem key={track.id} value={track.id}>
-                    {track.emoji} {track.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {!isOpen && isFilterActive && (
+          <div className="py-2 mb-2 flex flex-wrap gap-2">
+            <div className="text-sm text-muted-foreground">
+              {getFilterSummary()}
+            </div>
           </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-1 block">Factor</label>
-            <Select
-              value={factorFilter}
-              onValueChange={setFactorFilter}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by factor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Factors</SelectItem>
-                {factors.map((factor) => (
-                  <SelectItem key={factor.id} value={factor.id}>
-                    {factor.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-1 block">Supplier</label>
-            <Select
-              value={supplierFilter}
-              onValueChange={setSupplierFilter}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by supplier" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Suppliers</SelectItem>
-                <SelectItem value="none">No Supplier</SelectItem>
-                {suppliers.map((supplier) => (
-                  <SelectItem key={supplier.id} value={supplier.id}>
-                    {supplier.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        )}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">Quantity</label>
-              <div className="text-xs text-muted-foreground">
-                {activeQuantityRange[0]} - {activeQuantityRange[1]}
+        <CollapsibleContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Track</label>
+                <Select
+                  value={trackFilter}
+                  onValueChange={setTrackFilter}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by track" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tracks</SelectItem>
+                    {tracks.map((track) => (
+                      <SelectItem key={track.id} value={track.id}>
+                        {track.emoji} {track.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-1 block">Factor</label>
+                <Select
+                  value={factorFilter}
+                  onValueChange={setFactorFilter}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by factor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Factors</SelectItem>
+                    {factors.map((factor) => (
+                      <SelectItem key={factor.id} value={factor.id}>
+                        {factor.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-1 block">Supplier</label>
+                <Select
+                  value={supplierFilter}
+                  onValueChange={setSupplierFilter}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by supplier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Suppliers</SelectItem>
+                    <SelectItem value="none">No Supplier</SelectItem>
+                    {suppliers.map((supplier) => (
+                      <SelectItem key={supplier.id} value={supplier.id}>
+                        {supplier.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <Slider 
-              min={quantityRange[0]} 
-              max={quantityRange[1]} 
-              step={1}
-              value={[activeQuantityRange[0], activeQuantityRange[1]]}
-              onValueChange={(value) => setActiveQuantityRange([value[0], value[1]])}
-              className="py-4"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium">Calculated value (tCO₂e)</label>
-              <div className="text-xs text-muted-foreground">
-                {activeCalculatedValueRange[0]} - {activeCalculatedValueRange[1]}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">Quantity</label>
+                  <div className="text-xs text-muted-foreground">
+                    {activeQuantityRange[0]} - {activeQuantityRange[1]}
+                  </div>
+                </div>
+                <Slider 
+                  min={quantityRange[0]} 
+                  max={quantityRange[1]} 
+                  step={1}
+                  value={[activeQuantityRange[0], activeQuantityRange[1]]}
+                  onValueChange={(value) => setActiveQuantityRange([value[0], value[1]])}
+                  className="py-4"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">Calculated value (tCO₂e)</label>
+                  <div className="text-xs text-muted-foreground">
+                    {activeCalculatedValueRange[0]} - {activeCalculatedValueRange[1]}
+                  </div>
+                </div>
+                <Slider 
+                  min={calculatedValueRange[0]} 
+                  max={calculatedValueRange[1]} 
+                  step={1}
+                  value={[activeCalculatedValueRange[0], activeCalculatedValueRange[1]]}
+                  onValueChange={(value) => setActiveCalculatedValueRange([value[0], value[1]])}
+                  className="py-4"
+                />
               </div>
             </div>
-            <Slider 
-              min={calculatedValueRange[0]} 
-              max={calculatedValueRange[1]} 
-              step={1}
-              value={[activeCalculatedValueRange[0], activeCalculatedValueRange[1]]}
-              onValueChange={(value) => setActiveCalculatedValueRange([value[0], value[1]])}
-              className="py-4"
-            />
+            
+            <div className="flex flex-wrap gap-2">
+              {trackFilter !== "all" && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Track: {tracks.find(t => t.id === trackFilter)?.name || trackFilter}
+                  <button 
+                    className="ml-1 hover:text-destructive" 
+                    onClick={() => setTrackFilter("all")}
+                  >
+                    ✕
+                  </button>
+                </Badge>
+              )}
+              {factorFilter !== "all" && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Factor: {factors.find(f => f.id === factorFilter)?.name || factorFilter}
+                  <button 
+                    className="ml-1 hover:text-destructive" 
+                    onClick={() => setFactorFilter("all")}
+                  >
+                    ✕
+                  </button>
+                </Badge>
+              )}
+              {supplierFilter !== "all" && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Supplier: {supplierFilter === "none" ? "None" : (suppliers.find(s => s.id === supplierFilter)?.name || supplierFilter)}
+                  <button 
+                    className="ml-1 hover:text-destructive" 
+                    onClick={() => setSupplierFilter("all")}
+                  >
+                    ✕
+                  </button>
+                </Badge>
+              )}
+              {(activeQuantityRange[0] > quantityRange[0] || activeQuantityRange[1] < quantityRange[1]) && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Quantity: {activeQuantityRange[0]}-{activeQuantityRange[1]}
+                  <button 
+                    className="ml-1 hover:text-destructive" 
+                    onClick={() => setActiveQuantityRange([quantityRange[0], quantityRange[1]])}
+                  >
+                    ✕
+                  </button>
+                </Badge>
+              )}
+              {(activeCalculatedValueRange[0] > calculatedValueRange[0] || activeCalculatedValueRange[1] < calculatedValueRange[1]) && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  Value: {activeCalculatedValueRange[0]}-{activeCalculatedValueRange[1]} tCO₂e
+                  <button 
+                    className="ml-1 hover:text-destructive" 
+                    onClick={() => setActiveCalculatedValueRange([calculatedValueRange[0], calculatedValueRange[1]])}
+                  >
+                    ✕
+                  </button>
+                </Badge>
+              )}
+            </div>
           </div>
-        </div>
-        
-        <div className="flex flex-wrap gap-2">
-          {trackFilter !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              Track: {tracks.find(t => t.id === trackFilter)?.name || trackFilter}
-              <button 
-                className="ml-1 hover:text-destructive" 
-                onClick={() => setTrackFilter("all")}
-              >
-                ✕
-              </button>
-            </Badge>
-          )}
-          {factorFilter !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              Factor: {factors.find(f => f.id === factorFilter)?.name || factorFilter}
-              <button 
-                className="ml-1 hover:text-destructive" 
-                onClick={() => setFactorFilter("all")}
-              >
-                ✕
-              </button>
-            </Badge>
-          )}
-          {supplierFilter !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              Supplier: {supplierFilter === "none" ? "None" : (suppliers.find(s => s.id === supplierFilter)?.name || supplierFilter)}
-              <button 
-                className="ml-1 hover:text-destructive" 
-                onClick={() => setSupplierFilter("all")}
-              >
-                ✕
-              </button>
-            </Badge>
-          )}
-          {(activeQuantityRange[0] > quantityRange[0] || activeQuantityRange[1] < quantityRange[1]) && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              Quantity: {activeQuantityRange[0]}-{activeQuantityRange[1]}
-              <button 
-                className="ml-1 hover:text-destructive" 
-                onClick={() => setActiveQuantityRange([quantityRange[0], quantityRange[1]])}
-              >
-                ✕
-              </button>
-            </Badge>
-          )}
-          {(activeCalculatedValueRange[0] > calculatedValueRange[0] || activeCalculatedValueRange[1] < calculatedValueRange[1]) && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              Value: {activeCalculatedValueRange[0]}-{activeCalculatedValueRange[1]} tCO₂e
-              <button 
-                className="ml-1 hover:text-destructive" 
-                onClick={() => setActiveCalculatedValueRange([calculatedValueRange[0], calculatedValueRange[1]])}
-              >
-                ✕
-              </button>
-            </Badge>
-          )}
-        </div>
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };
