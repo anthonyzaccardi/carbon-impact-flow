@@ -17,6 +17,7 @@ import ScenariosPage from "./pages/ScenariosPage";
 import ScenarioDetailPage from "./pages/ScenarioDetailPage";
 import TargetDetailPage from "./pages/TargetDetailPage";
 import SuppliersPage from "./pages/SuppliersPage";
+import AskSweepyPage from "./pages/AskSweepyPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -107,6 +108,14 @@ const App = () => (
                 element={
                   <MainLayout>
                     <SuppliersPage />
+                  </MainLayout>
+                } 
+              />
+              <Route 
+                path="/ask-sweepy" 
+                element={
+                  <MainLayout>
+                    <AskSweepyPage />
                   </MainLayout>
                 } 
               />
