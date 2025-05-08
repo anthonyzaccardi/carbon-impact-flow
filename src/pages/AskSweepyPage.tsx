@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -185,7 +184,7 @@ const AskSweepyPage = () => {
     const config = {
       bar: { color: '#0088FE' },
       line: { color: '#00C49F' },
-      pie: { colors: CHART_COLORS },
+      pie: { color: '#FFBB28' }, // Changed from colors array to single color
     };
     
     switch (chartType) {
@@ -246,11 +245,11 @@ const AskSweepyPage = () => {
                 cx="50%"
                 cy="50%"
                 outerRadius={80}
-                fill="#8884d8"
+                fill={config.pie.color} // Use the single color as default fill
                 label={(entry) => entry.name}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={config.pie.colors[index % config.pie.colors.length]} />
+                  <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                 ))}
               </Pie>
               <ChartTooltip content={<ChartTooltipContent />} />
