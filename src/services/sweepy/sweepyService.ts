@@ -252,8 +252,10 @@ export const processProgressQuery = (
         return date.getFullYear() === currentYear && date.getMonth() === i;
       });
       
+      // Fixed the bug: converting progressPercent string to number before multiplication
+      const progressValue = parseFloat(progressPercent);
       const value = monthMeasurements.length > 0 ? 
-        progressPercent * (i / currentMonth) : // Simplistic estimation
+        progressValue * (i / currentMonth) : // Fixed: Now using a number for the calculation
         null;
       
       monthlyData.push({
