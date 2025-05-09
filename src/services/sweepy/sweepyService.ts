@@ -8,7 +8,7 @@ import { processSuppliersQuery } from './processors/suppliersProcessor';
 import { processProgressQuery } from './processors/progressProcessor';
 
 // Re-export types and utility functions for convenience
-export { QueryType, SweepyResponse } from './types';
+export type { QueryType, SweepyResponse } from './types';
 export { identifyQueryType, extractTimePeriod, extractQuantity } from './utils/queryParser';
 export { processEmissionsQuery } from './processors/emissionsProcessor';
 export { processTargetsQuery } from './processors/targetsProcessor';
